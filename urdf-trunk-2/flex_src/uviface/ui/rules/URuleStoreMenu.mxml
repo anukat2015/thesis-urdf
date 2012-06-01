@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:rules="uviface.ui.rules.*" 
+	layout="absolute" 
+	width="770" 
+	height="317" 
+    textAlign="center" 
+    borderStyle="solid"
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    headerHeight="0"
+    highlightAlphas="[0,0]"
+    headerColors="[#5F5751,white]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="2"
+    backgroundColor="#767675" 
+    backgroundAlpha="1.0" 
+	alpha="1.0" 
+	fontFamily="Arial" 
+	borderColor="#7B7979" 
+    showEffect="{wipeToTopOut}" 
+    hideEffect="{wipeToBottomIn}" 
+    color="#040200" 
+    creationComplete="onCreationComplete();"
+    fontSize="15"  horizontalAlign="center" 
+    verticalAlign="middle" horizontalScrollPolicy="off">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import urdf.api.URuleStore;
+			import uviface.viz.UFlareVis;
+			import uviface.event.ULineageLeaveEvent;
+			 import uviface.event.UQueryEvent;
+			import uviface.event.UPanelVisibilityEvent;
+		
+			import mx.effects.easing.*;
+			
+			[Bindable]
+			private var _showY:int = 0;
+			[Bindable]
+			private var _hideY:int = 0;
+			
+			// a flag to indicate that the panel is currently opening or closing   
+		    //[Bindable]
+		    //private var _isBusy:Boolean = false;
+			
+			/**
+			 * Selects the hard rule sub-panel after the creation of the main rule panel
+			 * is completed.
+			 * 
+			 * */
+			private function onCreationComplete():void {
+			    // first, select the hard rules
+			    selectRuleType(true);	
+			}
+				
+			public function updateDefaultRules(rules:URuleStore):void {
+				SoftRulesPanel.softRules = rules.getSoftRules();
+				HardRulesPanel.hardRules = rules.getHardRules();
+			}
+			
+			public function updateDefaultSoftRules(rules:URuleStore):void {
+				SoftRulesPanel.softRules = rules.getSoftRules();
+			}
+			
+			public function updateDefaultHardRules(rules:URuleStore):void {
+				HardRulesPanel.hardRules = rules.getHardRules();
+			}
+			
+			public function setSlideValues(showY:int, hideY:int):void {
+				_showY = showY - this.height;
+				_hideY = hideY - this.height;
+			}
+			
+			public function requestSoftRules():Array {
+				//trace("Soft rules requested : " + SoftRulesPanel.softRules.toString());
+				return SoftRulesPanel.softRules;
+			}
+			
+			public function requestHardRules():Array {
+				//trace("Hard rules requested : " + HardRulesPanel.hardRules.toString());
+				return HardRulesPanel.hardRules;
+			}
+			
+			public function areSoftRulesChanged():Boolean {
+				return SoftRulesPanel.softRulesChanged;
+			}
+			
+			public function areHardRulesChanged():Boolean {
+				return HardRulesPanel.hardRulesChanged;
+			}
+			
+			public function hide():Boolean {
+				if(wipeToBottomIn.isPlaying || wipeToTopOut.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function show():Boolean {
+				if(wipeToBottomIn.isPlaying || wipeToTopOut.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function hideButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function showButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function handleVisibilityButtonClick():void {
+				if(this.visible)
+				   this.visible = false;
+				else
+				   this.visible = true;
+			}
+			
+			private function resetRuleType():void {
+				
+				if(MenuViewStack.selectedIndex == 1)//SoftRulesPanel.visible)
+				   SoftRulesPanel.resetSoftRules();
+				else
+				   HardRulesPanel.resetHardRules();
+			}
+			
+			private function updateRules():void {
+				
+				// we first have to leave the lineage mode before changing the graph
+			    if(UFlareVis.lineageMode) 
+				      this.dispatchEvent(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));
+				
+				//if(MenuViewStack.selectedIndex == 1)//SoftRulesPanel.visible) 
+				SoftRulesPanel.buildSoftRuleList();
+				//else
+				HardRulesPanel.buildHardRuleList();
+				
+				this.dispatchEvent(new UQueryEvent(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY,null,true));
+			}
+			
+			private function selectRuleType(selectSoftRules:Boolean):void {
+				if(selectSoftRules) {
+					MenuViewStack.selectedChild = SoftRulesPanel;
+					//SoftRulesPanel.show();
+					//HardRulesPanel.hide();
+					SoftRulesSelectButton.emphasized = true;
+					SoftRulesSelectButton.setStyle("fillColors",["#00FFC6"]);
+					HardRulesSelectButton.emphasized = false;
+					HardRulesSelectButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);
+				}
+				else {
+					//HardRulesPanel.show();
+					//SoftRulesPanel.hide();
+					MenuViewStack.selectedChild = HardRulesPanel;
+					SoftRulesSelectButton.emphasized = false;
+					SoftRulesSelectButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);
+					HardRulesSelectButton.emphasized = true;
+					HardRulesSelectButton.setStyle("fillColors",["#00FFC6"]);
+				}	  
+			}
+			
+			/*
+			private function panelClosed():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_CLOSED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    
+		    private function panelOpened():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_OPENED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    */	
+			
+			/*
+			 <mx:ControlBar id="ButtonControlBar" label="MenuBar" cornerRadius="20" horizontalAlign="center" verticalCenter="161"
+		 paddingBottom="1" paddingLeft="1" paddingRight="1" paddingTop="1" height="27">
+		
+		<mx:Spacer width="452" height="2"/>
+		
+		<mx:Button 
+			id="CloseButton" 
+	        height="17" width="35" fontSize="10" paddingBottom="2" paddingTop="0" paddingLeft="0" paddingRight="0"
+		    click="hide();" color="#FEFCFC" borderColor="#B7BABC" fillAlphas="[1.0, 1.0]" fillColors="[#BC1C1C, #000000]"
+		    upSkin="@Embed('/assets/button/BlueLeftArrowButton.png')">
+		</mx:Button>
+		
+	</mx:ControlBar> 
+	
+	<mx:LinkBar 
+			id="MenuToggleButtonBar" 
+			direction="horizontal" 
+			dataProvider="{MenuViewStack}" 
+			backgroundColor="#5F5751" 
+            backgroundAlpha="1.0" 
+	        alpha="1.0" 
+	        horizontalGap="10" 
+	        themeColor="#00FF90" 
+	        fontSize="12" 
+	        fontWeight="bold"
+	        disabledColor="#5f5751"  color="#FFFEFE" barColor="#5F5751" borderStyle="solid" cornerRadius="20" borderThickness="2"/>
+			 
+			 */
+			
+		]]>
+	</mx:Script>
+		
+		 <mx:ApplicationControlBar id="ControlHBox" width="100%" height="40" horizontalAlign="center" 
+		 	 verticalAlign="middle" fontSize="10" dock="true" top="0" paddingTop="0" paddingBottom="0">
+		    	
+		    	<mx:HBox 
+		    		id="RulePanelChooserHBox" 
+		    		cornerRadius="10" 
+		    		borderStyle="solid" 
+		    		backgroundColor="#767675" 
+		    		height="35" 
+		    		verticalAlign="middle" 
+		    		horizontalAlign="center" 
+		    		width="210" 
+		    		horizontalGap="4" borderColor="#D1CECE" borderThickness="0" dropShadowEnabled="true">
+		    	    <mx:Button 
+			    	   	id="SoftRulesSelectButton" 
+			    	   	label="SOFT RULES" 
+			    	   	click="selectRuleType(true);" 
+			    	   	fontWeight="bold" 
+			    	   	fontSize="12" 
+			    	   	cornerRadius="10" 
+			    	   	fillAlphas="[1.0, 1.0]" 
+			    	   	fillColors="[#C5C6C6, #C5C6C6, #38FE03, #38FE03]" 
+			    	   	borderColor="#FCFDFD" 
+			    	   	color="#040404" 
+			    	   	alpha="1.0" 
+			    	   	themeColor="#00FFC6"
+			    	   	toolTip="Select the soft rules."/>
+		    	    <mx:Button 
+			    	   	id="HardRulesSelectButton" 
+			    	   	label="HARD RULES" 
+			    	   	click="selectRuleType(false);" 
+			    	   	fontWeight="bold" 
+			    	   	fontSize="12" 
+			    	   	cornerRadius="10" 
+			    	   	fillAlphas="[1.0, 1.0]" 
+			    	   	fillColors="[#C5C6C6, #C5C6C6, #38FE03, #38FE03]" 
+			    	   	borderColor="#FCFDFD" 
+			    	   	color="#000000" 
+			    	   	alpha="1.0" 
+			    	   	themeColor="#00FFC6"
+			    	   	toolTip="Select the hard rules."/>
+		    	</mx:HBox>
+		    	<mx:HBox 
+		    		id="ReloadAndUpdateButtonHBox" 
+		    		cornerRadius="10" 
+		    		borderStyle="solid" 
+		    		backgroundColor="#767675" 
+		    		height="35" 
+		    		verticalAlign="middle" 
+		    		horizontalAlign="center" 
+		    		width="245" 
+		    		horizontalGap="4" borderColor="#CCCCCC" borderThickness="0" dropShadowEnabled="true">
+		    	    <mx:Button 
+			    	   	id="RulesResetButton" 
+			    	   	label="RELOAD RULES" 
+			    	   	click="resetRuleType();" 
+			    	   	fontWeight="bold" 
+			    	   	fontSize="12" 
+			    	   	cornerRadius="10" 
+			    	   	fillAlphas="[1.0, 1.0]" 
+			    	   	fillColors="[#C5C6C6, #C5C6C6, #03FCF9, #03FCF9]" 
+			    	   	borderColor="#FCFDFD" 
+			    	   	color="#030303" 
+			    	   	alpha="1.0" 
+			    	   	themeColor="#00FFC6"
+			    	    toolTip="Reload the default soft and hard rules from the server."/>
+		    	    <mx:Button 
+			    	   	id="RulesUpdateButton" 
+			    	   	label="UPDATE GRAPH" 
+			    	   	click="updateRules();" 
+			    	   	fontWeight="bold" 
+			    	   	fontSize="12" 
+			    	   	cornerRadius="10" 
+			    	   	fillAlphas="[1.0, 1.0]" 
+			    	   	fillColors="[#C5C6C6, #C5C6C6, #03FCF9, #03FCF9]" 
+			    	   	borderColor="#FCFDFD" 
+			    	   	color="#020202" 
+			    	   	alpha="1.0" 
+			    	   	themeColor="#00FFC6"
+			    	    toolTip="Update the graph with the changed rule-set."/>
+		    	</mx:HBox>	
+		    	
+		    </mx:ApplicationControlBar>	
+		
+		<mx:ViewStack id="MenuViewStack" width="100%" height="265" y="41"
+			 backgroundColor="#3F3F3F">
+		
+		    <rules:UHardRulePanel label="Hard Rules" 
+		    	    id="HardRulesPanel" width="100%" height="265" fontSize="10"
+		    	    showEffect="DissolveIn" hideEffect="DissolveOut"/>
+		    <rules:USoftRulePanel label="Soft Rules" 
+		    	    id="SoftRulesPanel" width="100%" height="265" fontSize="10"
+		    	    showEffect="DissolveIn" hideEffect="DissolveOut"/>
+		
+		</mx:ViewStack>	
+	
+	<mx:WipeUp id="wipeToTopOut" duration="500"/>
+	<mx:WipeDown id="wipeToBottomIn" duration="500"/> 
+	<mx:Move id="panelOut" target="{this}" yTo="{_showY}" 
+		duration="2000" easingFunction="Bounce.easeOut"/>        
+    <mx:Move id="panelIn" target="{this}" yTo="{_hideY}"
+		duration="2000" easingFunction="Bounce.easeIn"/> 
+     
+     <mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="500"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="1000"/>
+
+</mx:Panel>

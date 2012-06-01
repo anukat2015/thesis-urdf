@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" width="330" height="20" 
+	borderStyle="solid" cornerRadius="5" backgroundColor="#3F3F3F" 
+	borderThickness="0" color="#FAFCFC" backgroundAlpha="0.0" 
+	dropShadowEnabled="false" creationComplete="init();">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import flash.display.StageDisplayState;
+            import mx.managers.SystemManager;
+            import mx.core.Application;
+            import uviface.viz.util.UColors;
+            import uviface.event.UCompareModeEvent;
+            
+            private var _glowFilter:GlowFilter = new GlowFilter(UColors.green(7),1,6.0,6.0,15);
+		    [Bindable]
+		    private var _glowFilterArray:Array = [_glowFilter];
+		    private var _compareModeActivated:Boolean = false;
+            
+            private function init():void {
+                /* Set up full screen handler. */
+                systemManager.stage.addEventListener(FullScreenEvent.FULL_SCREEN, fullScreenHandler);
+            }
+
+            private function fullScreenHandler(evt:FullScreenEvent):void {
+                if (evt.fullScreen) {
+                    // todo
+                } else {
+                    // todo
+                }
+            }
+
+            private function toggleFullScreen():void {
+                try {
+                    switch (systemManager.stage.displayState) {
+                        case StageDisplayState.FULL_SCREEN:
+                            /* If already in full screen mode, switch to normal mode. */
+                            systemManager.stage.displayState = StageDisplayState.NORMAL;
+                             FullScreenToggleButton.label="Full Screen";
+                            break;
+                        default:
+                            /* If not in full screen mode, switch to full screen mode. */
+                            systemManager.stage.displayState = StageDisplayState.FULL_SCREEN;
+                            FullScreenToggleButton.label="Normal Screen";
+                            break;
+                    }
+                } catch (err:SecurityError) {
+                    // ignore
+                    trace("Error is: " + err);
+                }
+            }
+            
+            private function toggleUVizHelp():void {
+            	if(mx.core.Application.application.UVizHelpPanel.visible == false) {
+            		//mx.core.Application.application.UVizHelpPanel.visible = true;
+            		mx.core.Application.application.showHelpPanel();
+            		HelpButton.filters = _glowFilterArray;
+            	}
+            	else {
+            		//mx.core.Application.application.UVizHelpPanel.visible = false;
+            		mx.core.Application.application.hideHelpPanel();
+            		HelpButton.filters = null;
+            	}
+            }
+            
+            private function toggleGraphOverview():void {
+            	if(mx.core.Application.application.GraphOverviewPanel.visible == false) {
+            		//mx.core.Application.application.UVizHelpPanel.visible = true;
+            		mx.core.Application.application.showGraphOverview();
+            		GraphOverviewToggleButton.filters = _glowFilterArray;
+            	}
+            	else {
+            		//mx.core.Application.application.UVizHelpPanel.visible = false;
+            		mx.core.Application.application.hideGraphOverview();
+            		GraphOverviewToggleButton.filters = null;
+            	}
+            }
+            
+            public function deselectHelpButton():void {
+            	HelpButton.filters = null;
+            }
+            
+            /** Sends an enter compare mode event to the UViz.mxml main class. */
+			private function activateCompareMode():void {
+				
+				// we have to make sure that no query was processed before, otherwise we get strange errors
+				if(!mx.core.Application.application.firstQueryProcessed())
+				   return;
+				
+				// check, if the compare mode is active currently
+				if(_compareModeActivated) {
+					_compareModeActivated = false;
+					CompareButton.emphasized = false;
+					//CompareButton.setStyle("fillAlphas",["1.0", "1.0", "1.0", "1.0"]); 
+					CompareButton.setStyle("fillColors",["#3F3F3F", "#028F8D", "#02FCE7", "#02FCE7"]);
+					CompareButton.dispatchEvent(new UCompareModeEvent(UCompareModeEvent.DEACTIVATE_COMPARE_MODE,true));
+					//return;
+				}
+				else {
+					_compareModeActivated = true;
+					CompareButton.emphasized = true;
+					//CompareButton.setStyle("fillAlphas",["1.0", "1.0", "1.0", "1.0"]); 
+					CompareButton.setStyle("fillColors",["#02FCE7", "#02FCE7", "#02FCE7", "#02FCE7"]);
+					CompareButton.dispatchEvent(new UCompareModeEvent(UCompareModeEvent.ACTIVATE_COMPARE_MODE,true));
+				}
+				
+			}
+            
+            /*
+            private function toggleGraphOverview():void {
+                
+                if(GraphOverviewToggleButton.label == "Show Graph Overview") 
+                	GraphOverviewToggleButton.label = "Hide Graph Overview";
+                else 
+                	GraphOverviewToggleButton.label = "Show Graph Overview";
+                	
+                mx.core.Application.application.GraphOverviewPanel.visible = !mx.core.Application.application.GraphOverviewPanel.visible;
+            }
+            */
+
+			
+		]]>
+	</mx:Script>
+	<mx:Button x="1" y="1" label="Full Screen" width="95" id="FullScreenToggleButton" 
+		alpha="1.0" fillAlphas="[1.0, 1.0, 0.89, 0.89]" fillColors="[#3F3F3F, #FF0000, #35FC00, #35FC00]" 
+		paddingLeft="0" paddingRight="0" click="toggleFullScreen();" fontSize="10" height="17" fontFamily="Arial"
+	    toolTip="Show UViz in full-screen or normal mode."/>
+	<mx:Button 
+		id="CompareButton" 
+		label="Comparison Mode" 
+		toolTip="Activate/Deactivate the Comparison Mode." 
+		fontSize="10" 
+		paddingBottom="0" 
+		paddingTop="0" 
+		paddingLeft="0" 
+		paddingRight="0"
+		click="activateCompareMode();" 
+		color="#FEFEFE"  
+		themeColor="#02FCE7"
+		cornerRadius="5" 
+		fillAlphas="[1.0, 1.0, 1.0, 1.0]" 
+		fillColors="[#3F3F3F, #028F8D, #02FCE7, #02FCE7]" 
+		borderColor="#B7BABC" labelPlacement="top"
+	    textAlign="center" y="1" x="98" fontFamily="Arial" height="17"/>
+	<mx:Button x="196" y="1" label="Graph Overview" width="90" id="GraphOverviewToggleButton" 
+		alpha="1.0" fillAlphas="[1.0, 1.0, 0.89, 0.89]" fillColors="[#3F3F3F, #028F8D, #35FC00, #35FC00]" 
+		paddingLeft="0" paddingRight="0" click="toggleGraphOverview();" fontSize="10" height="17" fontFamily="Arial"
+	    toolTip="Show/Hide the UViz graph overview panel. This panel lets you select the part of the currently visible graph you are interested in." 
+	    enabled="true"/>
+	<mx:Button x="289" y="1" label="Help" width="37" id="HelpButton" 
+		alpha="1.0" fillAlphas="[1.0, 1.0, 0.89, 0.89]" fillColors="[#3F3F3F, #028F8D, #35FC00, #35FC00]" 
+		paddingLeft="0" paddingRight="0" click="toggleUVizHelp();" fontSize="11" height="17" fontFamily="Arial"
+	    toolTip="Show/hide the UViz Help Menu Panel."/>
+    <!--
+    <mx:Button x="114" y="1" label="Show Graph Overview" width="110" id="GraphOverviewToggleButton" 
+		alpha="1.0" fillAlphas="[1.0, 1.0, 0.89, 0.89]" fillColors="[#3F3F3F, #FF0000, #35FC00, #35FC00]" 
+		paddingLeft="0" paddingRight="0" click="toggleGraphOverview();" fontSize="9" height="17" fontFamily="Arial"/>
+	-->
+</mx:Canvas>

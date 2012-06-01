@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="102" 
+	height="265" 
+	backgroundColor="#3F3F3F" 
+	borderStyle="solid" 
+	cornerRadius="10" 
+	borderThickness="0"
+	hideEffect="{HeightFoldAnimation}" 
+    showEffect="{HeightUnfoldAnimation}" backgroundAlpha="0.15" 
+    alpha="1.0" verticalScrollPolicy="off">
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			import uviface.event.UShowCompleteLineageTreeEvent;
+			import mx.events.ToolTipEvent;
+			import mx.events.ItemClickEvent;
+			 import uviface.viz.util.UStringConstants;
+			 import uviface.event.URadiusDistanceEvent;
+			 import uviface.viz.util.UColors;
+			 import uviface.viz.UFlareVis;
+			 import uviface.event.ULineageLeaveEvent;
+			
+			 private var _oldValue:int = 0;
+			 
+			 private var _glowFilter:GlowFilter = new GlowFilter(UColors.green(7),1,6.0,6.0,15);
+		     //private static var _filters:Array;
+		     private var _glowFilterArray:Array = [_glowFilter];
+			
+			 public function hide():void {
+				this.visible = false;
+				this.includeInLayout = false;
+			}
+			
+			public function show():void {
+				this.visible = true;
+			}
+			
+			private function centerVisualization():void {
+				ResetLinkButton.dispatchEvent(new Event(UStringConstants.CENTER_VISUALIZATION,true));
+			}
+			
+			 private function updateGraphDistance():void {
+				
+				if(UFlareVis.lineageMode)
+				   return;
+				
+				var radiusAndDistanceEvent:URadiusDistanceEvent = 
+				   new URadiusDistanceEvent(URadiusDistanceEvent.RADIUS_AND_DISTANCE_EVENT,URadiusDistanceEvent.INCREMENT_HOP_SIZE,HopSlider.value,200,true);
+				
+				radiusAndDistanceEvent.enforceBounds = false;
+				
+				HopSlider.dispatchEvent(radiusAndDistanceEvent);
+			}
+			
+			public function showLineageButtonGlow():void {
+				lineageLeaveButton.enabled = true;
+				//lineageLeaveButton.setStyle("fillColors",["#06ff00", "#06ff00", "#06ff00", "#06ff00"]);
+				lineageLeaveButton.setStyle("fillAlphas",["1.0", "1.0", "1.0", "1.0"]);
+				lineageLeaveButton.filters = _glowFilterArray;
+				ShowCompleteLineageTreeButton.enabled = true;
+			}
+			
+			public function hideLineageButtonGlow():void {
+				//lineageLeaveButton.setStyle("fillColors",["#3F3F3F", "#3F3F3F", "#06ff00", "#06ff00"]);
+				lineageLeaveButton.setStyle("fillAlphas",["0.0", "0.0", "0.0", "0.0"]);
+				lineageLeaveButton.filters = null;
+				lineageLeaveButton.enabled = false;
+				ShowCompleteLineageTreeButton.enabled = false;
+			}
+			
+			private function leaveLineageMode():void {
+		    	if(!UFlareVis.lineageMode)
+			      return;
+			    //lineageLeaveButton.setStyle("fillColors",["#3F3F3F", "#3F3F3F", "#06ff00", "#06ff00"]);
+				lineageLeaveButton.setStyle("fillAlphas",["0.0", "0.0", "0.0", "0.0"]);
+				lineageLeaveButton.filters = null;
+				lineageLeaveButton.enabled = false;
+				ShowCompleteLineageTreeButton.enabled = false;
+		    	this.dispatchEvent(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));
+			}
+			
+			private function showCompleteLineageTree():void {
+				if(!UFlareVis.lineageMode)
+			      return;
+			    ShowCompleteLineageTreeButton.dispatchEvent(
+			        new UShowCompleteLineageTreeEvent(UShowCompleteLineageTreeEvent.SHOW_COMPLETE_TREE,true));
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+
+		.buttons
+		{
+			font-family: "Arial";
+			font-color: white;
+			color: white;
+			fill-color: #3F3F3F;
+			font-size: 11px;
+			letter-spacing: 1px;
+			selected-color: #00ff12;
+			roll-over-color: #00ff12;
+            padding-left: 0;
+            padding-right: 0
+		}
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:WipeUp id="wipeToTopIn" duration="500"/>
+	<mx:WipeDown id="wipeToBottomOut" duration="500"/> 
+	<mx:Button 
+		x="3" 
+		y="192" 
+		id="ResetLinkButton" 
+		fontSize="12" 
+		enabled="true"
+		label="Center Graph" 
+		click="centerVisualization();"
+		paddingBottom="0" 
+		paddingLeft="0" 
+		paddingRight="0" 
+		paddingTop="0" 
+		fillAlphas="[0.0, 0.0, 0.0, 0.0]" 
+		fillColors="[#3F3F3F, #3F3F3F, #00C6FF, #00C6FF]" 
+		color="#FAFCFD" 
+		cornerRadius="10" 
+		borderColor="#FCFDFD"
+		toolTip="Center the graph"/>
+		
+	<mx:VSlider 
+		 id="HopSlider"
+		 minimum="-1"
+		 maximum="10"
+		 value="0" 
+		 tickInterval="1"
+		 liveDragging="true"
+		 showDataTip="true"
+		 showTrackHighlight="true"
+		 dataTipPlacement="top"
+		 allowTrackClick="true"
+		 dataTipPrecision="0"
+		 thumbCount="1"
+		 labels="[off,0,1,2,3,4,5,6,7,8,9,10]"
+		 snapInterval="1"
+		 toolTip="This slider determines the distance (path length from the focus nodes) over which the nodes and edges are visible, starting from the focus nodes."
+		 tickColor="white"
+		 trackColors="white"
+		 borderColor="#FEFEFE" 
+		 fillAlphas="[1.0, 1.0]" 
+		 fillColors="[#030000, #030000]" 
+		 labelStyleName="MySliderLabel" 
+		 change="updateGraphDistance();" 
+	     height="175" x="29" y="17"/>
+	
+	<mx:AnimateProperty
+        id="HeightFoldAnimation"
+        property="height"
+        fromValue="265"
+        toValue="0"
+        duration="1000" target="this"/>
+        
+     <mx:AnimateProperty
+        id="HeightUnfoldAnimation"
+        property="height" 
+        fromValue="0"
+        toValue="265"
+        duration="1000" target="this"/>
+     <mx:Button 
+     	x="3" 
+     	y="216" 
+     	id="lineageLeaveButton" 
+     	fontSize="12" 
+     	enabled="false"
+     	label="Exit Lineage" 
+     	click="leaveLineageMode();"
+     	paddingBottom="0" 
+     	paddingLeft="0" 
+     	paddingRight="0" 
+     	paddingTop="0" 
+     	fillAlphas="[0.0, 0.0, 0.0, 0.0]" 
+     	fillColors="[#3F3F3F, #3F3F3F, #06ff00, #06ff00]" 
+     	color="#FAFCFD" 
+     	cornerRadius="10" 
+     	borderColor="#FCFDFD"
+     	toolTip="Exit the Lineage/Explanation Mode." width="95"/>
+     <mx:Button 
+     	x="3" 
+     	y="240" 
+     	id="ShowCompleteLineageTreeButton" 
+     	fontSize="12" 
+     	enabled="false"
+     	label="Full Tree" 
+     	click="showCompleteLineageTree();"
+     	paddingBottom="0" 
+     	paddingLeft="0" 
+     	paddingRight="0" 
+     	paddingTop="0" 
+     	fillAlphas="[0.0, 0.0, 0.0, 0.0]" 
+     	fillColors="[#3F3F3F, #3F3F3F, #06ff00, #06ff00]" 
+     	color="#FAFCFD" 
+     	cornerRadius="10" 
+     	borderColor="#FCFDFD"
+     	toolTip="Force UViz to show the complete Lineage Tree." width="95"/>
+     <mx:Label x="3" y="2" text="Visible Distance" color="#FCFEFE" id="GraphDistanceLabel" fontWeight="bold"/>
+	
+</mx:Canvas>

@@ -1,0 +1,576 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="500" height="400" backgroundColor="#3F3F3F" 
+	borderStyle="solid" cornerRadius="10" horizontalAlign="center" 
+	verticalAlign="middle" roundedBottomCorners="true" title="UViz Help Menu Panel" 
+	color="#FDFEFE" controlBarStyleName="myHeader" titleStyleName="myHeader"
+    hideEffect="ZoomOut" showEffect="ZoomIn" fontFamily="Arial">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import uviface.event.UDeselectButtonEvent;
+			import mx.events.FlexEvent;
+			import mx.events.MenuEvent;
+			import mx.events.ItemClickEvent;
+			
+			[Bindable]
+			private var _welcomeString:String = "We hope you enjoy the system. For help regarding UViz, please use this help menu " + 
+					"for detailed explanations. By clicking on the button at the top-left corner, the main control bar of UViz will " + 
+					"appear/disappear. The query panel will appear by moving the mouse to the top of the UViz screen, the " + 
+					"options panel by moving the mouse to the left screen border and the statistics panel by moving the mouse to the right screen " + 
+					"border. Finally, the rule panel appears by moving the mouse to the bottom of the UViz screen." + 
+					"\n" + 
+					"Tip: To improve the performance of the graph engine, especially for the force layout, the shadows for the edges should be turned off.";
+			[Bindable]
+			private var _mainControlButtonString:String = "The main control button with the label 'UViz' is located at the top-left " + 
+					"corner of the screen and toggles the visibility of the main control bar.";
+			[Bindable]
+			private var _mainControlBarString:String = "The main control bar appears/disappears by clicking the main control button. " + 
+				"The main control bar lets you configure general UViz-related options by clicking on the 'General' " + 
+				"button in the options menu. " + 
+				"\n" + 
+				"In addition, it is possible to configure options for the processing and " + 
+				"representation of nodes and edges within UViz by clicking on the options menu buttons 'Nodes' " + 
+				"and 'Edges. " + 
+				"\n" + 
+				"By clicking on one of the aforementioned menu buttons, the appropriate sub-menu will occur at the bottom of the " + 
+				"control bar. Moreover, the control bar provides a button to enable/disable the 'Comparison Mode' (to compare different " + 
+				"results, explained in the distinct menu about the comparison mode) and the 'Glow Mode' (also separately explained). " + 
+				"\n" + 
+				"Additionally, statistics about the number of nodes and edges currently contained in the visualization (including " + 
+				"nodes and edges not visible), the memory currently consumed by Flash Player in the browser (not only this specific " + 
+				"UViz instance) and the current framerate of this Flash Player instance are shown.";
+			[Bindable]
+			private var _queryPanelString:String = "The query panel, which appears by moving the mouse to the top of the screen, " + 
+				"provides two basic input methods. The first one ist the direct input of " + 
+				"query literals(patterns) in the form of 'Subject,Predicate,Object' and an optional numerical value used " + 
+				"by certain predicates. " + 
+				"\n" + 
+				"To specify a literal variable, it is necessary to write a '?' in front of the variable " + 
+				"identifier, e.g., '?X' or '?personX'. The parsing algorithm will recognize if the same variable is specified " + 
+				"in different literals. A constant is either specified by selecting one of the predefined predicates from " + 
+				"the predicate list or by writing a string without leading '?'. Entities like 'Gerhard Weikum' or 'Kurt Mehlhorn' " + 
+				"have to be concatenated by an underscore '_', -> 'Gerhard_Weikum' and 'Kurt_Mehlhorn'. The literals can be cleared all at once " + 
+				"or by selecting the appropriate checkbox and clearing the selected literals (accomplished by clicking on one of the provided buttons " + 
+				"at the top-left corner of the direct literal input screen). " + 
+				"\n" + 
+				"The second input method is the writing of a query string after clicking on the button 'SPARQL Input' and switching to the query parsing. " + 
+				"The query string has to have the form '<subject,predicate,object,optval>.<subject,predicate,object,optval>. ...' " + 
+				"or 'predicate(subject,object,optval)+predicate(subject,object,optval)', whereby the distinct " + 
+				"literals are concatenated by a dot ('.') or a plus sign ('+'), respectively. No empty strings are allowed within the query string.";
+			[Bindable]
+			private var _statisticsPanelString:String = "The statistics panel, which is visible after moving the mouse to the right screen border, " + 
+					"shows the accumulated data statistics regarding all executed queries (excluding data loading), " + 
+					" the statistics averaged over all queries and the statistics for the latest executed query. ";
+			[Bindable]
+			private var _rulePanelString:String = "The rules used by the URDF reasoning engine can be edited via the UViz rule panel. This panel shows up by moving " + 
+					"the mouse to the bottom of the screen. " + 
+					"\n" + 
+					"Thereby, the panel is divided into a sub-panel for the soft rules and a sub-panel for the hard rules. " + 
+					"By clicking on a rule from one of the lists, a complete description of the rule will appear. There are two lists available for soft " + 
+					"and hard rules. " + 
+					"\n" + 
+					"The left list shows all currently available rules. It is possible to add, delete or select rules. By selecting one of the rules, " + 
+					"this rule will appear in the right list, which displays all currently selected rules. Only rules selected " + 
+					"and visible in this list will be used for the reasoning process. " + 
+					"\n" + 
+					"To update the lists of soft and hard rules internally used by UViz and URDF, it is necessary to click on the 'Update Graph' button. This will " + 
+					"automatically send the latest query again, this time with the updated rules lists. To reload the default set of rules from the server (which will " + 
+					"overwrite the lists of available rules), the 'Reload Rules' button has to be pushed. " + 
+					"\n" + 
+					"To change the distinct literals of a rule, the user has to click on a specific rule in the list of 'available' rules (clicking on a rule in the " + 
+					"list of selected rules will not have any effect). After clicking on a rule, every information available for this rule will appear in the third " + 
+					"big panel, which is located right from the list of selected rules. Regarding the hard rules, only the predicate to use can be changed. In case of the " + 
+					"soft rules, it is possible to change the weight of the rule and the head literal, which is implied by the body literals of this specific rule. " + 
+					"Body literals can be changed, added or deleted. But one body literal will always remain to prevent 'empty' soft rules.";
+			[Bindable]
+			private var _optionsPanelString:String = "The options panel is visible by moving the mouse to the left screen border. The options menu is divided into " + 
+					"three sub-menues. " + 
+					"\n" + 
+					"The 'Data Access' menu provides several options to select and filter-out distinct parts of the visualized graph. Every sub-panel " + 
+					"of the data access menu provides a help button which shows detailed explanations if the respective help button is clicked. " + 
+					"\n" + 
+					"- The 'Fact Details' panel offers several ways to order the received result facts of the graph. " + 
+					"The leave items of the shown item tree contain buttons that trigger distinct " + 
+					"actions to be performed by the graph engine. By clicking on the 'Fact' button, this fact will be shown in the graph. By clicking on the " + 
+					"'Subject' or 'Object' button, all facts containing the respective subject or object will be shown in the graph. Thereby, the engine does not " + 
+					"differentiate between subject or object, both will be treated as part of a fact. Clicking on the 'Predicate' button forces the graph engine to show only " + 
+					"the facts that contain this specific predicate. The buttons 'Truth Value' and 'Confidence' work in the same way, only this time for the truth value " + 
+					"and the confidence of facts. " + 
+					"\n" + 
+					"- The 'Data Filter' panel offers different filters to be applied to the graph (to the currently invisible items " + 
+					"as well) and is only available when the force layout is selected. " + 
+					"\n" + 
+					"- The panel 'Fact Lineage' shows only the facts that contain lineage/explanation information. " + 
+					"By clicking the buttons that appear after expanding a fact item of the shown item tree, the visualization will change into 'lineage/explanation mode'. " + 
+					"Now the lineage/explanation/derivation of the respective fact will be shown in form of a derivation tree. " + 
+					"\n" + 
+					"- The panel 'Result Selection/Lineage' provides several possibilities. First, the visible item tree shows " + 
+					"a history (chronologically arranged) of executed actions since the last executed regular query (no comparison mode or data loading, as these increase " + 
+					"the size of the visualized graph and do not clear the graph before executing a query). In addition, the panel always shows a dependency graph and the result set. " + 
+					"The dependency graph contains all facts that were produced by the URDF reasoner during reasoning and needed to infer the final answers that match the query patterns. " + 
+					"The query results represent all inferred answers for a specific query. It is possible to select all facts of a specific dependency graph or query result by " + 
+					"clicking on the respective button (labeled accordingly). " + 
+					"Moreover, the user can click on the appropriate button within the respective query result sub-tree to show the explanation tree for a certain " + 
+					"query pattern matching (answer). Finally, the explanation tree for the whole query result, including all answers that match the query patterns, is possible " + 
+					"by clicking the respective button (again, labeled accordingly). " + 
+					"- The last panel, named 'Result Comparison', offers the possibility to select two different result sets (no matter if it is a query result only containing " + 
+					"the result facts or a dependency graph for an executed query). These selected sets of facts can then be compared and the graph items (nodes and edges) " + 
+					"will be colored with special colors to indicate to which fact sets a specific fact/entity belongs. To use this panel, UViz has to be in " + 
+					"'Comparison Mode'. Please read the suitable help menu by clicking on the respective help button. " + 
+					"\n " + 
+					"The 'Graph Options' menu offers general configuration possibilities like selecting the radial layout or the force layout. It is also possible " + 
+					"to configure the shadow usage for the nodes and edges (separately). In addition, the 'Graph Overview' panel provides a smaller version of the " + 
+					"visualization itself. By clicking on the start button, UViz will draw a small version of the graph into the provided panel. Like the visualization itself, " + 
+					"this smaller graph only shows the currently visible nodes and edges, but it always shows the whole visible graph, no matter if parts of the graph are " + 
+					"located outside of the screen at the moment. The refresh rate for this graph drawing can be increased and decreased. Lower values will lead " + 
+					"to a smoother 'graph movie', but can drastically decrease the overall framerate of UViz, as this forces UViz to draw the graph twice and with a " + 
+					"high refresh rate. This small graph movie can be stopped by clicking on the start/stop button. Additionally, this panel offers a help button and a " + 
+					"small red selection circle. By clicking on the small graph and releasing the mouse button, this location of the big graph in the main visualization " + 
+					"will be pushed to the center of the screen. This way, it is possible to focus distinct parts of the graph, even the ones currently not within " + 
+					"the screen space. " + 
+					"\n" + 
+					"The last menu of the options panel deals with the layouts and lets the user configure the processing of the layouts provided by UViz.";
+			[Bindable]
+			private var _quickOptionsString:String = "The quick options panel is visible by clicking on the respective button in the UViz main interface. This button is located below " + 
+					"the main control button and is always visible. This quick options panel provides an easy way to select the visible graph distance, which specifies the visible path " + 
+					"length of the graph, starting at the focus nodes (the rectangular nodes without the rounded corners). Moreover, a button to center the graph is provided. " + 
+					"Pushing this button will redo all panning and zooming of the graph executed since the last centering of the graph. In addition, this panel also provides a " + 
+					"button to leave the lineage/explanation mode directly and change to the default mode again.";
+			[Bindable]
+			private var _dataloadingString:String = "Data loading (exploration) of nodes can be accomplished by double-clicking on a node. This will send an additional query to the server to " + 
+					"infer every information available for the entity the node represents.";
+			[Bindable]
+			private var _enterLineageModeString:String = "The lineage/explanation mode can be entered by clicking on an edge (edges represent predicates and whole facts). It is also possible " + 
+					"to enter lineage mode by using the respective panels of the 'Data Access' menu of the options panel (as explained before).";
+			[Bindable]
+			private var _leaveLineageModeString:String = "The lineage/exlanation mode can be left by double-clicking on a fact node of the lineage tree or by clicking on the respective button " + 
+					"of the quick options panel discussed in the menu item 'Quick Options Panel/Button'.";
+			[Bindable]
+			private var _changeGraphRootNodeString:String = "The graph root node (needed for the layouts in UViz) can be changed by clicking on a node or by using the different panels of the " + 
+					"'Data Access' menu. By selecting whole results or by applying data loading or any other action that selects nodes, the root node will change. Thereby, the new one will " + 
+					"be determined by the action directly or by choosing the node with the highest degree regarding the selected set of nodes and edges.";
+			[Bindable]
+			private var _showNodeEdgeTooltipString:String = "Node and edge tooltips appear by hovering over the respective node or edge.";
+			[Bindable]
+			private var _showConnectedString:String = "By hovering over an edge, the edge and the two connected nodes will be colored blue. By hovering over a node, this node and " + 
+					"all directly connected nodes and their edges will be colored blue. This can help to determine the connections between the different nodes and edges of teh graph.";
+			[Bindable]
+			private var _defaultModeString:String = "The default mode is represented by the entity-relationship graph of UViz. UViz always starts in this mode.";
+			[Bindable]
+			private var _explanationModeString:String = "The lineage/explanation mode of UViz is triggered by double-clicking on an edge or using the options menu, as discussed for the options panel. " + 
+					"\n" + 
+					"If UViz switches into lineage mode, the layout changes to a node-link tree. Thereby, nodes do represent facts now. Edges are directed and represent " + 
+					"how the facts were derived during the reaonsing process. A node labeled with 'OR' represents a disjunction of grounded soft rules (soft rules consisting only of " + 
+					"literals with bounded variables, also called facts). This disjunction indicates that a fact has different explanations. A node labeled with 'AND' " + 
+					"represents a conjunction of different facts that are part of a certain grounded soft rule. This conjunction of facts implies the fact whose fact node is " + 
+					"located one level higher in the tree and is the direct father node (not counting possible 'OR' nodes inbetween). A node labeled with 'Base Fact' states " + 
+					"that the respective fact is a base fact directly available in the database. By clicking on nodes, their sub-trees are collapsed/expanded (in case " + 
+					"a sub-tree exists). To enter lineage mode, 'glow mode' must be disabled.";
+			[Bindable]
+			private var _comparisonModeString:String = "UViz provides a third mode, the 'comparison mode'. By clicking on the respective button in the main control bar, " + 
+					"UViz switches into this mode. Now, every data loading (double-clicking on a node) or sending of regular queries leads to a growing graph. " + 
+					"This means, every received data is now added to the graph if not already existent in the graph. " + 
+					"This mode is useful for finding out connections between queries and the changes induced by altering the used rules. " + 
+					"\n" + 
+					"Nodes only existent in the graph before execution of the current query or before data loading are colored black. If these nodes " + 
+					"also occur in the result data of the latest data loading or regular query, these nodes are colored yellow. In contrast to " + 
+					"the black for the first case, which means 'old', the yellow means 'shared'. If nodes only occur in the result graph for the latest ecexuted " + 
+					"data loading or regular query, these nodes are colored white, which means 'fresh'. In general, the comparison mode only colors the borders of the nodes. " + 
+					"To also see the special indication colors for the edges(whole facts), the user has to additionally activate the 'glow mode' (only available if compariosn mode " + 
+					"is already active). Now, UViz draws a glow color around the nodes and edges. Glow mode can increase the consumed memory and decrease the frame rate " + 
+					"if applied to a huge graph. " + 
+					"\n" + 
+					"The comparison mode can only be activated after executing the first query. Nearly all options are available in comparison and glow mode, though. " + 
+					"If glow mode is activated, it is not possible to enter the lineage mode.";
+			
+			/*
+			private var _menuItemUI:Object;
+			private var _menuItemControl:Object;
+			private var _menuItemFeatures:Object;
+			[Bindable]
+			private var _helpMenu:Array;
+			*/
+			//private var _menuItemUI:Object;
+			//private var _menuItemUI:Object;
+			
+			/*
+			private function init():void {
+				var children:Array = new Array();
+				children.push({label: 'UViz Main Control Button'});
+				children.push({label: 'UViz Main Control Bar'});
+				children.push({label: 'Query Panel'});
+				children.push({label: 'Statistics Panel'});
+				children.push({label: 'Rule Panel'});
+				children.push({label: 'Options Panel'});
+				children.push({label: 'Quick Options Panel/Button'});
+				var children2:Array = new Array();
+				children2.push({label: 'Data Loading/Exploration'});
+				children2.push({label: 'Enter Lineage/Explanation Mode'});
+				children2.push({label: 'Leave Lineage/Explanation Mode'});
+				children2.push({label: 'Change Graph Root Node'});
+				children2.push({label: 'Show Node/Edge Tooltip'});
+				children2.push({label: 'Show Connected Nodes/Edges'});
+				var children3:Array = new Array();
+				children3.push({label: 'Default Mode'});
+				children3.push({label: 'Explanation/Lineage Mode'});
+				children3.push({label: 'Comparison Mode'});
+				_menuItemUI = {label: 'User Interface', children: children}; 
+				_menuItemControl = {label: 'UViz Task Controls', children: children2}; 
+				_menuItemFeatures = {label: 'UViz Operation Modes', children: children3}; 
+				// add all the menus
+				_helpMenu = new Array();
+				_helpMenu.push(_menuItemUI);
+				_helpMenu.push(_menuItemControl);
+				_helpMenu.push(_menuItemFeatures);
+			}
+			*/
+			
+			private function onItemClick(event:MenuEvent):void {
+				switch(event.label) {
+			    case "Welcome Panel": this.TutorialMenuViewStack.selectedChild = this.WelcomePanel;break;
+                case "Main Control Button": this.TutorialMenuViewStack.selectedChild = this.MainControlButtonPanel;break;
+                case "Main Control Bar": this.TutorialMenuViewStack.selectedChild = this.MainControlBarPanel;break;
+                case "Query Panel": this.TutorialMenuViewStack.selectedChild = this.QueryPanel;break;
+                case "Statistics Panel": this.TutorialMenuViewStack.selectedChild = this.StatisticsPanel;break;
+                case "Rule Panel": this.TutorialMenuViewStack.selectedChild = this.RulePanel;break;
+                case "Options Panel": this.TutorialMenuViewStack.selectedChild = this.OptionsPanel;break;
+                case "Quick Options Panel/Button": this.TutorialMenuViewStack.selectedChild = this.QuickOptionsPanel;break;    
+                case "Data Loading/Exploration": this.TutorialMenuViewStack.selectedChild = this.DataLoadingPanel;break;
+                case "Enter Lineage/Explanation Mode": this.TutorialMenuViewStack.selectedChild = this.EnterLineageModePanel;break;
+                case "Leave Lineage/Explanation Mode": this.TutorialMenuViewStack.selectedChild = this.LeaveLineageModePanel;break;
+                case "Change Graph Root Node": this.TutorialMenuViewStack.selectedChild = this.ChangeGraphRootNodePanel;break;
+                case "Show Node/Edge Tooltip": this.TutorialMenuViewStack.selectedChild = this.ShowNodeEdgeTooltipPanel;break;
+                case "Show Connected Nodes/Edges": this.TutorialMenuViewStack.selectedChild = this.ShowConnectedNodesEdgesPanel;break;
+                case "Default Mode": this.TutorialMenuViewStack.selectedChild = this.DefaultModePanel;break;
+                case "Explanation/Lineage Mode": this.TutorialMenuViewStack.selectedChild = this.ExplanationLineageModePanel;break;
+                case "Comparison Mode": this.TutorialMenuViewStack.selectedChild = this.ComparisonModePanel;break;
+				}
+			}
+			
+			public function show():void {
+				//this.visible = true;
+				if(ZoomIn.isPlaying || ZoomOut.isPlaying)
+				  return;
+				//ZoomIn.play([this]);
+				this.visible = true;
+			}
+			
+			public function hide():void {
+				if(ZoomIn.isPlaying || ZoomOut.isPlaying)
+				  return;
+				//ZoomOut.play([this]);
+				this.visible = false;
+			}
+			
+			private function closeHelpPanel():void {
+				//ZoomOut.play([this]);
+				this.visible = false;
+				this.dispatchEvent(new UDeselectButtonEvent(UDeselectButtonEvent.DESELECT_HELP_BUTTON,true));
+			}
+			
+			private function demonstrateInterfacePanelsAppearance():void {
+				mx.core.Application.application.toggleZoomPanelVisibility();
+				mx.core.Application.application.toggleControlBarVisibility();
+				mx.core.Application.application.toggleQueryPanelVisibility();
+				mx.core.Application.application.toggleOptionsPanelVisibility();
+				mx.core.Application.application.toggleRulesPanelVisibility();
+				mx.core.Application.application.toggleStatisticsPanelVisibility();
+				//mx.core.Application.application.toggleZoomPanelVisibility();
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+		
+		.myMenuBar {
+	       font-weight: bold;
+	       background-color: grey;
+	       selectionColor: #ECECD4;
+	       rollOverColor: #ECECD4;
+	       textRollOverColor: black;
+	       textSelectedColor: black;
+	       separatorColor: #FFFFFF;
+	       separatorWidth: 1;
+	       themeColor: #ECECD4;
+        }
+        
+        .myHeader {
+           text-indent: 175;
+           font-size: 15
+        }
+
+		
+	</mx:Style>
+	
+	<mx:HBox horizontalAlign="center" 
+		verticalAlign="middle" horizontalGap="50" width="98%">
+		<mx:MenuBar labelField="@label" 
+			width="384" fontFamily="Arial" fontWeight="bold" 
+			cornerRadius="5" fillAlphas="[1.0, 1.0]" 
+			fillColors="[#797878, #3F3F3F, #03FFDE, #03FFDE]" color="#FFFFFF"
+		    menuStyleName="myMenuBar" itemClick="onItemClick(event);"
+		    toolTip="Select one of the specified items to see an explanation for this subject.">
+			
+			<mx:XMLList>
+	            <menuitem label="UViz User Interface">
+	                <menuitem label="Welcome Panel"/> 
+	                <menuitem label="Main Control Button"/>
+	                <menuitem label="Main Control Bar"/>
+	                <menuitem label="Query Panel"/>
+	                <menuitem label="Statistics Panel"/>
+	                <menuitem label="Rule Panel"/>
+	                <menuitem label="Options Panel"/>
+	                <menuitem label="Quick Options Panel/Button"/>
+	            </menuitem>
+	            <menuitem label="UViz Task Controls">
+	                <menuitem label="Data Loading/Exploration"/>
+	                <menuitem label="Enter Lineage/Explanation Mode"/>
+	                <menuitem label="Leave Lineage/Explanation Mode"/>
+	                <menuitem label="Change Graph Root Node"/>
+	                <menuitem label="Show Node/Edge Tooltip"/>
+	                <menuitem label="Show Connected Nodes/Edges"/>
+	            </menuitem>
+	            <menuitem label="UViz Operation Modes">
+	                <menuitem label="Default Mode"/>
+	                <menuitem label="Explanation/Lineage Mode"/>
+	                <menuitem label="Comparison Mode"/>
+	            </menuitem>
+	        </mx:XMLList>
+			
+		</mx:MenuBar>	
+		<mx:Button label="Close" id="CloseButton" click="closeHelpPanel();" 
+			width="40" height="20" fontFamily="Arial" fontSize="11" 
+			paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" 
+			fillAlphas="[1.0, 1.0]" fillColors="[#FD0101, #FD0101, #72FD01, #72FD01]" 
+			cornerRadius="5" toolTip="Hide the UViz Help Menu Panel."/>						
+	</mx:HBox>
+	
+	
+	
+	<mx:ViewStack id="TutorialMenuViewStack" 
+		width="100%" height="95%" backgroundColor="#3F3F3F">
+		
+		<mx:Panel id="WelcomePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">			
+			<mx:Label text="Welcome to UViz, the visualization frontend of URDF!" 
+				color="#FAFDFE" fontWeight="bold" textDecoration="normal" fontSize="17" fontStyle="italic"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="120" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_welcomeString}" fontWeight="bold"/>					
+			<mx:Button label="Show / Hide Interface Panels!" 
+				id="InterfacePanelsAppearanceButton" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+				fontSize="12" click="demonstrateInterfacePanelsAppearance();" 
+				fillColors="[#66FE01, #66FE01, #66FE01, #66FE01]" enabled="true"/>
+		</mx:Panel>
+		
+		<mx:Panel id="MainControlButtonPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">			
+			<mx:Label text="Main Control Button" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="95%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_mainControlButtonString}"/>					
+		</mx:Panel>
+		
+		<mx:Panel id="MainControlBarPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">	
+			<mx:Label text="Main Control Bar" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="95%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true"
+			    text="{_mainControlBarString}"/>			
+		</mx:Panel>
+		
+		<mx:Panel id="QueryPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			  verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Query Panel" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="95%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true"
+			    text="{_queryPanelString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="StatisticsPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">			
+			<mx:Label text="Statistics Panel" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_statisticsPanelString}"/>			
+		</mx:Panel>
+		
+		<mx:Panel id="RulePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			  verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Rule Panel" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_rulePanelString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="OptionsPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">					
+			<mx:Label text="Options Panel" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_optionsPanelString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="QuickOptionsPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">			
+			<mx:Label text="Quick Options Panel" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			   backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_quickOptionsString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="DataLoadingPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Data Loading/Exploration" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			   backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_dataloadingString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="EnterLineageModePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">					
+			<mx:Label text="Enter Lineage/Explanation Mode" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			   backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_enterLineageModeString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="LeaveLineageModePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">						
+			<mx:Label text="Leave Lineage/Explanation Mode" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_leaveLineageModeString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="ChangeGraphRootNodePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			  hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">					
+			<mx:Label text="Change Graph Root Node" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_changeGraphRootNodeString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="ShowNodeEdgeTooltipPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			  verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Show Node/Edge Tooltip" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_showNodeEdgeTooltipString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="ShowConnectedNodesEdgesPanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Show Connected Nodes/Edges" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_showConnectedString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="DefaultModePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Default Mode" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_defaultModeString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="ExplanationLineageModePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			 verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">				
+			<mx:Label text="Explanation/Lineage Mode" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			    backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_explanationModeString}"/>
+		</mx:Panel>
+		
+		<mx:Panel id="ComparisonModePanel" borderStyle="none" borderThickness="0" cornerRadius="5"
+			 headerHeight="0" paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			  verticalGap="10" verticalAlign="middle" horizontalAlign="center" backgroundAlpha="0.0"
+			 hideEffect="DissolveOut" showEffect="DissolveIn" backgroundColor="#3F3F3F"
+			 width="100%" height="100%">					
+			<mx:Label text="Comparison Mode" color="#FAFDFE" fontWeight="bold" textDecoration="underline"/>
+			<mx:TextArea width="100%" wordWrap="true" editable="false" enabled="true" height="90%" 
+			   backgroundAlpha="0.0" color="#FFFFFF" borderStyle="none" condenseWhite="true" 
+			    text="{_comparisonModeString}"/>
+		</mx:Panel>
+		
+	</mx:ViewStack>
+	
+	<mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+        
+     <mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="500"/>
+        
+     <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="500"/>
+	
+</mx:Panel>

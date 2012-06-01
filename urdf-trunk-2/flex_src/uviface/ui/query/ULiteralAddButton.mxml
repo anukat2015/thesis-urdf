@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Button xmlns:mx="http://www.adobe.com/2006/mxml"
+	label="+" 
+	borderColor="0xff000000"
+	themeColor="0xff00ff00"
+	fontSize="25" 
+	fontWeight="bold" 
+	textAlign="center" 
+	paddingBottom="15"
+    paddingLeft="5"
+    paddingRight="5"
+    paddingTop="5"  
+    rollOver="rollOverHandler(event);"
+	height="28" 
+	width="50">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			protected override function rollOverHandler(event:MouseEvent):void {
+				this.emphasized = true;
+				this.setStyle("borderColor",0xff00ff00);
+				this.setStyle("color",0xff00ff00)
+			}
+			
+			protected override function rollOutHandler(event:MouseEvent):void {
+				this.emphasized = false;
+				this.setStyle("borderColor",0xff000000);
+				this.setStyle("color",0xff000000);
+				//this.setStyle(color,0xff838B83);
+			}
+	
+			
+		]]>
+	</mx:Script>
+	
+</mx:Button>

@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="500" 
+	height="350"
+	horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#3F3F3F" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1" 
+    verticalAlign="middle"
+    fontFamily="Arial"
+    xmlns:tooltip="uviface.ui.tooltip.*">
+	
+	<mx:Script>
+		<![CDATA[
+			import uviface.event.UClusterFixingEvent;
+			import uviface.event.UPanZoomEvent;
+			import mx.controls.Image;
+			import uviface.viz.util.UStringConstants;
+			import uviface.viz.util.UColors;
+			import uviface.event.UPulsateEvent;
+			import uviface.event.URadiusDistanceEvent;
+			import uviface.event.UForceLayoutEvent;
+			import uviface.event.ULayoutEvent;
+			import uviface.event.UDataSpriteEvent;
+			import uviface.event.ULineageLayoutEvent;
+			import uviface.event.UGraphConfigEvent;
+			import flare.util.Orientation;
+			
+			import uviface.event.UGraphConfigEvent;
+			import mx.events.ItemClickEvent;
+			import uviface.event.UGraphOverviewEvent;
+			
+			import uviface.viz.UFlareVis;
+			import uviface.ui.tooltip.OverviewHelpToolTip;
+			
+			import flash.utils.getTimer;
+			import flash.display.BitmapData;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			[Bindable]
+			private static var _forceLayoutActive:Boolean = false;
+			
+			private var _glowFilter:GlowFilter = new GlowFilter(UColors.green(7),1,6.0,6.0,15);
+		    //private static var _filters:Array;
+		    [Bindable]
+		    private var _glowFilterArray:Array = [_glowFilter];
+			
+			public static function get forceLayoutActive():Boolean {
+				return _forceLayoutActive;
+			}
+			
+			private function resetValues():void {
+				
+				var hopSize:int = int(HopSlider.value);
+				
+				var graphConfigEvent:UGraphConfigEvent = new UGraphConfigEvent(UGraphConfigEvent.GRAPH_CONFIG_EVENT, hopSize, 200, UFlareVis.RADIAL_LAYOUT, true);
+				
+				RadialLayoutButton.selected = true;
+				RadialLayoutButton.filters = _glowFilterArray;
+				ForceLayoutButton.selected = false;
+				ForceLayoutButton.filters = null;
+				
+				graphConfigEvent.enforceBounds = EnforceBoundsButton.selected;
+
+				// add node and edge related values to the event
+				addSpriteValuesToEvent(graphConfigEvent);
+				
+				GraphConfigResetButton.dispatchEvent(graphConfigEvent);
+			}
+			
+			private function addSpriteValuesToEvent(event:UGraphConfigEvent):void {
+				event.nodeShadowEnabled = NodesShadowActivateButton.selected;
+				event.nodeShadowLength = NodesShadowLengthSlider.value;
+				event.nodeShadowAlpha = NodesShadowAlphaSlider.value;
+				event.nodeShadowColor = NodeShadowColorPicker.selectedColor;
+				event.edgeShadowEnabled = EdgesShadowActivateButton.selected;
+				event.edgeShadowLength = EdgesShadowLengthSlider.value;
+				event.edgeShadowAlpha = EdgesShadowAlphaSlider.value;
+				event.edgeShadowColor = EdgeShadowColorPicker.selectedColor;
+			}
+			
+			private function updateDataSpriteValues():void {
+				
+				var dataSpriteEvent:UDataSpriteEvent = new UDataSpriteEvent(UDataSpriteEvent.DATASPRITE_EVENT,true);
+				
+				dataSpriteEvent.nodeShadowEnabled = NodesShadowActivateButton.selected;
+				dataSpriteEvent.nodeShadowLength = NodesShadowLengthSlider.value;
+				dataSpriteEvent.nodeShadowAlpha = NodesShadowAlphaSlider.value;
+				dataSpriteEvent.nodeShadowColor = NodeShadowColorPicker.selectedColor;
+				dataSpriteEvent.edgeShadowEnabled = EdgesShadowActivateButton.selected;
+				dataSpriteEvent.edgeShadowLength = EdgesShadowLengthSlider.value;
+				dataSpriteEvent.edgeShadowAlpha = EdgesShadowAlphaSlider.value;
+				dataSpriteEvent.edgeShadowColor = EdgeShadowColorPicker.selectedColor;
+				
+				NodesShadowActivateButton.dispatchEvent(dataSpriteEvent);
+			}
+			
+			private function resetGraphConfigValues():void {
+				
+				if(UFlareVis.lineageMode)
+				   return;
+				
+				// the hop size
+				HopSlider.value = 0;
+				
+				// common properties
+				EnforceBoundsButton.selected = false;
+				IgnoreBoundsButton.selected = true;
+				
+				NodesShadowActivateButton.selected = true;
+				NodesShadowLengthSlider.value = 10;
+				NodesShadowAlphaSlider.value = 0.7;
+				NodeShadowColorPicker.selectedColor = UColors.BLACK;
+				EdgesShadowActivateButton.selected = true;
+				EdgesShadowLengthSlider.value = 10;
+				EdgesShadowAlphaSlider.value = 0.7;
+				EdgeShadowColorPicker.selectedColor = UColors.BLACK;
+				
+				// the layout switch
+				//RadialLayoutSwitchButton.selected = true;
+				//RadialLayoutSwitchButton.filters = _glowFilterArray;
+				//ForceLayoutSwitchButton.selected = false;
+				//ForceLayoutSwitchButton.filters = null;
+				
+				resetValues();
+			}
+			
+			private function updateGraphDistance():void {
+				var radiusAndDistanceEvent:URadiusDistanceEvent = 
+				   new URadiusDistanceEvent(URadiusDistanceEvent.RADIUS_AND_DISTANCE_EVENT,URadiusDistanceEvent.INCREMENT_HOP_SIZE,HopSlider.value,0,true);
+				
+				radiusAndDistanceEvent.enforceBounds = EnforceBoundsButton.selected;
+				
+				HopSlider.dispatchEvent(radiusAndDistanceEvent);
+			}
+			
+			private function updateDistanceAlpha():void {
+				// todo
+			}
+			
+			private function updateBoundsEnforcing():void {
+				var radiusAndDistanceEvent:URadiusDistanceEvent = 
+				   new URadiusDistanceEvent(URadiusDistanceEvent.RADIUS_AND_DISTANCE_EVENT,URadiusDistanceEvent.ENFORCE_BOUNDS,HopSlider.value,0,true);
+	
+				radiusAndDistanceEvent.enforceBounds = EnforceBoundsButton.selected;
+				
+				EnforceBoundsButton.dispatchEvent(radiusAndDistanceEvent);
+			}
+			
+			private function centerVisualization():void {
+				CenterVisualizationChangeButton.dispatchEvent(new Event(UStringConstants.CENTER_VISUALIZATION,true));
+			}
+			
+			public function hideNonLineageProperties():void {
+				GeneralConfigurationPanel.enabled = false;
+				GeneralConfigurationPanel.filters = _filters;
+				ShadowsPanel.enabled = false;
+				ShadowsPanel.filters = _filters;
+			}
+			
+			public function showNonLineageProperties():void {
+				GeneralConfigurationPanel.enabled = true;
+				GeneralConfigurationPanel.filters = null;
+				ShadowsPanel.enabled = true;
+				ShadowsPanel.filters = null;
+			}
+			
+			public function updateLayout(layoutType:int):void {
+				
+				//_layout = ForceLayoutSwitchButton.selected ? 1 : 0;
+				
+				if(layoutType == UFlareVis.FORCE_LAYOUT) {
+					ForceLayoutButton.selected = true;
+					ForceLayoutButton.filters = _glowFilterArray;
+					RadialLayoutButton.selected = false;
+					RadialLayoutButton.filters = null;
+					_forceLayoutActive = true;
+					//ForceLayoutPanel.enabled = true;
+					//ForceLayoutPanel.filters = null;
+					//RadiusIncrementHBox.enabled = false;
+					//RadiusIncrementHBox.filters = _filters;
+				}
+				else {
+					RadialLayoutButton.selected = true;
+					RadialLayoutButton.filters = _glowFilterArray;
+					ForceLayoutButton.selected = false;
+					ForceLayoutButton.filters = null;
+					_forceLayoutActive = false;
+					//ForceLayoutPanel.enabled = false;
+					//ForceLayoutPanel.filters = _filters;
+					//RadiusIncrementHBox.enabled = true;
+					//RadiusIncrementHBox.filters = null;
+				}
+				
+				RadialLayoutButton.dispatchEvent(new ULayoutEvent(ULayoutEvent.LAYOUT,layoutType,true));
+			}
+			
+			private function fixNodeClusters(fixNodeCluster:Boolean):void {
+				if(fixNodeCluster)
+				   FixNodeClusterButton.dispatchEvent(new UClusterFixingEvent(UClusterFixingEvent.CLUSTER_FIXING_EVENT,
+				         true,ClusterFixSlider.value,true)); 
+				else
+				   FixNodeClusterButton.dispatchEvent(new UClusterFixingEvent(UClusterFixingEvent.CLUSTER_FIXING_EVENT,
+				         false,ClusterUnfixSlider.value,true)); 
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:VBox 
+		horizontalAlign="center" 
+		verticalGap="5" 
+		verticalAlign="middle" 
+		left="10" 
+		right="10" 
+		top="10" 
+		bottom="10" 
+		borderStyle="none" 
+		cornerRadius="20" 
+		borderColor="#5F5751" backgroundColor="#3F3F3F"  backgroundAlpha="1.0"
+	    verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	      
+	       <mx:ViewStack 
+	       	  id="ConfigurationViewStack" 
+	       	  width="95%" 
+	       	  height="280" 
+	       	  creationPolicy="all" 
+	       	  fontSize="10" 
+	       	  dropShadowEnabled="false"
+	       	  backgroundAlpha="1.0" borderStyle="none" 
+	       	  borderThickness="3" cornerRadius="10" alpha="1.0"
+	       	  backgroundColor="#3F3F3F" selectedIndex="0">
+	              
+	              <mx:Panel 
+	              	 label="General Configuration" 
+	              	 width="98%" 
+	              	 height="98%" 
+		    	     id="GeneralConfigurationPanel" 
+		    	     fontSize="10" 
+		    	     dropShadowEnabled="false" 
+		    	     alpha="1.0" 
+		    	     backgroundAlpha="0.0" 
+		    	     horizontalAlign="center" 
+		    	     verticalAlign="middle"
+		    	     textAlign="center"
+		    	     headerHeight="0" borderStyle="none" backgroundColor="#3F3F3F"  verticalGap="10"
+		    	     hideEffect="DissolveOut" showEffect="DissolveIn">
+	              	 
+	              	 <mx:VBox width="50%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#3F3F3F" 
+	              	 	borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="0" backgroundAlpha="0.0" dropShadowEnabled="true">	              	 	              		                         		                                      		                         	              	 
+	              	    <mx:Label id="GraphLayoutSwitchLabel" text="Layout Switch:" fontWeight="bold" color="#FFFFFF" 
+	              	    	fontSize="12" fontStyle="normal" textDecoration="normal" fontFamily="Arial"/>	              	
+	              	    <mx:HBox id="LayoutSwitchBox" width="100%" horizontalAlign="center" verticalAlign="middle" horizontalGap="20"
+	       	               borderStyle="none" borderThickness="4" cornerRadius="20" borderColor="#FFFFFF" backgroundColor="#3F3F3F" backgroundAlpha="0.0">				       	  
+				       	   <mx:Button 
+					      	id="RadialLayoutButton" 
+					      	label="Radial" 
+					      	toolTip="Activate the Radial Layout."
+					      	click="updateLayout(0);"
+					      	selected="true"
+					      	filters="{_glowFilterArray}"
+					      	fontWeight="bold" 
+					      	fontSize="15" 
+					      	cornerRadius="10" 
+					      	fillAlphas="[1.0, 1.0]" 
+					      	fillColors="[#3F3F3F, #3F3F3F, #6BFB02, #6BFB02]" 
+					      	borderColor="#FCFDFD" 
+					      	color="#FCFEFE" 
+					      	alpha="1.0" 
+					        enabled="true"
+					        width="70" height="30" themeColor="#3F3F3F"
+					        textSelectedColor="#FEFDFD" textRollOverColor="#FEFDFD"/>
+					       <mx:Button 
+					      	id="ForceLayoutButton" 
+					      	label="Force" 
+					      	click="updateLayout(1);" 
+					      	toolTip="Activate the Force-Directed Layout."
+					      	filters="{null}"
+					      	selected="false"
+					      	fontWeight="bold" 
+					      	fontSize="15" 
+					      	cornerRadius="10" 
+					      	fillAlphas="[1.0, 1.0]" 
+					      	fillColors="[#3F3F3F, #3F3F3F, #6BFB02, #6BFB02]" 
+					      	borderColor="#3F3F3F" 
+					      	color="#FCFEFE" 
+					      	alpha="1.0" 
+					        enabled="true"
+					        width="70" height="30" themeColor="#3F3F3F"
+					        textSelectedColor="#FEFDFD" textRollOverColor="#FEFDFD"/>				      
+				        </mx:HBox> 
+				     </mx:VBox> 
+				     
+				     <mx:HBox id="ClusterFixingBox" width="350" horizontalAlign="center" verticalAlign="middle" horizontalGap="20"
+	       	               borderStyle="solid" borderThickness="0" cornerRadius="10" borderColor="#FFFFFF" backgroundColor="#3F3F3F" backgroundAlpha="0.0" dropShadowEnabled="true" height="60">				       	  
+				       	   <mx:VBox width="50%" height="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="0" id="CLusterFixVBox">
+			       	     	   <mx:Button 
+				       	     	   id="FixNodeClusterButton" 
+				       	     	   label="Fix All Node Clusters" 
+				       	     	   toolTip="Fix all nodes that have more than the average number of edges connected."
+				       	     	   click="fixNodeClusters(true);"
+				       	     	   fontWeight="bold" 
+				       	     	   fontSize="12" 
+				       	     	   cornerRadius="10" 
+				       	     	   fillAlphas="[1.0, 1.0]" 
+				       	     	   fillColors="[#3F3F3F, #3F3F3F, #6BFB02, #6BFB02]" 
+				       	     	   borderColor="#3F3F3F" 
+				       	     	   color="#FCFEFE" 
+				       	     	   alpha="1.0" 
+				       	     	   enabled="true"
+				       	     	   themeColor="#3F3F3F"
+				       	     	   textSelectedColor="#FEFDFD" textRollOverColor="#FEFDFD"/>
+			       	     	   <mx:HSlider 
+		              	 	  	  id="ClusterFixSlider"
+		              	 	  	  minimum="0"
+			              	 	  maximum="5"
+			              	 	  value="1" 
+			              	 	  tickInterval="1"
+			              	 	  liveDragging="true"
+			              	 	  showDataTip="true"
+			              	 	  showTrackHighlight="true"
+			              	 	  dataTipPlacement="top"
+			              	 	  allowTrackClick="true"
+			              	 	  dataTipPrecision="0"
+			              	 	  thumbCount="1"
+			              	 	  labels="[0,1,2,3,4,5]"
+			              	 	  snapInterval="1"
+			              	 	  toolTip="This slider specifies the factor x for the computation 'if(node.degree > x*averageDegree) -> fix node'. Consequently, a higher slider value will only fix nodes with many connected edges.'."
+			              	 	  tickColor="white"
+			              	 	  trackColors="white"
+			              	 	  borderColor="#FEFEFE" 
+			              	 	  fillAlphas="[1.0, 1.0]" 
+			              	 	  fillColors="[#030000, #030000]" 
+			              	 	  labelStyleName="MySliderLabel" 
+ tickOffset="0" labelOffset="0"/>
+				       	   </mx:VBox>
+				       	   <mx:VBox width="50%" height="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="0" id="ClusterUnfixVBox">
+			       	     	   <mx:Button 
+				       	     	   id="UnfixNodeClusterButton" 
+				       	     	   label="Unfix All Node Clusters" 
+				       	     	   click="fixNodeClusters(false);" 
+				       	     	   toolTip="Unfix all previously fixed nodes."
+				       	     	   fontWeight="bold" 
+				       	     	   fontSize="12" 
+				       	     	   cornerRadius="10" 
+				       	     	   fillAlphas="[1.0, 1.0]" 
+				       	     	   fillColors="[#3F3F3F, #3F3F3F, #6BFB02, #6BFB02]" 
+				       	     	   borderColor="#3F3F3F" 
+				       	     	   color="#FCFEFE" 
+				       	     	   alpha="1.0" 
+				       	     	   enabled="true"
+				       	     	   themeColor="#3F3F3F"
+				       	     	   textSelectedColor="#FEFDFD" textRollOverColor="#FEFDFD"/>
+			       	     	  <mx:HSlider 
+		              	 	  	  id="ClusterUnfixSlider"
+		              	 	  	  minimum="0"
+			              	 	  maximum="5"
+			              	 	  value="1" 
+			              	 	  tickInterval="1"
+			              	 	  liveDragging="true"
+			              	 	  showDataTip="true"
+			              	 	  showTrackHighlight="true"
+			              	 	  dataTipPlacement="top"
+			              	 	  allowTrackClick="true"
+			              	 	  dataTipPrecision="0"
+			              	 	  thumbCount="1"
+			              	 	  labels="[0,1,2,3,4,5]"
+			              	 	  snapInterval="1"
+			              	 	  toolTip="This slider specifies the factor x for the computation 'if(node.degree &lt; x*averageDegree) -> unfix node'. Consequently, a smaller slider value will only unfix nodes with few connected edges.'."
+			              	 	  tickColor="white"
+			              	 	  trackColors="white"
+			              	 	  borderColor="#FEFEFE" 
+			              	 	  fillAlphas="[1.0, 1.0]" 
+			              	 	  fillColors="[#030000, #030000]" 
+			              	 	  labelStyleName="MySliderLabel"  tickOffset="0" labelOffset="0"/>
+				       	   </mx:VBox>
+				     </mx:HBox> 
+				     
+				     <mx:VBox width="50%" height="50" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" 
+	              	 	borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="0" dropShadowEnabled="true" backgroundAlpha="0.0">	              	 	              		                         		                                      		                         	              	               	    
+	              	    <mx:Label id="BoundsEnforceSwitchLabel" text="Enforce Visualization Bounds:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" fontFamily="Arial"/>
+					  
+					    <mx:HBox id="EnforceBoundsBox" width="100%" horizontalAlign="center" verticalAlign="middle" horizontalGap="5"
+	       	              borderStyle="none" borderThickness="4" cornerRadius="20" borderColor="#FFFFFF" backgroundColor="#3F3F3F" backgroundAlpha="0.0">					       
+					      <mx:RadioButtonGroup id="EnforceBoundsSwitch"/>
+					      <mx:RadioButton label="yes" groupName="EnforceBoundsSwitch" color="#FCFDFD" selected="false" enabled="true" id="EnforceBoundsButton" click="updateBoundsEnforcing();" fontWeight="bold" fontFamily="Verdana"/>
+					      <mx:RadioButton label="no" groupName="EnforceBoundsSwitch" color="#FEFEFE" selected="true" enabled="true" id="IgnoreBoundsButton" click="updateBoundsEnforcing();" fontFamily="Verdana" fontWeight="bold"/>					       	  
+				        </mx:HBox>
+				     </mx:VBox> 
+				     
+				     <mx:VBox width="75%" height="65" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" 
+	              	 	borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="0" backgroundAlpha="0.0" dropShadowEnabled="true">	              	 	              		                         		                                      		                         	              	               	                  	     
+					   <mx:Label id="NodeHopNeighbourhoodLabel" text="Visible Path Length (starting at focus nodes) :" fontWeight="bold" color="#FFFFFF" fontFamily="Arial" fontSize="12"/>	              	 	  
+              	 	   <mx:HSlider 
+              	 	  	  id="HopSlider"
+              	 	  	  minimum="-1"
+	              	 	  maximum="10"
+	              	 	  value="0" 
+	              	 	  tickInterval="1"
+	              	 	  liveDragging="true"
+	              	 	  showDataTip="true"
+	              	 	  showTrackHighlight="true"
+	              	 	  dataTipPlacement="top"
+	              	 	  allowTrackClick="true"
+	              	 	  dataTipPrecision="0"
+	              	 	  thumbCount="1"
+	              	 	  labels="[off,0,1,2,3,4,5,6,7,8,9,10]"
+	              	 	  snapInterval="1"
+	              	 	  toolTip="This slider determines the distance (path length from the focus nodes) over which the nodes and edges are visible, starting from the focus nodes."
+	              	 	  tickColor="white"
+	              	 	  trackColors="white"
+	              	 	  borderColor="#FEFEFE" 
+	              	 	  fillAlphas="[1.0, 1.0]" 
+	              	 	  fillColors="[#030000, #030000]" 
+	              	 	  labelStyleName="MySliderLabel" 
+	              	 	  change="updateGraphDistance();" 
+	              	 	  width="306" height="43" labelOffset="0" tickOffset="0"/>
+	              	 </mx:VBox>
+	              	 
+	              </mx:Panel>
+	              
+	              <mx:Panel 
+	              	 label="Shadows" 
+	              	 width="98%" 
+	              	 height="100%" 
+		    	     id="ShadowsPanel" 
+		    	     fontSize="10" 
+		    	     dropShadowEnabled="false" 
+		    	     alpha="1.0" 
+		    	     backgroundAlpha="0.0" 
+		    	     horizontalAlign="center" 
+		    	     verticalAlign="middle"
+		    	     textAlign="center"
+		    	     headerHeight="0" verticalGap="10" borderStyle="none" backgroundColor="#3F3F3F" 
+		    	     hideEffect="DissolveOut" showEffect="DissolveIn">
+	                 
+	                 <mx:HBox width="100%" height="100%" verticalAlign="middle">
+	                     
+	                     <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalGap="5" verticalAlign="middle" backgroundAlpha="0.0">             		      
+	                     
+	                         <mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                         		                                      
+		                         <mx:Label id="NodeLabel" text="Show Node Shadows:" fontWeight="bold" color="#FFFFFF" fontFamily="Arial" fontSize="12"/>	                    	                                    
+		                         <mx:HBox>		                      		                     	  
+		                     	    <mx:RadioButtonGroup id="NodesShadowSwitch"/>
+		                     	    <mx:RadioButton label="yes" groupName="NodesShadowSwitch" color="#FCFDFD" selected="true" enabled="true" id="NodesShadowActivateButton"
+		                     	      themeColor="#12FF00" click="updateDataSpriteValues();"/>
+		                     	    <mx:RadioButton label="no" groupName="NodesShadowSwitch" color="#FEFEFE" selected="false" enabled="true" id="NodesShadowDeactivateButton"
+		                     	  	  themeColor="#12FF00" click="updateDataSpriteValues();"/>
+	                     	     </mx:HBox>
+	                     	</mx:VBox> 	  	                   
+	                     	<mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                         		                                                             
+	                     	  <mx:Label id="NodesShadowLengthLabel" text="Node Shadow Length:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+	                     	  <mx:HSlider 
+	                     	  	  id="NodesShadowLengthSlider"
+	                     	  	  value="10" 
+	                     	  	  minimum="0"
+	                     	      maximum="50"
+	                     	      liveDragging="true"
+	                     	      showDataTip="true"
+	                     	      showTrackHighlight="true"
+	                     	      dataTipPlacement="top"
+	                     	      allowTrackClick="true"
+	                     	      dataTipPrecision="0"
+	                     	      thumbCount="1"
+	                     	      tickInterval="10"
+	                     	      labels="[0,50]"
+	                     	      toolTip="The length of the node shadow."
+	                     	      tickColor="white" 
+	                     	      trackColors="white" 
+	                     	      width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true" change="updateDataSpriteValues();"/>
+	                     	</mx:VBox>  
+	                     	<mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                         		                                                                              	  
+	                     	  <mx:Label id="NodesShadowAlphaLabel" text="Node Shadow Alpha:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+	                     	  <mx:HSlider 
+	                     	  	  id="NodesShadowAlphaSlider"
+	                     	  	  value="0.7" 
+	                     	  	  minimum="0"
+	                     	      maximum="1"
+	                     	      liveDragging="true"
+	                     	      showDataTip="true"
+	                     	      showTrackHighlight="true"
+	                     	      dataTipPlacement="top"
+	                     	      allowTrackClick="true"
+	                     	      dataTipPrecision="1"
+	                     	      thumbCount="1"
+	                     	      tickInterval="0.2"
+	                     	      labels="[0,1]"
+	                     	      toolTip="The alpha value of the node shadow."
+	                     	      tickColor="white" 
+	                     	      trackColors="white" 
+	                     	      width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true" change="updateDataSpriteValues();"/>
+	                     	</mx:VBox>
+	                     	<mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                       		                                                                             	                     	    
+	                     	  <mx:Label id="NodeShadowColorLabel" text="Node Shadow Color:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+	                     	  <mx:ColorPicker id="NodeShadowColorPicker"  change="updateDataSpriteValues();"/>
+	                        </mx:VBox>
+	                     
+	                     </mx:VBox>
+	                     
+	                     <mx:VRule height="100%"/>
+	                     
+	                      <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalGap="5" verticalAlign="middle">   
+	                        
+	                        <mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                       		                                                                             	                     	                        	     
+	                          <mx:Label id="EdgeLabel" text="Show Edge Shadows:" fontWeight="bold" color="#FFFFFF" fontFamily="Arial" fontSize="12"/>                     
+	                          <mx:HBox>		
+	                     	  <mx:RadioButtonGroup id="EdgesShadowSwitch"/>
+	                     	  <mx:RadioButton label="yes" groupName="EdgesShadowSwitch" color="#FCFDFD" selected="true" enabled="true" id="EdgesShadowActivateButton"
+	                     	      themeColor="#12FF00" click="updateDataSpriteValues();"/>
+	                     	  <mx:RadioButton label="no" groupName="EdgesShadowSwitch" color="#FEFEFE" selected="false" enabled="true" id="EdgesShadowDeactivateButton"
+	                     	  	  themeColor="#12FF00" click="updateDataSpriteValues();"/>
+	                     	  </mx:HBox>
+	                     	</mx:VBox>
+	                     	<mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                       		                                                                             	                     	                        	     	                           	  	                     	 
+	                     	  <mx:Label id="EdgesShadowLengthLabel" text="Edge Shadow Length:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+	                     	  <mx:HSlider 
+	                     	  	  id="EdgesShadowLengthSlider"
+	                     	  	  value="10" 
+	                     	  	  minimum="0"
+	                     	      maximum="50"
+	                     	      liveDragging="true"
+	                     	      showDataTip="true"
+	                     	      showTrackHighlight="true"
+	                     	      dataTipPlacement="top"
+	                     	      allowTrackClick="true"
+	                     	      dataTipPrecision="0"
+	                     	      thumbCount="1"
+	                     	      tickInterval="10"
+	                     	      labels="[0,50]"
+	                     	      toolTip="The length of the edge shadow."
+	                     	      tickColor="white" 
+	                     	      trackColors="white" 
+	                     	      width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true" change="updateDataSpriteValues();"/>
+	                      </mx:VBox>
+	                      <mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                       		                                                                             	                     	                        	     	                           	  	                     	 
+	                     	  <mx:Label id="EdgesShadowAlphaLabel" text="Edge Shadow Alpha:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+	                     	  <mx:HSlider 
+	                     	  	  id="EdgesShadowAlphaSlider"
+	                     	  	  value="0.7" 
+	                     	  	  minimum="0"
+	                     	      maximum="1"
+	                     	      liveDragging="true"
+	                     	      showDataTip="true"
+	                     	      showTrackHighlight="true"
+	                     	      dataTipPlacement="top"
+	                     	      allowTrackClick="true"
+	                     	      dataTipPrecision="1"
+	                     	      thumbCount="1"
+	                     	      tickInterval="0.2"
+	                     	      labels="[0,1]"
+	                     	      toolTip="The alpha value of the edge shadow."
+	                     	      tickColor="white" 
+	                     	      trackColors="white" 
+	                     	      width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true" change="updateDataSpriteValues();"/>
+	                      </mx:VBox>                       
+	                      <mx:VBox width="75%" height="60" horizontalAlign="center" verticalAlign="middle" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" verticalGap="1" backgroundAlpha="0.0" dropShadowEnabled="true">	                       		                                                                             	                     	                        	     	                           	  	                     	 
+	                     	  <mx:Label id="EdgeShadowColorLabel" text="Edge Shadow Color:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+	                     	  <mx:ColorPicker id="EdgeShadowColorPicker"  change="updateDataSpriteValues();"/>
+	                       </mx:VBox>    
+	                    </mx:VBox>
+	                      
+	                  </mx:HBox>
+	              	
+	              </mx:Panel>
+	              
+	      </mx:ViewStack>
+		
+		   <mx:HBox cornerRadius="10" borderStyle="solid" backgroundColor="#FFFEFE" horizontalAlign="center" 
+		   	verticalAlign="middle" height="35" width="260" borderThickness="0" borderColor="#CFCBCB" horizontalGap="5" backgroundAlpha="0.0" dropShadowEnabled="true">
+		      <mx:Button 
+		      	id="CenterVisualizationChangeButton" 
+		      	label="Center Graph" 
+		      	fontWeight="bold" 
+		      	fontSize="15" 
+		      	cornerRadius="10" 
+		      	fillAlphas="[1.0, 1.0]" 
+		      	fillColors="[#898787, #898787, #61FC03, #61FC03]" 
+		      	borderColor="#FCFDFD" 
+		      	color="#FDF9F9" 
+		      	alpha="0.0" 
+		      	themeColor="#00FFC6"
+		      	toolTip="Center the visualization again."
+		        click="centerVisualization();" labelPlacement="bottom"
+		        textAlign="center" paddingTop="0" paddingBottom="0"/>
+		      <mx:Button 
+		      	id="GraphConfigResetButton" 
+		      	label="Reset Values" 
+		      	click="resetGraphConfigValues();" 
+		      	fontWeight="bold" 
+		      	fontSize="15" 
+		      	cornerRadius="10" 
+		      	fillAlphas="[1.0, 1.0]" 
+		      	fillColors="[#898787, #898787, #61FC03, #61FC03]" 
+		      	borderColor="#FCFDFD" 
+		      	color="#FEFDFD" 
+		      	alpha="0.0" 
+		      	themeColor="#00FFC6"
+		      	toolTip="Reset Graph Values." labelPlacement="bottom"
+		      	 textAlign="center" paddingTop="0" paddingBottom="0"/>
+		   </mx:HBox>
+	
+	  </mx:VBox>
+	  
+	<mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+        
+     <mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="500"/>
+        
+     <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="500"/>
+	  
+</mx:Panel>

@@ -1,0 +1,160 @@
+<?xml version="1.0"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+    implements="mx.core.IToolTip" 
+    alpha="1.0" 
+    borderThickness="3"
+    backgroundColor="#FFFC00"
+    dropShadowEnabled="true" 
+    borderColor="#8F8E8E"
+    borderStyle="solid"
+    roundedBottomCorners="true"
+    cornerRadius="20"
+    horizontalAlign="center"
+    verticalAlign="middle" 
+    title="Node Name:" 
+    headerColors="[#000000,#000000]"
+    fontSize="15" 
+    fontWeight="bold" 
+    backgroundAlpha="1.0"
+    textAlign="center" 
+    layout="absolute" 
+    horizontalScrollPolicy="off" color="#000000" fontFamily="Arial" creationPolicy="all">
+    
+    <mx:Script><![CDATA[
+    
+    	import flare.vis.data.NodeSprite;
+    	
+    	private var _titleWidth:int = 0;
+    	
+    	private var _numOfNeighbours:int = 0;
+    	private var _neighbours:Object = new Object();
+    
+        public var _text:String;
+
+        //[Bindable]
+        public function get text():String { 
+            return _text; 
+        } 
+        public function set text(value:String):void {
+        }
+        
+        /*
+        private function onCreationComplete():void {
+        	InDegreeLabel.initialize();
+        	InDegreeText.initialize();
+        	OutDegreeLabel.initialize();
+        	OutDegreeText.initialize();
+        	NeighboursLabel.initialize();
+        	NeighboursText.initialize();
+        }
+        */
+        
+        public function setNodeProperties(node:NodeSprite):void {
+        	
+        	title = node.data.tooltip;
+        	TitleTextPlaceHolder.text = node.data.tooltip;
+        	_titleWidth = TitleTextPlaceHolder.measureText(TitleTextPlaceHolder.text).width;
+        	InDegreeText.text = node.inDegree.toString();
+        	OutDegreeText.text = node.outDegree.toString();
+      
+        	var biggerText:Text = new Text();
+        	biggerText.text = "";
+        	
+        	// reset the neighbor values
+        	_numOfNeighbours = 0;
+        	for (var name:String in _neighbours) {
+        		delete _neighbours[name];
+        	}
+        	
+        	//_neighbours[node.data.tooltip] = node.data.tooltip;
+        	
+        	// fill the hash and increase the neighbors counter
+        	var num:int = 0;
+        	var ns:NodeSprite;
+        	
+        	/*
+        	for(num;num<node.inDegree;num++) {
+        		ns = node.getInNode(num);
+        		if(!_neighbours.hasOwnProperty(ns.data.name)) {
+			   	  _neighbours[ns.data.name] = ns.data.name;
+			   	  _numOfNeighbours++;
+			   	  trace("ns.data.name: " + ns.data.name);
+			    }
+			    else
+			       continue;
+        	}
+        	
+        	num=0;
+        	
+        	for(num;num<node.outDegree;num++) {
+        		ns = node.getOutNode(num);
+        		if(!_neighbours.hasOwnProperty(ns.data.name)) {
+			   	  _neighbours[ns.data.name] = ns.data.name;
+			   	  _numOfNeighbours++;
+			   	  trace("ns.data.name: " + ns.data.name);
+			    }
+			    else
+			       continue;
+        	}
+        	*/
+        	
+        	node.visitNodes(
+        	    function(ns:NodeSprite):void {
+				   if(!_neighbours.hasOwnProperty(ns.data.tooltip)) {
+				   	  _neighbours[ns.data.tooltip] = ns.data.tooltip;
+				   	  _numOfNeighbours++;
+				   	  //trace("ns.data.name: " + ns.data.tooltip);
+				   }
+			    },NodeSprite.IN_LINKS);
+		    
+		    node.visitNodes(
+        	    function(ns:NodeSprite):void {
+				   if(!_neighbours.hasOwnProperty(ns.data.tooltip)) {
+				   	  _neighbours[ns.data.tooltip] = ns.data.tooltip;
+				   	  _numOfNeighbours++;
+				   	  //trace("ns.data.name: " + ns.data.tooltip);
+				   }
+			    },NodeSprite.OUT_LINKS);
+		   
+		   
+		    NeighboursText.text = _numOfNeighbours.toString();  
+		    
+		    // check id InDegree or OutDegree number has bigger width
+		    if(InDegreeText.text.length > OutDegreeText.text.length)
+		       biggerText = InDegreeText;
+		    else
+		       biggerText = OutDegreeText;
+		    
+		    // check if number of connected nodes has bigger width   
+		    if(NeighboursText.text.length > biggerText.text.length)
+		       biggerText = NeighboursText;
+		    
+		    //if(this.title.length < (NeighboursLabel.text.length + biggerText.text.length + 10))
+        	  //   this.width = biggerText.measureText(biggerText.text).width + NeighboursLabel.width + 80;
+        	//else
+        	  //   this.width = biggerText.measureText(this.titleTextField.text).width + 60;
+        	     
+        	if(_titleWidth < (NeighboursLabel.width + biggerText.width + 10))
+        	     this.width = biggerText.measureText(biggerText.text).width + NeighboursLabel.width + 80;
+        	else
+        	     this.width = _titleWidth + 80;
+		    
+		    //this.invalidateSize(); 
+        } 
+        
+    ]]></mx:Script>
+
+    <mx:Text id="InDegreeText" text="0" x="140" y="10" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="10" text="In-Degree:" id="InDegreeLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="OutDegreeText" text="0" x="140" y="38" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="38" text="Out-Degree:" id="OutDegreeLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="NeighboursText" text="0" x="140" y="66" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="66" text="Connected Nodes:" id="NeighboursLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    
+    <mx:Text id="TitleTextPlaceHolder" text="0" fontFamily="Verdana" 
+    	color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic" 
+    	includeInLayout="false" visible="false"/>
+    
+    
+</mx:Panel>

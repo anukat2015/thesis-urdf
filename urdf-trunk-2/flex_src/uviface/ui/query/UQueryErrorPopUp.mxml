@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	title="Query Constant Error!" 
+	layout="absolute" 
+	width="300" 
+	height="200" 
+	backgroundColor="#EBE806"
+	textAlign="center"
+	fontSize="15"
+    fontWeight="bold" 
+    borderColor="#746565" 
+    barColor="0xFFFFFF00" 
+    headerColors="0xFFFFFF00"  
+    color="#030000" 
+    cornerRadius="8" 
+    alpha="1.0" 
+    backgroundAlpha="0.8" borderAlpha="0.5">
+    
+	<mx:Label 
+		x="10" 
+		y="25" 
+		text = "You must specify at" 
+		width="260" 
+		height="39"
+		fontWeight = "bold"
+	    fontSize="20"
+	    textAlign="center"
+	    id="FirstLineLabel"/>
+	<mx:Label 
+		x="10" 
+		y="66" 
+		text="least one constant!" 
+		width="260" 
+		height="39"
+		fontWeight = "bold"
+	    fontSize="20"
+	    textAlign="center"
+	    id="SecondLineLabel"/>
+	<mx:Button x="114.5" y="113" label="OK" fillAlphas="[0.8, 0.8, 0.8, 0.8]" id="OKButton"/>                            
+	
+</mx:Panel>

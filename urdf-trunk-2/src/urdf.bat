@@ -1,0 +1,1 @@
+java -Xmx1200m -Xms1200m -XX:+DisableExplicitGC -cp ..\lib\classes12.jar;..\lib\colt.jar;..\lib\yagobasics.jar;. urdf.main.URDF_main .\yago.ini
