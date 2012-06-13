@@ -40,6 +40,7 @@ public class Sampler
 	{
  		initializeConnection(iniFile);
  		this.relations=relations;
+ 	
  		
  		initializeDumpRelations();
  		
@@ -117,7 +118,7 @@ public class Sampler
  		}
  		// create sample table
  		sqlCreateSampleTbl=sqlCreateSampleTbl.substring(0,sqlCreateSampleTbl.length()-6); // get rid of last UNION
- 		sqlCreateSampleTbl="CREATE TABLE sample"+SEEDS+" AS (SELECT distinct(id,relation,arg1,arg2,confidence) FROM ("+sqlCreateSampleTbl+"))";
+ 		sqlCreateSampleTbl="CREATE TABLE sample"+SEEDS+" AS (SELECT distinct(id),relation,arg1,arg2,confidence FROM ("+sqlCreateSampleTbl+"))";
  		System.out.println("sqlCreateSampleTbl: "+sqlCreateSampleTbl);
  		
  		stmt.execute(sqlCreateSampleTbl);

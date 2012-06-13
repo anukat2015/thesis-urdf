@@ -41,9 +41,9 @@ public class LearningManager
 				positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);		
 		
 		
-		//preprocessor=new RelationPreProcessor(iniFile,tChecker,relations,types,relationsForConstants,baseTbl);		
+		preprocessor=new RelationPreProcessor(iniFile,tChecker,relations,types,relationsForConstants,baseTbl);		
 		
-		preprocessor=new RelationPreProcessor(iniFile);	
+		//preprocessor=new RelationPreProcessor(iniFile);	
 		//System.out.println("hi!");
 		info=preprocessor.getRelationsInfo();	
 		tChecker.setDangerousRelations(info.dangerousRelations);

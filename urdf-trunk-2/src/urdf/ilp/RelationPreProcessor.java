@@ -69,7 +69,8 @@ public class RelationPreProcessor implements Serializable
 			this.relations=relations;
 			this.types=types;
 			this.relationsForConstants=relationsForConstants;
-			initializeConnection(iniFile); //initialize the connection			
+			initializeConnection(iniFile); //initialize the connection		
+			System.out.println("Connected to DB");
 			prepareStatements();// Prepare the PreparedStatements
 			this.stmt = conn.createStatement();				
 		} 
@@ -198,9 +199,9 @@ public class RelationPreProcessor implements Serializable
 			rs.close();
 			
 			//  Get the relations that appear in the DB
-			rs=getRelationsFromDB();			
+			rs=getRelationsFromDB();	
 			
-			while(rs.next())
+			while(rs!=null && rs.next())
 			{
 				name=rs.getString(1);
 				if(eliminateRelations(name))
@@ -247,9 +248,10 @@ public class RelationPreProcessor implements Serializable
 				relations.add(rel);		
 			}
 			rs.close();
-			repairTypes();
+			//repairTypes();
 			repairRelations();
 		}
+		
 
 		printTypesAndRelations();
 		
@@ -451,11 +453,13 @@ public class RelationPreProcessor implements Serializable
 	// ********* AUXILLIARY METHODS ***********
 	public Type getTypeFromTypes(String typeName)
 	{
-		for(int i=0,len=types.size();i<len;i++)
-		{
-			if (types.get(i).getName().equals(typeName))
+		if (types != null && typeName != null) {
+			for(int i=0,len=types.size();i<len;i++)
 			{
-				return types.get(i);
+					if (types.get(i).getName().equals(typeName))
+					{
+						return types.get(i);
+					}
 			}
 		}
 		return null;
@@ -666,8 +670,10 @@ public class RelationPreProcessor implements Serializable
 
 		String finalClause="SELECT r1.relation, r1.domain, r1.rang, r2.n, r2.mult1,r2.mult2 FROM"+r1+r2;
 		
-		
+		System.out.println(finalClause);
 		ResultSet rs = stmt.executeQuery(finalClause);
+		System.out.println("Query successful");
+		
 		return rs;
 	}
 	// relations that are too  big can cause problems if there are two of them in the same sql statement
@@ -677,6 +683,8 @@ public class RelationPreProcessor implements Serializable
 		String sql="SELECT Relation, n FROM rel_stats WHERE N>150000";
 		String rel;
 		int n;
+		
+		System.out.println(sql);
 		ResultSet rs = stmt.executeQuery(sql);
 		
 		//System.out.println("Dangerous relations:");
@@ -700,7 +708,9 @@ public class RelationPreProcessor implements Serializable
 		String mainStmt="("+rangeStmt+" UNION "+domainStmt+")";		
 		String finalClause="SELECT arg1 as sub, arg2 as super FROM facts WHERE relation='subClassOf' AND arg1 IN "+mainStmt+ " AND arg2 IN "+mainStmt;
 		
+		System.out.println(finalClause);
 		ResultSet rs = stmt.executeQuery(finalClause);
+		
 		return rs;
 		
 	}
@@ -719,7 +729,10 @@ public class RelationPreProcessor implements Serializable
 		
 		ps.setString(1, target);
 		ps.setString(2, target);
+
+		System.out.println("CP1");
 		ResultSet rs=ps.executeQuery();
+		
 		rs.next();
 		float ans=rs.getFloat(1);
 		rs.close();
@@ -739,7 +752,10 @@ public class RelationPreProcessor implements Serializable
 		}
 		
 		ps.setString(1, target);
+		
+		System.out.println("CP2");
 		ResultSet rs=ps.executeQuery();
+		
 		rs.next();
 		int ans=rs.getInt(1);
 		rs.close();
@@ -769,6 +785,7 @@ public class RelationPreProcessor implements Serializable
 		ps.setInt(4,minFacts);
 		ps.setInt(5,possibleExamplesThreshold);
 		
+		System.out.println("CP3");
 		ResultSet  rs = ps.executeQuery();
 		
 		if (rs.next())

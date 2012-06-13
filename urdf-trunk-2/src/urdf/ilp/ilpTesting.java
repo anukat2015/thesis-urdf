@@ -44,8 +44,8 @@ public class ilpTesting
 //			String[] relationsToBeLearned={"livesIn","hasChild","bornIn","hasPredecessor"};
 //			int[] inputArg={1,1,1,1};
 			
-			String[] relationsToBeLearned={"hasChild"};
-			int[] inputArg={1};
+//			String[] relationsToBeLearned={"hasChild"};
+//			int[] inputArg={1};
 			
 //			String[] relationsToBeLearned={"hasCapital","hasChild",
 //					"isAffiliatedTo", "originatesFrom", "worksAt","diedIn"};
@@ -64,9 +64,9 @@ public class ilpTesting
 //			String[] relationsToBeLearned={"politicianOf"};
 //			int[] inputArg={1};
 			
-//			String[] relationsToBeLearned={"isPoliticianOf","graduatedFrom","directed","hasAcademicAdvisor",
-//					"hasCapital","hasPredecessor","hasSuccessor","isKnownFor","isLocatedIn","isMarriedTo","hasChild", "worksAt"};
-//			int[] inputArg={1,1,1,1,1,1,1,1,1,1,1,1};
+			String[] relationsToBeLearned={"isPoliticianOf","graduatedFrom","directed","hasAcademicAdvisor",
+					"hasCapital","hasPredecessor","hasSuccessor","isKnownFor","isLocatedIn","isMarriedTo","hasChild", "worksAt"};
+			int[] inputArg={1,1,1,1,1,1,1,1,1,1,1,1};
 			
 
 			
