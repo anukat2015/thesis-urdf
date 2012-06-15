@@ -47,9 +47,13 @@ public class HeadSampler
 		ResultSet rs;
 		String existance;
 		this.numOfPartitions=numOfPartitions;
+		
 		existance="SELECT 1 FROM user_objects WHERE object_type = 'TABLE' AND object_name='TRAIN"+inputArg+numOfPartitions+(noise==0?"'":"_"+noise+"'");
-				
+		System.out.println(existance);
+		
 		rs=stmt.executeQuery(existance);		
+		
+		//recreateIfExist = true;
 		
 		if (!rs.next()||recreateIfExist) // if it exists
 		{
@@ -57,10 +61,17 @@ public class HeadSampler
 			if (recreateIfExist)
 			{
 				// drop and recreate tables
+				
 				for (int i=1;i<=numOfPartitions;i++)
 				{
-					stmt.execute("DROP TABLE train"+inputArg+ i+(noise==0?"":"_"+noise));
+					try {
+						stmt.execute("DROP TABLE train"+inputArg+ i+(noise==0?"":"_"+noise));
+					}
+					catch(SQLException e) {
+						
+					}
 				}
+				
 				
 			}
 			if (noise>0)	// create a new table facts_noise and use that one as base
@@ -80,6 +91,7 @@ public class HeadSampler
 		String temp,modPart,train,baseTbl="facts"+(noise==0?"":"_"+noise);
 		// create a temp table		
 		temp="CREATE TABLE temp AS (SELECT rownum rnum, relation, arg"+inputArg+" FROM	(SELECT relation,arg"+inputArg+" FROM "+baseTbl+" GROUP BY relation,arg"+inputArg+" ORDER BY relation,arg"+inputArg+" ASC))";
+		System.out.println(temp);
 		
 		
 		
@@ -90,6 +102,7 @@ public class HeadSampler
 		for (int i=1;i<=numOfPartitions;i++)
 		{
 			train="CREATE TABLE train"+inputArg+i+(noise==0?"":"_"+noise)+" AS (SELECT f0.relation, f0.arg1,f0.arg2 FROM facts f0,temp tbl WHERE  f0.relation=tbl.relation AND f0.arg"+inputArg+"=tbl.arg"+inputArg+" AND "+modPart+(i-1)+")";
+			System.out.println(train);
 			stmt.execute(train);			
 		}
 		
@@ -103,10 +116,19 @@ public class HeadSampler
 			name=inputArg+""+i+(noise==0?"":"_"+noise);
 			
 			// the training tables
+			System.out.println("CREATE INDEX ind_train"+name+"_rel_arg1_arg2 ON train"+name+"(relation,arg1,arg2)");
  			stmt.execute("CREATE INDEX ind_train"+name+"_rel_arg1_arg2 ON train"+name+"(relation,arg1,arg2)");
+ 			
+ 			System.out.println("CREATE INDEX ind_train"+name+"_rel_arg2_arg1 ON train"+name+"(relation,arg2,arg1)");
  			stmt.execute("CREATE INDEX ind_train"+name+"_rel_arg2_arg1 ON train"+name+"(relation,arg2,arg1)");
+ 			
+ 			System.out.println("CREATE INDEX ind_train"+name+"_arg2_rel_arg1 ON train"+name+"(arg2,relation,arg1)");
 			stmt.execute("CREATE INDEX ind_train"+name+"_arg2_rel_arg1 ON train"+name+"(arg2,relation,arg1)");
+			
+			System.out.println("CREATE INDEX ind_train"+name+"_arg1_rel_arg2 ON train"+name+"(arg1,relation,arg2)");
  			stmt.execute("CREATE INDEX ind_train"+name+"_arg1_rel_arg2 ON train"+name+"(arg1,relation,arg2)");
+ 			
+ 			System.out.println("CREATE INDEX ind_train"+name+"_arg1_arg2_rel ON train"+name+"(arg1,arg2,relation)");
  			stmt.execute("CREATE INDEX ind_train"+name+"_arg1_arg2_rel ON train"+name+"(arg1,arg2,relation)");		
 		}
 	}

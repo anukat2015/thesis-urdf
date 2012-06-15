@@ -1,6 +1,11 @@
 package urdf.ilp;
 
+import java.io.IOException;
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 
 /**
  * @author Christina Teflioudi 
@@ -22,7 +27,45 @@ public class Relation implements Serializable
 	private int distinctEntitiesArg1=0;
 	private int distinctEntitiesArg2=0;
 	
- 	public Relation(String name, Type domain, Type range)
+	//Query database to get Relation data
+ 	public Relation(String name, Connection conn) {
+ 		String query;
+ 		ResultSet rs;
+		Statement stmt;
+		try {
+			stmt = conn.createStatement();
+			
+			query = "SELECT arg2 FROM facts WHERE relation='hasRange' AND arg1='" + name + "'";
+			rs = stmt.executeQuery(query);
+			if (rs!=null && rs.next()) 
+				this.range = new Type(rs.getString(1), conn);
+				
+
+			query = "SELECT arg2 FROM facts WHERE relation='hasDomain' AND arg1='" + name + "'";
+			rs = stmt.executeQuery(query);
+			if (rs!=null && rs.next()) 
+				this.domain = new Type(rs.getString(1), conn);
+				
+			
+			query = "SELECT n, mult1, mult2 FROM rel_stats WHERE relation='" + name + "'";
+			rs = stmt.executeQuery(query);
+			if (rs!=null && rs.next()) {
+				this.size = rs.getInt(1);
+				this.mult1 = rs.getFloat(2);
+				this.mult2 = rs.getFloat(3);
+			}	
+				
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(e.getMessage());
+		}
+ 	}
+ 	public Relation(String name, String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+ 		this(name,QueryHandler.getConnection(iniFile));
+ 	}
+	
+	public Relation(String name, Type domain, Type range)
 	{
 		this.name=name;
 		this.domain=domain;
@@ -143,6 +186,8 @@ public class Relation implements Serializable
 	public void setInputArg(int arg){this.inputArg=arg;}
 	public boolean equals(Relation rel)
 	{
+		if (rel==null || rel.name==null) return false;
+		System.out.println(this.name);
 		if (!this.name.equals(rel.name))
 			return false;
 		if (this.domain!=rel.domain)

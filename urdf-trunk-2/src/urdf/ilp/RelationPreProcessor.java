@@ -60,6 +60,17 @@ public class RelationPreProcessor implements Serializable
 	private PreparedStatement distinctEntitiesArg1;
 	private PreparedStatement distinctEntitiesArg2;
 	
+	//private PreparedStatement factsQuery;							
+	private String arg1JoinOnArg1OverlapQueryString = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg1=f2.arg1 HAVING count(*)>?*? AND count(*)>?";				
+	private String arg1JoinOnArg2OverlapQueryString = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg1=f2.arg2 HAVING count(*)>?*? AND count(*)>?";				
+	private String arg2JoinOnArg1OverlapQueryString = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg2=f2.arg1 HAVING count(*)>?*? AND count(*)>?";				
+	private String arg2JoinOnArg2OverlapQueryString = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg2=f2.arg2 HAVING count(*)>?*? AND count(*)>?";				
+	private String multVarianceArg1QueryString = "SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg1) GROUP BY mult), (SELECT mult1 average FROM rel_stats WHERE relation=?)";	
+	private String multVarianceArg2QueryString = "SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg2) GROUP BY mult), (SELECT mult2 average FROM rel_stats WHERE relation=?)";
+	private String distinctEntitiesArg1QueryString = "SELECT count(*) FROM (SELECT arg1 FROM "+baseTbl+" WHERE relation=? GROUP BY arg1)";
+	private String distinctEntitiesArg2QueryString = "SELECT count(*) FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation=? GROUP BY arg2)";	
+	
+	
 	public RelationPreProcessor(String iniFile, ThresholdChecker tChecker, ArrayList<Relation> relations,ArrayList<Type> types, HashMap<Integer,String>relationsForConstants,String baseTbl) throws Exception
 	{
 		try 
@@ -196,6 +207,8 @@ public class RelationPreProcessor implements Serializable
 					getTypeFromTypes(subType).setSuperType(getTypeFromTypes(superType));
 				}
 			}
+			
+			
 			rs.close();
 			
 			//  Get the relations that appear in the DB
@@ -248,12 +261,13 @@ public class RelationPreProcessor implements Serializable
 				relations.add(rel);		
 			}
 			rs.close();
-			//repairTypes();
+					
+			repairTypes();
 			repairRelations();
 		}
 		
 
-		printTypesAndRelations();
+		//printTypesAndRelations();
 		
 		dangerousRelations=getDangerousRelations();
 		
@@ -308,9 +322,9 @@ public class RelationPreProcessor implements Serializable
 			
 			//relations.get(i).setIsSymmetric(tChecker.isSymmetric(relations.get(i), facts1));
 			
-			System.out.println(relations.get(i).getName());
 			if (facts1==0)
 				continue;
+			
 			
 			while(j<len)
 			{
@@ -325,7 +339,8 @@ public class RelationPreProcessor implements Serializable
 						continue;
 					}
 						
-					minFacts=(facts1>facts2?facts2:facts1);
+					//minFacts=(facts1>facts2?facts2:facts1);
+					minFacts=Math.min(facts1, facts2);
 					System.out.println("Facts1: "+facts1+" facts2: "+facts2);
 					
 				}
@@ -650,6 +665,7 @@ public class RelationPreProcessor implements Serializable
 		// Prepare the PreparedStatements
 		//factsQuery=conn.prepareStatement("SELECT count(*) FROM facts WHERE relation =? ");
 		
+		/*
 		arg1JoinOnArg1Overlap=conn.prepareStatement("SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg1=f2.arg1 HAVING count(*)>?*? AND count(*)>?");
 		arg1JoinOnArg2Overlap=conn.prepareStatement("SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg1=f2.arg2 HAVING count(*)>?*? AND count(*)>?");
 		arg2JoinOnArg1Overlap=conn.prepareStatement("SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg2=f2.arg1 HAVING count(*)>?*? AND count(*)>?");
@@ -659,12 +675,24 @@ public class RelationPreProcessor implements Serializable
 		multVarianceArg2=conn.prepareStatement("SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg2) GROUP BY mult), (SELECT mult2 average FROM rel_stats WHERE relation=?)");
 		distinctEntitiesArg1=conn.prepareStatement("SELECT count(*) FROM (SELECT arg1 FROM "+baseTbl+" WHERE relation=? GROUP BY arg1)");
 		distinctEntitiesArg2=conn.prepareStatement("SELECT count(*) FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation=? GROUP BY arg2)");
+		*/
+		arg1JoinOnArg1Overlap=conn.prepareStatement(arg1JoinOnArg1OverlapQueryString);
+		arg1JoinOnArg2Overlap=conn.prepareStatement(arg1JoinOnArg2OverlapQueryString);
+		arg2JoinOnArg1Overlap=conn.prepareStatement(arg2JoinOnArg1OverlapQueryString);
+		arg2JoinOnArg2Overlap=conn.prepareStatement(arg2JoinOnArg2OverlapQueryString);
+		
+		multVarianceArg1=conn.prepareStatement(multVarianceArg1QueryString);
+		multVarianceArg2=conn.prepareStatement(multVarianceArg2QueryString);
+		distinctEntitiesArg1=conn.prepareStatement(distinctEntitiesArg1QueryString);
+		distinctEntitiesArg2=conn.prepareStatement(distinctEntitiesArg2QueryString);
 	}
 	private ResultSet getRelationsFromDB() throws SQLException
 	{
 		String selectStmt="SELECT NVL(tbl1.arg1,tbl2.arg1) as relation, tbl2.arg2 as domain, tbl1.arg2 as rang ";
-		String tbl1="(SELECT * FROM facts f0 WHERE f0.relation='range') tbl1";
-		String tbl2="(SELECT * FROM facts f1 WHERE f1.relation='domain') tbl2 ";
+		//String tbl1="(SELECT * FROM facts f0 WHERE f0.relation='range') tbl1";
+		//String tbl2="(SELECT * FROM facts f1 WHERE f1.relation='domain') tbl2 ";
+		String tbl1="(SELECT * FROM facts f0 WHERE f0.relation='hasRange') tbl1";
+		String tbl2="(SELECT * FROM facts f1 WHERE f1.relation='hasDomain') tbl2 ";
 		String r1="("+selectStmt+"FROM "+ tbl1+ " FULL OUTER JOIN "+tbl2+" ON tbl1.arg1=tbl2.arg1) r1";
 		String r2=" INNER JOIN rel_stats  r2 ON r1.relation=r2.relation";
 
@@ -703,10 +731,12 @@ public class RelationPreProcessor implements Serializable
 	}
 	private ResultSet getTypeHierarchyFromDB() throws SQLException
 	{
-		String rangeStmt="(SELECT arg2 FROM facts WHERE relation='range')";
-		String domainStmt="(SELECT arg2 FROM facts WHERE relation='domain')";
+		//String rangeStmt="(SELECT arg2 FROM facts WHERE relation='range')";
+		//String domainStmt="(SELECT arg2 FROM facts WHERE relation='domain')";
+		String rangeStmt="(SELECT arg2 FROM facts WHERE relation='hasRange')";
+		String domainStmt="(SELECT arg2 FROM facts WHERE relation='hasDomain')";
 		String mainStmt="("+rangeStmt+" UNION "+domainStmt+")";		
-		String finalClause="SELECT arg1 as sub, arg2 as super FROM facts WHERE relation='subClassOf' AND arg1 IN "+mainStmt+ " AND arg2 IN "+mainStmt;
+		String finalClause="SELECT arg1 as sub, arg2 as super FROM facts WHERE relation='subclassOf' AND arg1 IN "+mainStmt+ " AND arg2 IN "+mainStmt;
 		
 		System.out.println(finalClause);
 		ResultSet rs = stmt.executeQuery(finalClause);
@@ -717,20 +747,26 @@ public class RelationPreProcessor implements Serializable
 	private float getVarMult(String target,int arg) throws SQLException
 	{
 		PreparedStatement ps;
+		String psString;
 		
 		switch(arg)
 		{
 			case 1:
 				ps=multVarianceArg1;
+				psString=multVarianceArg1QueryString;
 				break;
 			default: // 2
 				ps=multVarianceArg2;
+				psString=multVarianceArg2QueryString;
 		}
 		
-		ps.setString(1, target);
-		ps.setString(2, target);
+		ps.setString(1, target);   	
+		psString=psString.replaceFirst("?", target);
+		
+		ps.setString(2, target);	
+		psString=psString.replaceFirst("?", target);
 
-		System.out.println("CP1");
+		System.out.println(psString);
 		ResultSet rs=ps.executeQuery();
 		
 		rs.next();
@@ -741,19 +777,23 @@ public class RelationPreProcessor implements Serializable
   	private int getDistinctEntities(String target,int arg) throws SQLException
   	{
   		PreparedStatement ps;
+  		String psString;
 		
 		switch(arg)
 		{
 			case 1:
 				ps=distinctEntitiesArg1;
+				psString=distinctEntitiesArg1QueryString;
 				break;
 			default: // 2
 				ps=distinctEntitiesArg2;
+				psString=distinctEntitiesArg2QueryString;
 		}
 		
 		ps.setString(1, target);
+		psString=psString.replaceFirst("?", target);
 		
-		System.out.println("CP2");
+		System.out.println(psString);
 		ResultSet rs=ps.executeQuery();
 		
 		rs.next();
@@ -764,28 +804,43 @@ public class RelationPreProcessor implements Serializable
 	private boolean fireOverlapQuery(int joinCase, Relation relation1, Relation relation2, int minFacts, float supportThreshold,int possibleExamplesThreshold) throws SQLException
 	{
  		PreparedStatement ps=null;
+ 		String psString = "";
+ 		
 		switch(joinCase)
 		{
 			case 1:
 				ps=arg1JoinOnArg1Overlap;
+				psString=arg1JoinOnArg1OverlapQueryString;
 				break;
 			case 2:
 				ps=arg1JoinOnArg2Overlap;
+				psString=arg1JoinOnArg2OverlapQueryString;
 				break;
 			case 3:
 				ps=arg2JoinOnArg1Overlap;
+				psString=arg2JoinOnArg1OverlapQueryString;
 				break;
 			case 4:
 				ps=arg2JoinOnArg2Overlap;
+				psString=arg2JoinOnArg2OverlapQueryString;
 				
 		}
 		ps.setString(1, relation1.getName());
-		ps.setString(2, relation2.getName());
-		ps.setFloat(3,supportThreshold);
-		ps.setInt(4,minFacts);
-		ps.setInt(5,possibleExamplesThreshold);
+		psString=psString.replaceFirst("?", relation1.getName());
 		
-		System.out.println("CP3");
+		ps.setString(2, relation2.getName());
+		psString=psString.replaceFirst("?", relation2.getName());
+		
+		ps.setFloat(3,supportThreshold);
+		psString=psString.replaceFirst("?", Float.toString(supportThreshold));
+		
+		ps.setInt(4,minFacts);
+		psString=psString.replaceFirst("?", Integer.toString(minFacts));
+		
+		ps.setInt(5,possibleExamplesThreshold);
+		psString=psString.replaceFirst("?", Integer.toString(possibleExamplesThreshold));
+		
+		System.out.println(psString);
 		ResultSet  rs = ps.executeQuery();
 		
 		if (rs.next())

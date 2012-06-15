@@ -48,19 +48,30 @@ public class LearningManager
 		info=preprocessor.getRelationsInfo();	
 		tChecker.setDangerousRelations(info.dangerousRelations);
 		expDesc	="supp"	+supportThreshold+"_conf"+confidenceThreshold+"_spec"+specialityRatioThreshold+"_possPos"+possiblePosToBeCoveredThreshold;
+		System.out.println(expDesc);
+		
 		this.inputArg=inputArg;
 		sampler=new HeadSampler(iniFile);
-		sample(partitionNumber,false,noise);		
+		sample(partitionNumber,false,noise);	
+		System.out.println("Learning Manager Constructed Successfully");
 
 	}
 	
  	public void createHeadPredicates(String[] rel,int[] inputArg, int depth)
 	{
- 		headPredicates=new ArrayList<HeadPredicate>();		
+ 		headPredicates=new ArrayList<HeadPredicate>();
+ 		System.out.println("Size of relations = " + rel.length);
+ 		if (info!=null) {
+ 			System.out.println(info.getAllRelations().size());
+ 			for (String key: info.getAllRelations().keySet()) System.out.println(key);
+ 		}
+ 		else System.out.println("info == null");
 		for (int i=0,len=rel.length;i<len;i++)
 		{	
-			HeadPredicate hp=new HeadPredicate(info.getRelationFromRelations(rel[i]),depth, info, inputArg[i]);
-			headPredicates.add(new HeadPredicate(info.getRelationFromRelations(rel[i]),depth, info, inputArg[i]));				
+			Relation headRelation = info.getRelationFromRelations(rel[i]);
+			System.out.println(i + ": " + headRelation.getName());
+			HeadPredicate hp = new HeadPredicate(headRelation,depth, info, inputArg[i]);
+			headPredicates.add(hp);				
 		}
 		System.out.println("HeadPredicates created...");
 	}
@@ -93,13 +104,16 @@ public class LearningManager
 		long time;
 		
 		// create the head predicates
+		System.out.println("Create Head Predicates");
 		createHeadPredicates(relationsToBeLearned,inputArg, depth);		
 		
 		// initialize the learner
+		System.out.println("Construct Rule Learner");
 		learner=new RuleLearner(queryHandler,tChecker,info,allowFreeVars,gainMeasure,beamWidth,tryConstants);
 		
 		
 		// learn for each training and testing partition
+		System.out.println("Lear for each training and testing partition");
 		for (int i=1;i<=numOfPartitions;i++)
 		{	
 			time= System.currentTimeMillis();

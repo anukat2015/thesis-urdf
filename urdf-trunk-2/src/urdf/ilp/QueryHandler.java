@@ -81,6 +81,30 @@ public class QueryHandler
 		catch (SQLException e) {e.printStackTrace();}
 	}
 
+	public static Connection getConnection(String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+		DatabaseParameters p = DBConfig.databaseParameters(iniFile);
+		Connection conn = null;
+	    if (p.system.toLowerCase().indexOf("postgres") >= 0) 
+	    {
+	    
+	      DriverManager.registerDriver((Driver) Class.forName("org.postgresql.Driver").newInstance());
+
+	      conn = DriverManager.getConnection("jdbc:postgresql://" + p.host + ":" + p.port + (p.database == null ? "" : "/" + p.database), p.user,
+	          p.password);
+
+	    } 
+	    else if (p.system.toLowerCase().indexOf("oracle") >= 0) 
+	    {
+	    	
+	      DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance());
+
+	      conn = DriverManager.getConnection("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=" + p.host
+	          + ")(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=" + p.inst + ")(server = dedicated)))", p.user, p.password);
+
+	    } 
+	    return conn;
+	}
+	
  	private void initializeConnection(String iniFile) throws Exception
 	{ 
 	    DatabaseParameters p = DBConfig.databaseParameters(iniFile);
