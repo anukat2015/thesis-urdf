@@ -314,7 +314,7 @@ public class QueryHandler
 
 	public float calcRulePropertiesRdf3x(Rule rule, String[] clauses, int forWhat, int inputArg) throws Exception {
 		String sparql;
-		switch(forWhat)
+		/*switch(forWhat)
 		{
 			case 0:	// positivesCovered
 				break;
@@ -343,7 +343,8 @@ public class QueryHandler
 				finalClause="SELECT count(*) FROM ("+finalClause+")";
 				//key=clauses[1]+clauses[2];
 				key=finalClause;
-		}
+		}*/
+		return -1;
 	}
 	
 	/**
