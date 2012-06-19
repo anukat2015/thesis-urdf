@@ -1,4 +1,4 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 
 
@@ -53,6 +53,7 @@ public class HeadSampler
 		
 		rs=stmt.executeQuery(existance);		
 		
+		//recreateIfExist = true;
 		
 		if (!rs.next()||recreateIfExist) // if it exists
 		{

@@ -75,6 +75,10 @@ public final class Driver implements java.sql.Driver
          return null;
       String fileName=url.substring(8);
 
+   	  if (info.containsKey("DIR")) {
+		 fileName = info.get("DIR") + "/" + fileName;
+	  }
+      
       // Safety check to locate the database
       if (!((new File(fileName)).isFile()))
          throw new SQLException("database file "+fileName+" not found");

@@ -1,4 +1,4 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -41,13 +41,11 @@ public class LearningManager
 				positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);		
 		
 		
-		//preprocessor=new RelationPreProcessor(iniFile,tChecker,relations,types,relationsForConstants,baseTbl);		
+		preprocessor=new RelationPreProcessor(iniFile,tChecker,relations,types,relationsForConstants,baseTbl);		
 		
-		preprocessor=new RelationPreProcessor(iniFile);	
-		
-
+		//preprocessor=new RelationPreProcessor(iniFile);	
+		//System.out.println("hi!");
 		info=preprocessor.getRelationsInfo();	
-		
 		tChecker.setDangerousRelations(info.dangerousRelations);
 		expDesc	="supp"	+supportThreshold+"_conf"+confidenceThreshold+"_spec"+specialityRatioThreshold+"_possPos"+possiblePosToBeCoveredThreshold;
 		System.out.println(expDesc);
@@ -62,11 +60,16 @@ public class LearningManager
  	public void createHeadPredicates(String[] rel,int[] inputArg, int depth)
 	{
  		headPredicates=new ArrayList<HeadPredicate>();
- 		
+ 		System.out.println("Size of relations = " + rel.length);
+ 		if (info!=null) {
+ 			System.out.println(info.getAllRelations().size());
+ 			for (String key: info.getAllRelations().keySet()) System.out.println(key);
+ 		}
+ 		else System.out.println("info == null");
 		for (int i=0,len=rel.length;i<len;i++)
 		{	
 			Relation headRelation = info.getRelationFromRelations(rel[i]);
-			//System.out.println(i + ": " + headRelation.getName());
+			System.out.println(i + ": " + headRelation.getName());
 			HeadPredicate hp = new HeadPredicate(headRelation,depth, info, inputArg[i]);
 			headPredicates.add(hp);				
 		}
@@ -117,7 +120,7 @@ public class LearningManager
 			goodRulesForPartition=new ArrayList<Rule>();
 			learnForPartition(i,depth);	
 			time = System.currentTimeMillis() - time;
-			System.out.println(i + ") Time elapsed for the whole partition: "+time);
+			System.out.println("Time elapsed for the whole partition: "+time);
 			
 			//runUrdfExp(i);		
 			break;

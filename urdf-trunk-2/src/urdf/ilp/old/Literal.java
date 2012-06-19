@@ -1,4 +1,4 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 
 
@@ -8,8 +8,6 @@ package urdf.ilp;
 
 public class Literal implements Cloneable
 {
-	private static final String prefix = "<http://yago-knowledge.org/resource/";
-	private static final String suffix = ">";
 	private Relation relation;
 	private int firstArgument;
 	private int secondArgument;
@@ -137,15 +135,5 @@ public class Literal implements Cloneable
 	{
 		this.freeVariable=freeVariable;
 	}
-	public String getRelationNameRdf3x() {
-		String name = relation.getName();
-		if (!name.contains(prefix)) 
-			name = prefix + name + suffix;
-		return name; 
-	}
-	public String getSparqlPattern() {
-		return "?" + Character.toChars(firstArgument) + " " + getRelationNameRdf3x() + "" + Character.toChars(secondArgument) + " . ";
-	}
-	
 
 }

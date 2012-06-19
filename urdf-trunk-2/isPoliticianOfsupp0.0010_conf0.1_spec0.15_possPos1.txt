@@ -1,0 +1,15 @@
+TARGET PREDICATE: isPoliticianOf
+ 
+isPoliticianOf(65,66)<-isLeaderOf(65,67)isPoliticianOf(67,66)!=(67,65)
+confidence: 1.0 support: 0.0013661202 specialityRatio: 1.0
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 2 E+: 1464
+
+isPoliticianOf(65,66)<-livesIn(65,67)hasCapital(66,67)type(65,68)=(68,wikicategory_American_Roman_Catholic_politicians)
+confidence: 0.5 support: 0.0034153005 specialityRatio: 0.5
+N+(c): 3 E+(c): 5 N(c): 6 B(c): 12 E+: 1464
+
+isPoliticianOf(65,66)<-livesIn(65,66)type(65,67)=(67,wikicategory_Governors_of_Delaware)
+confidence: 0.48591548 support: 0.04781421 specialityRatio: 1.0
+N+(c): 69 E+(c): 70 N(c): 142 B(c): 142 E+: 1464
+
+time elapsed for whole partition: 134868552

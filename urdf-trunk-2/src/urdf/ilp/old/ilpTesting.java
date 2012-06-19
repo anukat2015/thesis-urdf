@@ -1,10 +1,10 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * @author Christina Teflioudi
@@ -37,9 +37,25 @@ public class ilpTesting {
 			boolean learnOnlyConstants = true;
 
 			long timer = System.currentTimeMillis();
+			/*
+			Connection conn = QueryHandler.getConnection(args[0]);
+			Statement stmt = conn.createStatement();
+			ResultSet rs;
 			
-			//args[0] = "src/rdf3x.properties";
-
+			rs= stmt.executeQuery("SELECT DISTINCT(relation) FROM rel_stats");
+			while (rs.next()) {
+				Relation r = new Relation(rs.getString(1), conn);
+				System.out.println(r.getName() + r.getRange().getName() + r.getDomain().getName());
+				relations.add(r);		
+			}
+			System.out.println("Relations created");
+			
+			rs = stmt.executeQuery("SELECT DISTINCT(arg2) FROM facts WHERE relation='hasRange' OR relation='hasDomain'");
+			while (rs!=null && rs.next()) {
+				types.add(new Type(rs.getString(1), conn));			
+			}
+			System.out.println("Types created");
+			*/
 			
 			
 

@@ -1,4 +1,4 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 
 
@@ -311,41 +311,6 @@ public class QueryHandler
 		return ps;
 	}
 	
-
-	public float calcRulePropertiesRdf3x(Rule rule, String[] clauses, int forWhat, int inputArg) throws Exception {
-		String sparql;
-		switch(forWhat)
-		{
-			case 0:	// positivesCovered
-				break;
-			case 1: // examplesCovered
-				sparql = "SELECT COUNT ?w WHERE {";
-				sparql += "?" + rule.getHead().getFirstArgument()
-				
-				break;
-			case 2: // body
-				finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-				key=clauses[1]+clauses[2];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				break;
-			case 4:
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
-				break;
-			case 5: // case 5
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
-				break;
-			default:
-				finalClause=clauses[7];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				//key=clauses[1]+clauses[2];
-				key=finalClause;
-		}
-	}
-	
 	/**
 	 * @param clauses
 	 * 		0: select clause 
@@ -400,13 +365,8 @@ public class QueryHandler
 				//key=clauses[1]+clauses[2];
 				key=finalClause;
 		}
-		
-		
-		rule.printRule(true);
-		String s = "Query For: ";
-		switch(forWhat){case 0: s="PositivesCovered"; case 1: s="examplesCovered"; case 2: s="body"; case 4: s="mult1"; case 5: s="mult2"; case 6: s="possiblePosToBeCovered";}
-		System.out.println(s);
-		System.out.println(finalClause);
+		//rule.printRule(true);
+		//System.out.println(finalClause);
 		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,forWhat, rule.getBodyLiterals().size()),rule,1, forWhat, inputArg);
 		return fire(ps,forWhat,rule);
 	}
@@ -416,9 +376,8 @@ public class QueryHandler
 		String basic=clauses[0]+clauses[1]+clauses[2]+clauses[3];
 		String finalClause="SELECT avg(mult) average FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+")";
 		String key=clauses[1]+clauses[2];
-		
-		rule.printRule(true);
-		System.out.println(finalClause);
+		//rule.printRule(true);
+		//System.out.println(finalClause);
 		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,12, rule.getBodyLiterals().size()),rule,1, 2, inputArg);
 		
 		float avg=fire(ps,2,rule);		
@@ -435,9 +394,8 @@ public class QueryHandler
 		
 		
 		String key=clauses[1]+clauses[2];
-		
-		rule.printRule(true);
-		System.out.println(finalClause);
+		//rule.printRule(true);
+		//System.out.println(finalClause);
 		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,13, rule.getBodyLiterals().size()),rule,1, 2, inputArg);
 		float var=fire(ps,2,rule);	
 		//System.out.println("BodyVar: "+var);
@@ -457,7 +415,7 @@ public class QueryHandler
 		finalClause+="SELECT "+arg+" FROM ("+clauses[7]+") GROUP BY "+arg+" HAVING count(*)>"+possiblePosToBeCoveredThershold+" OR count(*)>"+supportThreshold*factsForHead;
 		key=finalClause;
 		
-		System.out.println(finalClause);
+		//System.out.println(finalClause);
 		
 		PreparedStatement ps=checkForQueryExistance(finalClause,key, 7, rule.getBodyLiterals().size());
 		ps=fillInPreparedStatement(ps, rule, 1, 0, inputArg);
@@ -783,9 +741,7 @@ public class QueryHandler
 		String finalClause;
 		ResultSet rs;
 		finalClause="SELECT count(*) FROM (SELECT "+(arg==1?"input":"output")+" FROM (SELECT arg1 input, arg2 output FROM "+baseTbl+" WHERE relation='"+target+"') GROUP BY "+(arg==1?"input":"output")+")";
-		
-		
-		System.out.println(finalClause);
+		//System.out.println(finalClause);
 		rs=stmt.executeQuery(finalClause);
 		//rsCounter++;
 		//System.out.println(rsCounter);
@@ -903,7 +859,6 @@ public class QueryHandler
 		String sql="SELECT arg2 FROM (SELECT f1.arg2, count(*) c FROM "+headTbl+" f0, "+baseTbl+" f1 WHERE f0.relation='"+target+
 						"' AND f1.relation='type' AND f0.arg"+arg+"=f1.arg1 GROUP BY f1.arg2 ORDER BY c DESC) WHERE rownum<="+numOfTries;
 			
-		System.out.println(sql);
 		ResultSet rs=stmt.executeQuery(sql);
 		//rsCounter++;
 		//System.out.println(rsCounter);
@@ -923,7 +878,6 @@ public class QueryHandler
 	{
 		String sql="SELECT VARIANCE(mult) FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation='"+target+"' GROUP BY f0.arg"+arg+")";
 		
-		System.out.println(sql);
 		ResultSet rs=stmt.executeQuery(sql);
 		//rsCounter++;
 		//System.out.println(rsCounter);
@@ -944,8 +898,6 @@ public class QueryHandler
 			tbl1="(SELECT count(*) denom FROM (SELECT arg1 FROM "+headTbl+" WHERE relation='"+target+"' GROUP BY arg1))";
 			tbl2="(SELECT count(*) nom FROM (SELECT arg1 FROM "+baseTbl+" WHERE relation='"+target+"' GROUP BY arg1))";			
 			sql="SELECT nom/denom FROM"+tbl1+", "+tbl2;
-			
-			System.out.println(sql);
 			rs=stmt.executeQuery(sql);
 			rs.next();
 			param1=rs.getFloat(1);
@@ -956,8 +908,6 @@ public class QueryHandler
 			tbl1="(SELECT count(*) denom FROM (SELECT arg2 FROM "+headTbl+" WHERE relation='"+target+"' GROUP BY arg2))";
 			tbl2="(SELECT count(*) nom FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation='"+target+"' GROUP BY arg2))";			
 			sql="SELECT nom/denom FROM"+tbl1+", "+tbl2;
-			
-			System.out.println(sql);
 			rs=stmt.executeQuery(sql);
 			rs.next();
 			param2=rs.getFloat(1);

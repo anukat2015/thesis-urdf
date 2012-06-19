@@ -1,4 +1,4 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 
 
@@ -483,25 +483,6 @@ public class Rule implements Cloneable
 		}
 		
 		this.numOfFreeVariables=count;
-	}
-	
-	public String positivesCoveredPatterns() {
-		String patterns = head.getSparqlPattern();
-		patterns += head.getSparqlPattern();
-		patterns += examplesCoveredPatterns();
-		return patterns;
-	}
-	
-	public String examplesCoveredPatterns() {
-		String patterns = "";
-		for (Literal literal: bodyLiterals) {
-			patterns += literal.getSparqlPattern();
-		}
-		return patterns;
-	}
-	
-	public String possiblePositivesToBeCovered() {
-		
 	}
 
 

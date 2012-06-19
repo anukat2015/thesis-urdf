@@ -15,7 +15,7 @@ import java.util.Properties;
 // or send a letter to Creative Commons, 171 Second Street, Suite 300,
 // San Francisco, California, 94105, USA.
 
-final class Connection implements java.sql.Connection
+public final class Connection implements java.sql.Connection
 {
    // The connected process
    private Process process;

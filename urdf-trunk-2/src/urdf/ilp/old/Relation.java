@@ -1,4 +1,4 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -58,6 +58,7 @@ public class Relation implements Serializable
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.out.println(e.getMessage());
 		}
  	}
  	public Relation(String name, String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
@@ -186,6 +187,7 @@ public class Relation implements Serializable
 	public boolean equals(Relation rel)
 	{
 		if (rel==null || rel.name==null) return false;
+		System.out.println(this.name);
 		if (!this.name.equals(rel.name))
 			return false;
 		if (this.domain!=rel.domain)

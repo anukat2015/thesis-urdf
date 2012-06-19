@@ -1,10 +1,8 @@
-package urdf.ilp;
+package urdf.ilp.old;
 
 
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -19,7 +17,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Properties;
 
 import basic.configuration.DBConfig;
 import basic.configuration.DBConfig.DatabaseParameters;
@@ -71,16 +68,7 @@ public class RelationPreProcessor implements Serializable
 	private String multVarianceArg1QueryString = "SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg1) GROUP BY mult), (SELECT mult1 average FROM rel_stats WHERE relation=?)";	
 	private String multVarianceArg2QueryString = "SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg2) GROUP BY mult), (SELECT mult2 average FROM rel_stats WHERE relation=?)";
 	private String distinctEntitiesArg1QueryString = "SELECT count(*) FROM (SELECT arg1 FROM "+baseTbl+" WHERE relation=? GROUP BY arg1)";
-	private String distinctEntitiesArg2QueryString = "SELECT count(*) FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation=? GROUP BY arg2)";
-	
-	private String arg1JoinOnArg1OverlapSPARQL = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg1=f2.arg1 HAVING count(*)>?*? AND count(*)>?";				
-	private String arg1JoinOnArg2OverlapSPARQL = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg1=f2.arg2 HAVING count(*)>?*? AND count(*)>?";				
-	private String arg2JoinOnArg1OverlapSPARQL = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg2=f2.arg1 HAVING count(*)>?*? AND count(*)>?";				
-	private String arg2JoinOnArg2OverlapSPARQL = "SELECT 1 FROM facts f1, facts f2 WHERE f1.relation=? AND f2.relation=? AND f1.arg2=f2.arg2 HAVING count(*)>?*? AND count(*)>?";				
-	private String multVarianceArg1SPARQL = "SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg1) GROUP BY mult), (SELECT mult1 average FROM rel_stats WHERE relation=?)";	
-	private String multVarianceArg2SPARQL = "SELECT sum((mult-average)*(mult-average)*numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation=? GROUP BY f0.arg2) GROUP BY mult), (SELECT mult2 average FROM rel_stats WHERE relation=?)";
-	private String distinctEntitiesArg1SPARQL = "SELECT count(*) FROM (SELECT arg1 FROM "+baseTbl+" WHERE relation=? GROUP BY arg1)";
-	private String distinctEntitiesArg2SPARQL = "SELECT count(*) FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation=? GROUP BY arg2)";	
+	private String distinctEntitiesArg2QueryString = "SELECT count(*) FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation=? GROUP BY arg2)";	
 	
 	
 	public RelationPreProcessor(String iniFile, ThresholdChecker tChecker, ArrayList<Relation> relations,ArrayList<Type> types, HashMap<Integer,String>relationsForConstants,String baseTbl) throws Exception
@@ -93,11 +81,11 @@ public class RelationPreProcessor implements Serializable
 			this.types=types;
 			this.relationsForConstants=relationsForConstants;
 			initializeConnection(iniFile); //initialize the connection		
-			//this.conn = initializeRdf3xConnection(iniFile); //initialize the connection
 			System.out.println("Connected to DB");
 			prepareStatements();// Prepare the PreparedStatements
 			this.stmt = conn.createStatement();				
 		} 
+		catch (ClassNotFoundException e) {e.printStackTrace();}	
 		catch (SQLException e) {e.printStackTrace();}
 		
 		long time=System.currentTimeMillis();
@@ -161,7 +149,6 @@ public class RelationPreProcessor implements Serializable
            
         	in.close();
         	fileIn.close();
-
        }
        catch(IOException i)
        {
@@ -671,17 +658,6 @@ public class RelationPreProcessor implements Serializable
 	    } 
 	    else
 	      throw new Exception("UNKNOWN DB DRIVER!");
-	    
-	}
-  	
- 	private Connection initializeRdf3xConnection(String propsFile) throws SQLException, FileNotFoundException, IOException
-	{ 
- 		Properties props = new Properties();
- 		props.load(new FileInputStream(new File(propsFile)));
- 		urdf.rdf3x.Driver drvr = new urdf.rdf3x.Driver();
- 		String db = (String) props.get("Database");
- 		urdf.rdf3x.Connection conn = (urdf.rdf3x.Connection) drvr.connect(db, props);
- 		return conn;
 	    
 	}
 	private void prepareStatements() throws SQLException
