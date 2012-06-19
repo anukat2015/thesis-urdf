@@ -501,7 +501,7 @@ public class Rule implements Cloneable
 	}
 	
 	public String possiblePositivesToBeCovered() {
-		
+		return "";
 	}
 
 
