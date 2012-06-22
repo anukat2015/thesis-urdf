@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TextInput 
+	 xmlns:mx="http://www.adobe.com/2006/mxml"
+	 editable="true"
+	 textAlign="center" 
+	 change="checkTextInput(event);">
+	
+	<mx:Script>
+		<![CDATA[
+			import flash.events.Event;
+			import util.UStringUtil;
+			import uviface.event.UStringChangeEvent;
+			
+			private function checkTextInput(event:Event = null):void {
+				//if(_relations.contains(this.textInput.text) || UStringUtil.startsWith(this.textInput.text,"?"))
+				  //  this.dispatchEvent(new URelationChangeEvent(URelationChangeEvent.RELATION_CHANGE_EVENT,true));
+				/*
+				if(UStringUtil.startsWith(this.text,"?"))
+				    this.dispatchEvent(new UStringChangeEvent(UStringChangeEvent.STRING_CHANGE_EVENT,
+				                       UStringChangeEvent.SUBJECT, this.text,true));
+				else {
+				   this.text = "";
+				   return;//this.dispatchEvent(new Event(Event.CHANGE,true));
+				}
+				*/
+				this.dispatchEvent(new UStringChangeEvent(UStringChangeEvent.STRING_CHANGE_EVENT,
+				                       UStringChangeEvent.SUBJECT, this.text,true));
+			}
+			
+		]]>
+	</mx:Script>
+	
+</mx:TextInput>

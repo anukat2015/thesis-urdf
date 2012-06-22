@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+    xmlns:ac="com.hillelcoren.components.*" 
+	width="527" 
+	height="25"
+	paddingTop="0"  
+	paddingLeft="0" 
+	paddingRight="0" 
+	paddingBottom="0"
+    xmlns:query="uviface.ui.query.*" 
+    cornerRadius="12" backgroundAlpha="0.0" borderStyle="none">
+	 
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ValidationResultEvent;
+			import mx.events.FlexEvent;
+			import uviface.event.UQueryEvent;
+			import util.UStringUtil;
+			
+			import com.hillelcoren.components.autoComplete.*;
+			
+			import mx.collections.ArrayCollection;
+			import urdf.api.URelation;
+			import uviface.ui.query.UQueryErrorPanel;
+			
+			[Bindable]
+			private var _relations:ArrayCollection = URelation.getRelations();
+			
+			public function get firstArgument():String {
+			    return QueryLiteralArg1Input.text;
+			}
+			
+			public function set firstArgument(firstArgument:String):void {
+			    QueryLiteralArg1Input.text = firstArgument;
+			}
+			
+			public function get relation():String {
+				if(QueryLiteralRelationInputAutoComplete.selectedItem != null)
+				   return QueryLiteralRelationInputAutoComplete.selectedItem;
+				else
+				   return QueryLiteralRelationInputAutoComplete.searchText;
+			    //return QueryLiteralRelationInputAutoComplete.searchText;
+			}
+			
+			public function get compareValueString():String {
+			    return CompareValueInput.text;
+			}
+			
+			public function get compareValue():int {
+			    return parseInt(CompareValueInput.text);
+			}
+			
+			public function set relation(relation:String):void {
+				
+				if(UStringUtil.startsWith(relation,"?")) {
+				    QueryLiteralRelationInputAutoComplete.searchText = relation;
+				    //this.dispatchEvent(new Event(Event.CHANGE,true));
+				}
+				else
+				    //trace("_relations.contains(relation) : " + _relations.contains(relation));
+				    
+				    //if(_relations.contains(relation)) {
+				    {
+				       //trace("selectedItem is : " + QueryLiteralRelationInputAutoComplete.selectedItem);
+				       //QueryLiteralRelationInputAutoComplete.selectedItems.addItem(relation);
+				       QueryLiteralRelationInputAutoComplete.selectedItem = relation;
+					   //this.dispatchEvent(new Event(Event.CHANGE,true));
+				       //QueryLiteralRelationInputAutoComplete.invalidateDisplayList();
+				       //trace("selectedItem is : " + QueryLiteralRelationInputAutoComplete.selectedItem);
+				    }
+				this.dispatchEvent(new Event(Event.CHANGE,true));    
+			}
+			
+			public function get secondArgument():String {
+				return QueryLiteralArg2Input.text;
+			}
+			
+			public function set secondArgument(secondArgument:String):void {
+				QueryLiteralArg2Input.text = secondArgument;
+			}
+			
+			/** Checks that the relation name is either a constant from the list
+			 * or a variable that starts with a "?". 
+			 * 
+			 * Is neither of these cases holds -> create an error popup.
+			 * */
+			public function validateRelationInput():void {
+				if(!_relations.contains(QueryLiteralRelationInputAutoComplete.selectedItem) 
+				    //QueryLiteralRelationInputAutoComplete.searchText
+				    && QueryLiteralRelationInputAutoComplete.textInput.text != ""
+				    && !UStringUtil.startsWith(QueryLiteralRelationInputAutoComplete.textInput.text, "?")) {
+				    // create the error popup
+				    mx.core.Application.application.UVizErrorPanel.writePredicateError();
+		    	    mx.core.Application.application.UVizErrorPanel.show();
+		        }
+			}
+			
+			/** Checks that the relation name is either a constant from the list
+			 * or a variable that starts with a "?". 
+			 * 
+			 * Is neither of these cases holds -> return false.
+			 * */
+			public function checkRelationInput():Boolean {
+				if(!_relations.contains(QueryLiteralRelationInputAutoComplete.selectedItem) 
+				    && QueryLiteralRelationInputAutoComplete.searchText != ""
+				    && !UStringUtil.startsWith(QueryLiteralRelationInputAutoComplete.searchText, "?"))
+				    // create the error popup
+				    return false;
+				return true;
+			}
+			
+			public function isEmpty():Boolean {
+				if(QueryLiteralArg1Input.text == "" 
+				  && ((QueryLiteralRelationInputAutoComplete.selectedItem == null && QueryLiteralRelationInputAutoComplete.searchText == "")
+				   || (QueryLiteralRelationInputAutoComplete.selectedItem == "" && QueryLiteralRelationInputAutoComplete.searchText == "")) 
+				   && QueryLiteralArg2Input.text == "" && CompareValueInput.text == "")
+				   return true;
+				else
+				   return false;
+			}
+			
+			public function literalString():String {
+				if(QueryLiteralRelationInputAutoComplete.searchText.length == 0) {
+				  if(QueryLiteralRelationInputAutoComplete.selectedItem == null || QueryLiteralRelationInputAutoComplete.selectedItem == "")
+				     return (CompareValueInput.text == "")
+				            ? ("(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ")")
+				            : ("(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + "," + CompareValueInput.text + ")");
+				  else 
+				     return (CompareValueInput.text == "")
+				            ? (QueryLiteralRelationInputAutoComplete.selectedItem + "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ")")
+				            : (QueryLiteralRelationInputAutoComplete.selectedItem + "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + "," + CompareValueInput.text + ")");
+				}
+				else
+				   return (CompareValueInput.text == "")
+				           ? (QueryLiteralRelationInputAutoComplete.searchText + "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ")")
+				           : (QueryLiteralRelationInputAutoComplete.searchText + "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + "," + CompareValueInput.text + ")");
+				   //return "";
+			}
+			
+			public function buildLiteralStringSPARQL():String {
+				if(QueryLiteralRelationInputAutoComplete.searchText.length == 0) {
+				  if(QueryLiteralRelationInputAutoComplete.selectedItem == null || QueryLiteralRelationInputAutoComplete.selectedItem == "")
+				     return (CompareValueInput.text == "") 
+				            ? ("<" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ">")
+				            : ("<" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + "," + CompareValueInput.text + ">");
+				  else 
+				     return (CompareValueInput.text == "") 
+				             ? ("<" + QueryLiteralArg1Input.text + "," + QueryLiteralRelationInputAutoComplete.selectedItem 
+				                + "," +  QueryLiteralArg2Input.text + ">")
+				             : ("<" + QueryLiteralArg1Input.text + "," + QueryLiteralRelationInputAutoComplete.selectedItem 
+				                + "," +  QueryLiteralArg2Input.text + "," + CompareValueInput.text + ">");
+				}
+				else
+				   return (CompareValueInput.text == "")
+				           ? ("<" + QueryLiteralArg1Input.text + "," + QueryLiteralRelationInputAutoComplete.searchText 
+				               + "," +  QueryLiteralArg2Input.text + ">")
+				           : ("<" + QueryLiteralArg1Input.text + "," + QueryLiteralRelationInputAutoComplete.searchText 
+				               + "," +  QueryLiteralArg2Input.text + "," + CompareValueInput.text + ">");
+				   //return "";
+			}
+			
+			public function parseLiteralStringSPARQL(literalString:String):Boolean {
+				
+				// check if the string starts with the typical SPARQL pattern initializer "<"
+				// and ends with ">"
+				if(!(UStringUtil.startsWith(literalString,"<") && UStringUtil.endsWith(literalString,">")))
+				   return false;
+				 
+				if(literalString.indexOf(",") < 0)
+				   return false; 
+				 
+				// set a temporary literal string 
+				//var tempLiteralString:String = new String(literalString); 
+				var tempLiteralArray:Array = new Array();
+				// set a temporary literal string and eliminate the "<" and the ">"
+				var tempLiteralString:String = literalString.substring(1,literalString.length -1);
+				// split the literal string into an array of substrings
+				/*
+				if(tempLiteralString.indexOf(",_") > 0){
+				   str = literalSPO[pos];
+							str = (str.indexOf("\%22") > 0) ? ("\"" + str.substr(4,str.length-1)) : str;
+							str = UStringUtil.replace(str,"%20"," ");
+							str = (str.indexOf("\%22") > 0) ? (str.substr(0,str.length-4) + "\"") : str;
+							literalSPO[pos] = str;
+				}
+				*/
+				tempLiteralArray = tempLiteralString.split(",");
+				
+				// set the string for the subject of the literal
+				QueryLiteralArg1Input.text = tempLiteralArray[0] as String;
+				
+				// check if we accidentely separated concatenated words like 'Thal,_Austria'
+				if(UStringUtil.startsWith(tempLiteralArray[1] as String,"_")) {
+					QueryLiteralArg1Input.text += "," + tempLiteralArray[1] as String; 
+					tempLiteralArray.splice(1,1);
+				}
+				
+				// set the string for the object of the literal
+				QueryLiteralArg2Input.text = tempLiteralArray[2] as String;
+				
+				// check if we accidentely separated concatenated words like 'Thal,_Austria'
+				if(UStringUtil.startsWith(tempLiteralArray[3] as String,"_")) {
+					QueryLiteralArg2Input.text += "," + tempLiteralArray[3] as String; 
+					tempLiteralArray.splice(3,1);
+				}
+				
+				// add the compare value if existent
+				if(tempLiteralArray.length == 4) {
+				   CompareValueInput.text = tempLiteralArray[3] as String;
+				   if(!checkCompareValue(tempLiteralArray[3] as String))
+				      return false;
+				}
+				
+				// the relation string
+				var relationString:String = tempLiteralArray[1] as String;
+				
+				// we have a variable as relation string -> set the relation search text
+				if(UStringUtil.startsWith(relationString,"?"))
+				   QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				else
+				  // we have a predefined predicate -> select it
+				  if(_relations.contains(relationString)) {
+				     QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				     this.relation = relationString;
+				     //QueryLiteralRelationInputAutoComplete.selectedItem = relationString;//_relations.getItemAt(_relations.getItemIndex(relationString));
+				     //QueryLiteralRelationInputAutoComplete.handleFlowBoxChange(new Event(AutoComplete.SEARCH_CHANGE));
+				     //QueryLiteralRelationInputAutoComplete.handleFlowBoxChange(new Event(AutoComplete.SEARCH_CHANGE));
+				  }
+				else
+				  // neither of the aforementioned two cases holds -> return false
+				  return false;
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function parseLiteralStringDatalog(literalString:String):Boolean {
+				
+				// check if the string contains the Datalog-style notation "predicate(subject,object)"
+				if((literalString.indexOf("(") < 0) || (literalString.indexOf(")") < 0))
+				   return false;
+				
+				if(literalString.indexOf(",") < 0)
+				   return false; 
+				 
+				// set a temporary literal string 
+				var tempLiteralString:String = new String(literalString); 
+				var tempLiteralArray:Array = new Array();
+				tempLiteralArray = tempLiteralString.split("(");
+				
+				// the relation string
+				var relationString:String = tempLiteralArray[0] as String;
+				
+				// we have a variable as relation string -> set the relation search text
+				if(UStringUtil.startsWith(relationString,"?"))
+				   QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				else
+				  // we have a predefined predicate -> select it
+				  if(_relations.contains(relationString)) {
+				     QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				     this.relation = relationString;
+				  }
+				else
+				  // neither of the aforementioned two cases holds -> return false
+				  return false;
+				
+				if(tempLiteralArray.length < 2)
+				   return false;
+				
+				// set a temporary literal string and eliminate the ")"
+				tempLiteralString = tempLiteralArray[1] as String;
+				tempLiteralString = tempLiteralString.substring(0,tempLiteralString.length -1);
+				// split the literal string into an array of substrings
+				tempLiteralArray = tempLiteralString.split(",");
+				
+				// set the string for the subject of the literal
+				QueryLiteralArg1Input.text = tempLiteralArray[0] as String;
+				
+				// check if we accidentely separated concatenated words like 'Thal,_Austria'
+				if(UStringUtil.startsWith(tempLiteralArray[1] as String,"_")) {
+					QueryLiteralArg1Input.text += "," + tempLiteralArray[1] as String; 
+					tempLiteralArray.splice(1,1);
+				}
+				
+				// set the string for the object of the literal
+				QueryLiteralArg2Input.text = tempLiteralArray[1] as String;
+				
+				// check if we accidentely separated concatenated words like 'Thal,_Austria'
+				if(UStringUtil.startsWith(tempLiteralArray[2] as String,"_")) {
+					QueryLiteralArg2Input.text += "," + tempLiteralArray[2] as String; 
+					tempLiteralArray.splice(2,1);
+				}
+				
+				// add the compare value if existent
+				if(tempLiteralArray.length == 3) {
+				   CompareValueInput.text = tempLiteralArray[2] as String;
+				   if(!checkCompareValue(tempLiteralArray[2] as String))
+				      return false;
+				}
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function parseLiteralFromURL(literal:Array):Boolean {
+				
+				if(literal.length < 3)
+				   return false;
+				
+				// set the string for the subject of the literal
+				QueryLiteralArg1Input.text = literal[0] as String;
+				
+				// check if we accidentely separated concatenated words like 'Thal,_Austria'
+				if(UStringUtil.startsWith(literal[1] as String,"_")) {
+					QueryLiteralArg1Input.text += "," + literal[1] as String; 
+					literal.splice(1,1);
+				}
+				
+				// the relation string
+				var relationString:String = literal[1] as String;
+				
+				// we have a variable as relation string -> set the relation search text
+				if(UStringUtil.startsWith(relationString,"?")) {
+				   QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				   this.relation = relationString;
+				}
+				else
+				  // we have a predefined predicate -> select it
+				  if(_relations.contains(relationString)) {
+				     QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				     this.relation = relationString;
+				  }
+				else
+				  // neither of the aforementioned two cases holds -> return false
+				  return false;
+				
+				// set the string for the object of the literal
+				QueryLiteralArg2Input.text = literal[2] as String;
+				
+				// check if we accidentely separated concatenated words like 'Thal,_Austria'
+				if(UStringUtil.startsWith(literal[3] as String,"_")) {
+					QueryLiteralArg2Input.text += "," + literal[3] as String; 
+					literal.splice(3,1);
+				}
+				
+				if(literal.length == 4) {
+				   CompareValueInput.text = literal[3] as String;
+				   if(!checkCompareValue(literal[3] as String))
+				      return false;
+				}
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function onClearButtonClick():void {
+				QueryLiteralArg1Input.text = "";
+				//QueryLiteralRelationInputAutoComplete.selectedItem = null;
+				if(QueryLiteralRelationInputAutoComplete.selectedItem != null)
+				   QueryLiteralRelationInputAutoComplete.selectedItems.removeAll();
+				//QueryLiteralRelationInputAutoComplete.textInput.text = ""
+				QueryLiteralRelationInputAutoComplete.searchText = "";
+				QueryLiteralArg2Input.text = "";
+				//QueryLiteralRelationInputAutoComplete.invalidateProperties();
+				CompareValueInput.text = "";
+				//this.invalidateProperties();
+				this.dispatchEvent(new Event(Event.CHANGE,true));
+			}
+			
+			public function adjustArguments():void {
+				adjustArgumentOne();
+				adjustArgumentTwo();
+			}
+			
+			private function adjustArgumentOne():void {
+				// adjust the first literal argument
+				var argument:String = QueryLiteralArg1Input.text;
+				
+				// check if we have a quote
+				if(UStringUtil.startsWith(argument,"\""))
+				   return;
+				
+				var temp1:String;
+				//var temp2:String;
+				var argArray:Array = argument.split(" ",2);
+				//if(argArray.length == 0) 
+				  // argArray = argument.split(" + ",2);
+				
+				if(argArray.length >= 2) {
+					temp1 = (String)(argArray[0]);
+					for(var i:int = 1; i<argArray.length; i++) {
+					   temp1 = temp1 + "_" + (String)(argArray[1]);
+					   //QueryLiteralArg1Input.text = temp1.charAt(0).toUpperCase().concat(temp1.substr(1,temp1.length -1))
+					   //                         + "_" + temp2.charAt(0).toUpperCase().concat(temp2.substr(1,temp2.length -1));
+					   QueryLiteralArg1Input.text = temp1;// + "_" + temp2;
+					}
+				}
+				//else
+				    //QueryLiteralArg1Input.text = argument.charAt(0).toUpperCase().concat(argument.substr(1,argument.length -1));
+				
+			}
+			
+			private function adjustArgumentTwo():void {
+				// adjust the second literal argument
+				var argument:String = QueryLiteralArg2Input.text;
+				
+				// check if we have a quote
+				if(UStringUtil.startsWith(argument,"\""))
+				   return;
+				
+				var temp1:String;
+				//var temp2:String;
+				var argArray:Array = argument.split(" ",2);
+				//if(argArray.length == 0) 
+				  // argArray = argument.split(" + ",2);
+				
+				if(argArray.length >= 2) {
+					temp1 = (String)(argArray[0]);
+					for(var i:int = 1; i<argArray.length; i++) {
+					   temp1 = temp1 + "_" + (String)(argArray[1]);
+					   //QueryLiteralArg1Input.text = temp1.charAt(0).toUpperCase().concat(temp1.substr(1,temp1.length -1))
+					   //                         + "_" + temp2.charAt(0).toUpperCase().concat(temp2.substr(1,temp2.length -1));
+					   QueryLiteralArg2Input.text = temp1;// + "_" + temp2;
+					}
+				}
+				//else
+				  //  QueryLiteralArg2Input.text = argument.charAt(0).toUpperCase().concat(argument.substr(1,argument.length -1));
+			}
+			
+			
+			public function validateHardRuleLiteral():Boolean {
+				if(!checkRelationInput())
+				   return false;
+				if(UStringUtil.startsWith(QueryLiteralArg1Input.text,"?") 
+				    && (QueryLiteralArg1Input.text.indexOf("?") == QueryLiteralArg1Input.text.lastIndexOf("?"))) {
+					if(UStringUtil.startsWith(QueryLiteralArg2Input.text,"??") 
+				          && (QueryLiteralArg1Input.text.indexOf("??") == QueryLiteralArg1Input.text.lastIndexOf("??")))
+				          return true;
+				    return false;
+				}
+				return false;
+			}
+			
+			public function validateSoftRuleLiteral():Boolean {
+				if(!checkRelationInput())
+				   return false;
+				if(UStringUtil.startsWith(QueryLiteralArg1Input.text,"?") 
+				    && (QueryLiteralArg1Input.text.indexOf("?") == QueryLiteralArg1Input.text.lastIndexOf("?"))) {
+					if(UStringUtil.startsWith(QueryLiteralArg2Input.text,"?") 
+				          && (QueryLiteralArg1Input.text.indexOf("?") == QueryLiteralArg1Input.text.lastIndexOf("?")))
+				          return true;
+				    return false;
+				}
+				return false;
+			}
+			
+			private function onLiteralChange():void {
+				this.dispatchEvent(new UQueryEvent(UQueryEvent.QUERY_STRING_UPDATE_EVENT,null,true));
+			}
+			
+			public function checkCompareValue(compareValueString:String = null):Boolean {
+				//trace("Compare Value is : " + compareValueString);
+				//trace("Compare Value is : " + CompareValueInput.text);
+				if(compareValueString == null) {
+					if(CompareValueInput.text == "")
+					   return false;
+				}
+				else if(compareValueString == "")
+				   return false;
+				   
+				var compareValue:int = (compareValueString == null) ? parseInt(CompareValueInput.text) : parseInt(compareValueString);
+				//trace("Compare Value is : " + compareValue.toString());
+				// this is not a valid integer value
+				if(isNaN(compareValue)) {
+					mx.core.Application.application.UVizErrorPanel.writeLiteralCompareValueError();
+		    	    mx.core.Application.application.UVizErrorPanel.show();
+					return false;
+				}
+				else if(compareValue < 0 || compareValue > 10000) {
+					mx.core.Application.application.UVizErrorPanel.writeLiteralCompareValueError();
+		    	    mx.core.Application.application.UVizErrorPanel.show();
+					return false;
+				}
+				else {
+				   this.dispatchEvent(new UQueryEvent(UQueryEvent.QUERY_STRING_UPDATE_EVENT,null,true));
+				   return true;
+				}
+				   
+			}
+			
+			private function showCompareValueError(event:ValidationResultEvent):void {
+				mx.core.Application.application.UVizErrorPanel.writeLiteralCompareValueError();
+		    	mx.core.Application.application.UVizErrorPanel.show();
+			} 
+			 
+		]]> 
+	</mx:Script> 
+	
+	<mx:Grid 
+	    x="0"	
+		width="100%"  
+		paddingTop="0" 
+	    paddingLeft="0" 
+	    paddingRight="0" 
+	    paddingBottom="0" 
+	    height="100%"
+	    id="LiteralInputGrid" backgroundAlpha="0.0">	
+	    
+	    <mx:GridRow 
+	    	x="0"
+	    	width="100%" 
+	    	height="100%"
+	    	id="LiteralInputGridRow" backgroundAlpha="0.0" borderStyle="none">
+	    	
+	    	<mx:GridItem>
+	    		<mx:TextInput 
+	    			width="150" 
+	    			height="100%" 
+	    			id="QueryLiteralArg1Input" 
+	    			textAlign="center" 
+	    			borderThickness="2"
+	    			mouseOut="adjustArgumentOne();"	
+	    		    keyFocusChange="adjustArgumentOne();"	
+	    			borderStyle="none" cornerRadius="0" change="onLiteralChange();" fontWeight="bold" fontSize="12"/>
+	    	</mx:GridItem>
+	    	
+	    	<mx:GridItem borderStyle="none" borderThickness="2" cornerRadius="20">
+	    		<ac:AutoComplete id="QueryLiteralRelationInputAutoComplete" 
+		          	label="Predicate" 
+		          	textAlign="center" 
+		          	dataProvider="{_relations}" 
+		          	width="150" 
+		          	height="100%"
+		          	allowMultipleSelection="false" 
+		          	allowNewValues="false" 
+		          	allowEditingNewValues="true"
+		            labelField="Predicate" 
+		            matchType="word" 
+		            dropDownRowCount="10" 
+		            selectedItemStyleName="none"
+		            borderThickness="2"
+	    		    keyFocusChange="validateRelationInput();"	
+	    		    mouseFocusChange="validateRelationInput();" 
+	    		    backspaceAction="remove" 
+	    		    borderStyle="none" 
+	    		    cornerRadius="20" 
+	    		    change="onLiteralChange();" verticalAlign="middle" horizontalAlign="center" fontSize="12" fontWeight="bold">
+                </ac:AutoComplete>
+	    	</mx:GridItem>
+	    	
+	    	<mx:GridItem>
+	    		<mx:TextInput 
+	    			width="150" 
+	    			height="100%" 
+	    			id="QueryLiteralArg2Input" 
+	    			textAlign="center" 
+	    			borderThickness="2"
+	    			mouseOut="adjustArgumentTwo();"
+	    			keyFocusChange="adjustArgumentTwo();" 
+	    			cornerRadius="0" 
+	    			borderStyle="none" 
+	    			change="onLiteralChange();" fontSize="12" fontWeight="bold"/>
+	    	</mx:GridItem>
+	    	
+	    	<mx:GridItem>
+	    		<mx:TextInput 
+	    			width="50" 
+	    			height="100%" 
+	    			id="CompareValueInput" 
+	    			textAlign="center" 
+	    			borderThickness="2"
+	    			cornerRadius="0" 
+	    			borderStyle="none"
+	    			restrict="0-9\\.\\-\"
+                    maxChars="5"
+                    toolTip="This input field for numeric compare values is needed for special predicates
+                      like 'isWithinMinutes'" fontWeight="bold" fontSize="12"/>
+	    	</mx:GridItem>
+   	
+      </mx:GridRow>
+	
+	</mx:Grid>
+	
+	<mx:NumberValidator id="CompareValueValidator"
+            source="{CompareValueInput}"
+            property="text"
+            trigger="{CompareValueInput}"
+            triggerEvent="change"
+            invalid="showCompareValueError(event);"
+            minValue="0" maxValue="10000" requiredFieldError="Required for Compare Values!"
+            exceedsMaxError="Only values up to 10000 are allowed!" lowerThanMinError="Minimum allowed value is 0!"/>
+
+	
+</mx:Canvas>

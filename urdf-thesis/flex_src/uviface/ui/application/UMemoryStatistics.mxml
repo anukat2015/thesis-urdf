@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="198" 
+	height="186"
+    horizontalAlign="center"
+    verticalAlign="middle"
+    textAlign="center" 
+    borderThickness="5"
+    backgroundColor="#4B0101"
+    borderColor="black"
+    borderStyle="none" 
+    cornerRadius="15" 
+    paddingTop="10" paddingBottom="0" 
+    backgroundAlpha="0.71" 
+    color="#FCFCFC" 
+    cacheAsBitmap="true" horizontalScrollPolicy="off" verticalScrollPolicy="off" headerHeight="0" creationComplete="onCreationComplete();">
+	
+	<mx:Script>
+		<![CDATA[
+			import uviface.viz.UFrameRateCounter;
+			import uviface.viz.UFlareVis;
+			import flash.system.*;
+			import util.UMath;
+			
+			private var _created:Boolean = false;
+			private var _fpsCounter:UFrameRateCounter;
+		    
+			private function onCreationComplete():void {
+				_created = true;
+				// initialize a frames per second counter
+				_fpsCounter = new UFrameRateCounter();
+			}
+			
+			public function updateFrameRateCounter():void {
+				if(_created) {
+				   FrameRateNumber.text = _fpsCounter.showFPS().toString() + " fps";
+				}
+				return;
+			}
+			
+			public function updateDataStatistics(flareVis:UFlareVis):void {
+				if(_created) {
+					UsedNodesNumber.text = flareVis.visualization.data.nodes.length.toString();
+					CachedNodesNumber.text = flareVis.graphData.graphCache.numOfCachedNodes.toString();
+					UsedEdgesNumber.text = flareVis.visualization.data.edges.length.toString();
+					CachedEdgesNumber.text =  flareVis.graphData.graphCache.numOfCachedEdges.toString();
+				    //MemoryConsumptionNumber.text =  flareVis.calculateMemoryUsage().toString() + " KB";
+				}
+				return;
+			}
+			
+			public function updateMemoryConsumption():void {
+				if(_created)
+				   MemoryConsumptionNumber.text =  Number(System.totalMemory/Math.pow(2,10)).toString() + " KB";
+				return;
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Label x="5" y="5" id="UsedNodesLabel" text="Used Nodes:"/>
+	<mx:Label x="134" y="5" width="40" id="UsedNodesNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="bold"/>
+	<mx:Label x="5" y="25" id="CachedNodesLabel" text="Cached Nodes:"/>
+	<mx:Label x="134" y="25" width="40" id="CachedNodesNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="bold"/>
+	<mx:HRule width="90%" x="10" y="51" height="3"/>
+	<mx:Label x="5" y="60" id="UsedEdgesLabel" text="Used Edges:"/>
+	<mx:Label x="134" y="60" width="40" id="UsedEdgesNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="bold"/>
+	<mx:Label x="5" y="80" id="CachedEdgesLabel" text="Cached Edges:"/>
+	<mx:Label x="134" y="80" width="40" id="CachedEdgesNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="bold"/>
+	<mx:HRule width="90%" x="10" y="106" height="3"/>
+	<mx:Label x="5" y="115" id="MemoryConsumptionLabel" text="Used Memory:"/>
+	<mx:Label x="95" y="115" width="79" id="MemoryConsumptionNumber" text="0 KB" textAlign="right" fontStyle="italic" fontWeight="bold"/>
+	<mx:HRule width="90%" x="10" y="141" height="3"/>
+	<mx:Label x="5" y="150" id="FrameRateLabel" text="Frame Rate:"/>
+	<mx:Label x="95" y="150" width="79" id="FrameRateNumber" text="0 fps" textAlign="right" fontStyle="italic" fontWeight="bold"/>
+	
+</mx:Panel>

@@ -1,0 +1,1672 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="500" 
+	height="350" 
+	layout="absolute"
+	xmlns:ac="com.hillelcoren.components.*"
+    horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#3F3F3F" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1"	
+    creationComplete="init();" fontSize="10">
+	
+	<mx:Script>
+		<![CDATA[
+			import urdf.api.ULineageAnd;
+			import uviface.event.ULineageEvent;
+			import uviface.event.UFilterEvent;
+			import uviface.event.ULayoutEvent;
+			import mx.events.ListEvent;
+			import mx.events.SliderEvent;
+			import mx.events.ItemClickEvent;
+			import mx.collections.ArrayCollection;
+			import mx.collections.SortField;
+            import mx.collections.Sort;
+            
+            import uviface.event.UFactSelectEvent;
+	        import uviface.event.URootNodeUpdateEvent;
+	        import uviface.event.UClusterCompareEvent;
+	        import uviface.viz.UFlareVis; 
+	        import uviface.viz.util.UStringConstants;
+	        import urdf.api.URelation;
+	        import util.UStringUtil;
+	        import uviface.ui.options.UButtonTreeItemRenderer;
+			
+			private const _removeObject:Object = {label: 'remove', children: []};
+			
+			//[Bindable]
+			//private var _nodeList:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _factList:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _lineageFactList:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _factListSorted:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _resultClusterList:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _resultClusterArray:ArrayCollection = new ArrayCollection();
+			private var _sortFieldNodes:SortField = new SortField();
+			private var _sortFieldFacts:SortField = new SortField();
+			private var _sortFieldFactsSorted:SortField = new SortField();
+			private var _sortFieldLineageFacts:SortField = new SortField();
+			//private var _sortFieldResultClusters:SortField = new SortField();
+			private var _sortNodes:Sort = new Sort();
+			private var _sortFacts:Sort = new Sort();
+			private var _sortFactsSorted:Sort = new Sort();
+			private var _sortLineageFacts:Sort = new Sort();
+			//private var _sortResultClusters:Sort = new Sort();
+			
+			private var _selectedNode:String;
+			private var _selectedFact:Object;
+			private var _selectedLineageFact:Object;
+			//private var _selectedResultCluster:String;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			
+			[Bindable]
+			private var _availableButtonLabels:Array = ["SELECT_BLACK","SELECT_WHITE"];
+			
+			[Bindable]
+			private var _factsButtons:Array = ["Fact","Subject","Predicate","Object","Confidence","Truth Value"];
+			[Bindable]
+			private var _filterButtons:Array = ["Subject/Object","Predicate","Confidence/Truth Value"];
+			
+			[Bindable]
+			private var _dropDown:ClassFactory;	
+			[Bindable]
+			private var _dropDownStringOnly:ClassFactory;	
+			
+			// the currently selected labeling field
+			[Bindable]
+			private var _currentLabelField:String = UStringConstants.LABEL;
+			[Bindable]
+			private var _predicates:ArrayCollection = URelation.getRelations();
+			[Bindable]
+			private var _nodeList:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _selectedPredicates:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _selectedNodes:ArrayCollection = new ArrayCollection();
+			
+			private function init():void {
+				
+                _sortFieldNodes.caseInsensitive = true;
+                _sortFieldFacts.caseInsensitive = true;
+                _sortFieldFactsSorted.caseInsensitive = true;
+                _sortFieldLineageFacts.caseInsensitive = true;
+                //_sortFieldResultClusters.caseInsensitive = true;
+                _sortFieldFacts.name = "label";
+                // always the curretn selected sort field
+                _sortFieldFactsSorted.name = _currentLabelField;
+                _sortFieldLineageFacts.name = "label";
+                _sortNodes.fields = [_sortFieldNodes];
+                _sortFacts.fields = [_sortFieldFacts];
+                _sortFactsSorted.fields = [_sortFieldFactsSorted];
+                _sortLineageFacts.fields = [_sortFieldLineageFacts];
+                //_sortResultClusters.fields = [_sortFieldResultClusters];
+                _nodeList.sort = _sortNodes;
+                _factList.sort = _sortFacts;
+                _lineageFactList.sort = _sortLineageFacts;
+                _factListSorted.sort = _sortFactsSorted;
+                //_resultClusterList.sort = _sortResultClusters;
+                //_resultClusterArray.sort = _sortResultClusters;
+                _nodeList.refresh();
+                _factList.refresh();
+                _factListSorted.refresh();
+                _lineageFactList.refresh();
+                _factListSorted.refresh();
+                _resultClusterList.refresh();
+                _resultClusterArray.refresh();
+                
+                _dropDown = new ClassFactory(List);
+				_dropDown.properties = {showDataTips:true, dataTipFunction:dataTipProducer};
+				_dropDownStringOnly = new ClassFactory(List);
+				_dropDownStringOnly.properties = {showDataTips:true, dataTipFunction:dataTipProducerStringOnly}
+				
+				FactsTree.selectedIndex = -1;
+				
+				//this.addEventListener(ULayoutEvent.LAYOUT,toggleFilterPanelVisibility,false,0,true);
+				// disable the filter panel
+				FilterPanel.enabled = false;
+				FilterPanel.filters = _filters;
+				
+			}
+			
+			
+			public function toggleFilterPanelVisibility(event:ULayoutEvent):void {
+				switch(event.layout){
+					case UFlareVis.FORCE_LAYOUT: {
+						FilterPanel.enabled = true;
+						FilterPanel.filters = null;
+						break;
+					}
+					case UFlareVis.RADIAL_LAYOUT: {
+						FilterPanel.enabled = false;
+						FilterPanel.filters = _filters;
+						break;
+					}
+				}
+			}
+			
+			
+			private function dataTipProducer(value:Object):String{
+				return value.label;
+			}
+			
+			private function dataTipProducerStringOnly(value:Object):String{
+				return value as String;
+			}
+				
+			public function set nodeList(nodeList:Array):void {
+				
+				//while(_nodeList.source.length > 0) {
+					//_nodeList.source.pop();
+				//}
+				
+				_nodeList.removeAll();
+				//_selectedPredicates.removeAll();
+				_selectedNodes.removeAll();
+				
+				_nodeList.source = nodeList;
+				_nodeList.refresh();
+				//_selectedPredicates.refresh();
+				_selectedNodes.refresh();
+			}
+			
+			public function set predicateList(predicateList:Array):void {
+				
+				//while(_nodeList.source.length > 0) {
+					//_nodeList.source.pop();
+				//}
+				
+				_predicates.removeAll();
+				_selectedPredicates.removeAll();
+				
+				_predicates.source = predicateList;
+				_predicates.refresh();
+				_selectedPredicates.refresh();
+			}
+			
+			public function set factList(factList:Array):void {
+				
+				//while(_factList.source.length > 0) {
+					//_factList.source.pop();
+				//}
+				
+				// delete everything
+				var object:Object;	
+				while (_factListSorted.length > 0) {
+					object = _factListSorted.removeItemAt(0);
+					delete object.label;
+					while ((object.children as Array).length > 0) {
+					   //delete (object.children as Array).pop();
+					   (object.children as Array).pop();
+					}
+				}
+				_factListSorted.removeAll();
+				_factListSorted.refresh();
+				
+				var obj:Object;
+				var label:String;
+				var index:int = 0;
+				var found:Boolean = false;
+				var pos:int;
+				var rangeBucket:int = 0;
+				
+				_factList.source = factList;
+				_factList.refresh();
+				
+				// -----------------------------------------------------
+				// we want to use histogram for the confidences
+				// -----------------------------------------------------
+				if(_currentLabelField == UStringConstants.CONFIDENCE) {
+					
+					var range1:Object = {label: '[0 , 0.05)', children: []};
+					var range2:Object = {label: '[0.05 , 0.1)', children: []};
+					var range3:Object = {label: '[0.1 , 0.15)', children: []};
+					var range4:Object = {label: '[0.15 , 0.2)', children: []};
+					var range5:Object = {label: '[0.2 , 0.25)', children: []};
+					var range6:Object = {label: '[0.25 , 0.3)', children: []};
+					var range7:Object = {label: '[0.3 , 0.35)', children: []};
+					var range8:Object = {label: '[0.35 , 0.4)', children: []};
+					var range9:Object = {label: '[0.4 , 0.45)', children: []};
+					var range10:Object = {label: '[0.45 , 0.5)', children: []};
+					var range11:Object = {label: '[0.5 , 0.55)', children: []};
+					var range12:Object = {label: '[0.55 , 0.6)', children: []};
+					var range13:Object = {label: '[0.6 , 0.65)', children: []};
+					var range14:Object = {label: '[0.65 , 0.7)', children: []};
+					var range15:Object = {label: '[0.7 , 0.75)', children: []};
+					var range16:Object = {label: '[0.75 , 0.8)', children: []};
+					var range17:Object = {label: '[0.8 , 0.85)', children: []};
+					var range18:Object = {label: '[0.85 , 0.9)', children: []};
+					var range19:Object = {label: '[0.9 , 0.95)', children: []};
+					var range20:Object = {label: '[0.95 , 1.0]', children: []};
+					_factListSorted.addItem(range1);
+					_factListSorted.addItem(range2);
+					_factListSorted.addItem(range3);
+					_factListSorted.addItem(range4);
+					_factListSorted.addItem(range5);
+					_factListSorted.addItem(range6);
+					_factListSorted.addItem(range7);
+					_factListSorted.addItem(range8);
+					_factListSorted.addItem(range9);
+					_factListSorted.addItem(range10);
+					_factListSorted.addItem(range11);
+					_factListSorted.addItem(range12);
+					_factListSorted.addItem(range13);
+					_factListSorted.addItem(range14);
+					_factListSorted.addItem(range15);
+					_factListSorted.addItem(range16);
+					_factListSorted.addItem(range17);
+					_factListSorted.addItem(range18);
+					_factListSorted.addItem(range19);
+					_factListSorted.addItem(range20);
+					
+					for (pos = 0; pos<_factList.length;pos++) {
+					
+					   // reset the found flag
+					   found = false;
+						
+					   // set the temporary label
+					   label = _factList.getItemAt(pos)[_currentLabelField];//.label;
+					   
+					   // no element added so far -> special case
+					   //if(_factListSorted.length == 0) {
+					   	 // _factListSorted.addItem({label: label, children: [_factList.getItemAt(pos)]});
+					   	 // continue;
+					   //}
+					   // the confidence of the fact
+					   rangeBucket = int(parseFloat(label)*100/5);
+					   // we do not have a 20th bucket, because we start with 0
+					   rangeBucket = (rangeBucket == 20) ? 19 : rangeBucket;
+					   //trace("range is : " + rangeBucket.toString());
+					   obj = _factListSorted.getItemAt(rangeBucket);
+					   (obj.children as Array).push(_factList.getItemAt(pos));
+					   
+					   found = true;
+					}
+					
+					_factListSorted.refresh();
+				    var someObjectsLeft:Boolean = true;
+				    
+				    // remove empty ranges
+				    while(someObjectsLeft) {
+				    	someObjectsLeft = false;
+				    	for (index = 0; index < _factListSorted.length; index++) {
+				    	   obj = _factListSorted.getItemAt(index);
+				    		// overwrite teh position value with the nzumber of instances per confidence bucket
+						   pos = (obj.children as Array).length;
+						   if(pos == 0) {
+						   	  _factListSorted.removeItemAt(index);
+						   	  //_factListSorted.refresh();
+						   	  someObjectsLeft = true;
+						   	  break;
+						   }
+				    	}
+				    }
+					
+					//_factList.refresh();
+					_factListSorted.refresh();
+					
+				}
+				else {
+					
+					for (pos = 0; pos<_factList.length;pos++) {
+					
+					   // reset the found flag
+					   found = false;
+						
+					   // set the temporary label
+					   label = _factList.getItemAt(pos)[_currentLabelField];//.label;
+					   
+					   // no element added so far -> special case
+					   if(_factListSorted.length == 0) {
+					   	  _factListSorted.addItem({label: label, children: [_factList.getItemAt(pos)]});
+					   	  continue;
+					   }
+					   
+					   for(index=0;index<_factListSorted.length;index++) {
+					   	  obj = _factListSorted.getItemAt(index);
+					   	  if(obj.hasOwnProperty("label") && UStringUtil.equals(obj.label,label,true)) {
+					   	  //if(obj.hasOwnProperty(_currentLabelField) && obj[_currentLabelField] == label) {//obj.label == label) {
+					         (obj.children as Array).push(_factList.getItemAt(pos));				     
+					         // we found the current searched object -> it is already contained
+					         // -> only add one more child
+					         found = true;
+					         break;
+					      }
+					   }
+					   // we found the search object and processed it already -> continue
+					   if(found)
+					     continue;
+					   // we have to add a new object
+					   else {
+				      	  _factListSorted.addItem({label: label, children: [_factList.getItemAt(pos)]});
+				      	  continue;
+					   }
+					}
+					
+				}
+				
+				//_factList.refresh();
+				_factListSorted.refresh();
+				
+				// now add the number of similar instances belonging to the same father path
+				for each (obj in _factListSorted) {
+					if(obj.hasOwnProperty(UStringConstants.LABEL)) {
+					   // overwrite teh position value with the nzumber of instances per confidence bucket
+					   pos = (obj.children as Array).length;
+					   //if(pos > 0) {
+					      obj.label = (obj.label as String) + "  -  (" + pos + ")";
+					      _factListSorted.itemUpdated(obj);
+					   //}
+					}
+				}
+				
+				FactsTree.selectedIndex = -1;
+			}
+			
+			public function set lineageFactList(lineageFactList:Array):void {
+				
+				/* while(_lineageFactList.source.length > 0) {
+					_lineageFactList.source.pop();
+				} */
+				_lineageFactList.removeAll();
+				var obj:Object;
+				for each(obj in lineageFactList) {
+				   _lineageFactList.addItem(obj);	
+				}
+				
+				_lineageFactList.refresh();
+				
+				LineageAvailabilityTree.selectedIndex = -1;
+			}
+			
+			public function set resultClusterList(resultClusterList:Array):void {
+				
+				// delete everything
+				/*
+				var object:Object;	
+				while (_resultClusterList.length > 0) {
+					object = _resultClusterList.removeItemAt(0);
+					//delete object.label;
+					while ((object.children as Array).length > 0) {
+					   //delete (object.children as Array).pop();
+					   (object.children as Array).pop();
+					}
+					//object = _resultClusterArray.removeItemAt(0);
+					trace("result object list length : " + _resultClusterList.length);
+					trace("result string list length : " + _resultClusterArray.length);
+					if(_resultClusterArray.length > 0)
+					   _resultClusterArray.removeItemAt(0);
+					//delete object.label;
+				}
+				*/
+				
+				//_resultClusterList.removeAll();
+				//_resultClusterList.refresh();
+				_resultClusterArray.removeAll();
+				_resultClusterArray.refresh();
+				/*
+				while(_resultClusterList.source.length > 0) {
+					_resultClusterList.source.pop();
+				}
+				
+				_resultClusterArray.removeAll();
+				*/
+				
+				// overwrite the list of query results
+				_resultClusterList.source = resultClusterList;
+				_resultClusterList.refresh();
+				
+				//var clusterID:String;
+				// overwrite the list of query results for the comparison list   
+				for (var i:int = 0; i<_resultClusterList.length;i++) {
+					_resultClusterArray.addItem(_resultClusterList.getItemAt(i).label);
+				}
+				
+				_resultClusterArray.refresh();
+				//_resultClusterList.refresh();
+				
+				BlackClusterTextArea.text = null;
+				WhiteClusterTextArea.text = null;
+				
+				QueryResultsTree.selectedIndex = -1;
+			}
+			
+			public function get sortedResultClusterList():ArrayCollection {
+				return _resultClusterList;
+			}
+			
+			/*
+			private function clickResultCluster(event:ListEvent):void {
+				
+				// we are already in the lineage mode
+				if(UFlareVis.lineageMode)
+				   return;
+				
+				_selectedResultCluster = ResultClusterComboBox.selectedItem as String;
+			    //trace("Selected Result Cluster : " + _selectedResultCluster); 
+			    
+			    var rootUpdateEvent:URootNodeUpdateEvent = new URootNodeUpdateEvent(URootNodeUpdateEvent.UPDATE_ROOT_NODE,null,_selectedResultCluster,true)
+			    rootUpdateEvent.useResultCluster = true;
+			    ResultClusterComboBox.dispatchEvent(rootUpdateEvent);
+			}
+			*/
+			
+			public function hideNonLineageProperties():void {
+				QueryResultPanel.enabled = false;
+				LineageAvailabilityPanel.enabled = false;
+				FactsPanel.enabled = false;
+				FilterPanel.enabled = false;
+				QueryResultPanel.filters = _filters;
+				LineageAvailabilityPanel.filters = _filters;
+				FactsPanel.filters = _filters;
+				FilterPanel.filters = _filters;
+				hideCompareProperties();
+				//ClusterBox.enabled = false;
+				//ClusterBox.filters = _filters;
+			}
+			
+			public function showNonLineageProperties():void {
+				QueryResultPanel.enabled = true;
+				LineageAvailabilityPanel.enabled = true;
+				FactsPanel.enabled = true;
+				// we only allow the filtering for the force layout
+				// because the radial layout does not work with tthe filters 
+				if(UGraphConfigurationPanel.forceLayoutActive) {
+				   FilterPanel.enabled = true;
+				   FilterPanel.filters = null;
+				}
+				QueryResultPanel.filters = null;
+				LineageAvailabilityPanel.filters = null;
+				FactsPanel.filters = null;
+				//ClusterBox.enabled = true;
+				//ClusterBox.filters = null;
+				//hideCompareProperties();
+			}
+			
+			public function hideCompareProperties():void {
+				ClusterComparisonPanel.enabled = false;
+				ClusterComparisonPanel.filters = _filters;
+			}
+			
+			public function showCompareProperties():void {
+				ClusterComparisonPanel.enabled = true;
+				ClusterComparisonPanel.filters = null;
+			}
+			
+			private function handleBlackClusterButtonClicked():void {
+				BlackClusterTextArea.text = AvailableClustersList.selectedItem as String;
+			}
+			
+			private function handleWhiteClusterButtonClicked():void {
+				WhiteClusterTextArea.text = AvailableClustersList.selectedItem as String;
+			}
+			
+			private function handleCompareButtonClick():void {
+				
+				// we are already in the lineage mode
+				if(UFlareVis.lineageMode)
+				   return;
+				
+				if(BlackClusterTextArea.text == null || BlackClusterTextArea.text == "" || WhiteClusterTextArea.text == null || WhiteClusterTextArea.text == "")
+				   return;
+				
+				ClusterCompareButton.dispatchEvent(new UClusterCompareEvent(UClusterCompareEvent.CLUSTER_COMPARE_EVENT,
+				         BlackClusterTextArea.text,WhiteClusterTextArea.text,true)); 
+			}
+			
+			private function showTooltip(event:ListEvent):void {
+				AvailableClustersList.toolTip = _resultClusterArray.getItemAt(event.rowIndex) as String;// AvailableClustersList.selectedItem as String;AvailableClustersList.
+			}
+			
+			private function hideTooltip():void {
+				AvailableClustersList.toolTip = "";
+			}
+			
+			private function changeSortField(event:ItemClickEvent):void {
+				
+				//while(_factList.source.length > 0) {
+					//_factList.source.pop();
+				//}
+				
+				// delete everything
+				var object:Object;	
+				while (_factListSorted.length > 0) {
+					object = _factListSorted.removeItemAt(0);
+					delete object.label;
+					while ((object.children as Array).length > 0) {
+					   //delete (object.children as Array).pop();
+					   (object.children as Array).pop();
+					}
+				}
+				_factListSorted.removeAll();
+				_factListSorted.refresh();
+				
+				var obj:Object;
+				var label:String;
+				var index:int = 0;
+				var found:Boolean = false;
+				var pos:int;
+				var rangeBucket:int = 0;
+				
+				switch(event.index) {
+					case 0: _currentLabelField = UStringConstants.LABEL;break;
+					case 1: _currentLabelField = UStringConstants.SUBJECT;break;
+					case 2: _currentLabelField = UStringConstants.PREDICATE;break;
+					case 3: _currentLabelField = UStringConstants.OBJECT;break;
+					case 4: _currentLabelField = UStringConstants.CONFIDENCE;break;
+					case 5: _currentLabelField = UStringConstants.TRUTH_VALUE;break;
+					default: _currentLabelField = UStringConstants.LABEL;break;
+				}
+				
+				// set the new label field for the tree
+				//FactsTree.labelField = _currentLabelField;
+				
+				//_factList.source = factList;
+				//trace("fact list size = " + _factList.length);
+				//_factList.refresh();
+				//trace("fact list size = " + _factList.length);
+				
+				// -----------------------------------------------------
+				// we want to use histogram for the confidences
+				// -----------------------------------------------------
+				if(_currentLabelField == UStringConstants.CONFIDENCE) {
+					
+					var range1:Object = {label: '[0 , 0.05)', children: []};
+					var range2:Object = {label: '[0.05 , 0.1)', children: []};
+					var range3:Object = {label: '[0.1 , 0.15)', children: []};
+					var range4:Object = {label: '[0.15 , 0.2)', children: []};
+					var range5:Object = {label: '[0.2 , 0.25)', children: []};
+					var range6:Object = {label: '[0.25 , 0.3)', children: []};
+					var range7:Object = {label: '[0.3 , 0.35)', children: []};
+					var range8:Object = {label: '[0.35 , 0.4)', children: []};
+					var range9:Object = {label: '[0.4 , 0.45)', children: []};
+					var range10:Object = {label: '[0.45 , 0.5)', children: []};
+					var range11:Object = {label: '[0.5 , 0.55)', children: []};
+					var range12:Object = {label: '[0.55 , 0.6)', children: []};
+					var range13:Object = {label: '[0.6 , 0.65)', children: []};
+					var range14:Object = {label: '[0.65 , 0.7)', children: []};
+					var range15:Object = {label: '[0.7 , 0.75)', children: []};
+					var range16:Object = {label: '[0.75 , 0.8)', children: []};
+					var range17:Object = {label: '[0.8 , 0.85)', children: []};
+					var range18:Object = {label: '[0.85 , 0.9)', children: []};
+					var range19:Object = {label: '[0.9 , 0.95)', children: []};
+					var range20:Object = {label: '[0.95 , 1.0]', children: []};
+					_factListSorted.addItem(range1);
+					_factListSorted.addItem(range2);
+					_factListSorted.addItem(range3);
+					_factListSorted.addItem(range4);
+					_factListSorted.addItem(range5);
+					_factListSorted.addItem(range6);
+					_factListSorted.addItem(range7);
+					_factListSorted.addItem(range8);
+					_factListSorted.addItem(range9);
+					_factListSorted.addItem(range10);
+					_factListSorted.addItem(range11);
+					_factListSorted.addItem(range12);
+					_factListSorted.addItem(range13);
+					_factListSorted.addItem(range14);
+					_factListSorted.addItem(range15);
+					_factListSorted.addItem(range16);
+					_factListSorted.addItem(range17);
+					_factListSorted.addItem(range18);
+					_factListSorted.addItem(range19);
+					_factListSorted.addItem(range20);
+					
+					for (pos = 0; pos<_factList.length;pos++) {
+					
+					   // reset the found flag
+					   found = false;
+						
+					   // set the temporary label
+					   label = _factList.getItemAt(pos)[_currentLabelField];//.label;
+					   
+					   // no element added so far -> special case
+					   //if(_factListSorted.length == 0) {
+					   	 // _factListSorted.addItem({label: label, children: [_factList.getItemAt(pos)]});
+					   	 // continue;
+					   //}
+					   // the confidence of the fact
+					   rangeBucket = int(parseFloat(label)*100/5);
+					   // we do not have a 20th bucket, because we start with 0
+					   rangeBucket = (rangeBucket == 20) ? 19 : rangeBucket;
+					   //trace("range is : " + rangeBucket.toString());
+					   obj = _factListSorted.getItemAt(rangeBucket);
+					   (obj.children as Array).push(_factList.getItemAt(pos));
+					   
+					   found = true;
+					}
+					
+					_factListSorted.refresh();
+				    var someObjectsLeft:Boolean = true;
+				    
+				    // remove empty ranges
+				    while(someObjectsLeft) {
+				    	someObjectsLeft = false;
+				    	for (index = 0; index < _factListSorted.length; index++) {
+				    	   obj = _factListSorted.getItemAt(index);
+				    		// overwrite teh position value with the nzumber of instances per confidence bucket
+						   pos = (obj.children as Array).length;
+						   if(pos == 0) {
+						   	  _factListSorted.removeItemAt(index);
+						   	  //_factListSorted.refresh();
+						   	  someObjectsLeft = true;
+						   	  break;
+						   }
+				    	}
+				    }
+					
+					//_factList.refresh();
+					_factListSorted.refresh();
+					
+				}
+				else {
+					
+					for (pos = 0; pos<_factList.length;pos++) {
+					
+					   // reset the found flag
+					   found = false;
+						
+					   // set the temporary label
+					   label = _factList.getItemAt(pos)[_currentLabelField];//.label;
+					   
+					   // no element added so far -> special case
+					   if(_factListSorted.length == 0) {
+					   	  _factListSorted.addItem({label: label, children: [_factList.getItemAt(pos)]});
+					   	  continue;
+					   }
+					   
+					   for(index=0;index<_factListSorted.length;index++) {
+					   	  obj = _factListSorted.getItemAt(index);
+					   	  if(obj.hasOwnProperty("label") && UStringUtil.equals(obj.label,label,true)) {
+					   	  //if(obj.hasOwnProperty(_currentLabelField) && obj[_currentLabelField] == label) {//obj.label == label) {
+					         (obj.children as Array).push(_factList.getItemAt(pos));				     
+					         // we found the current searched object -> it is already contained
+					         // -> only add one more child
+					         found = true;
+					         break;
+					      }
+					   }
+					   // we found the search object and processed it already -> continue
+					   if(found)
+					     continue;
+					   // we have to add a new object
+					   else {
+				      	  _factListSorted.addItem({label: label, children: [_factList.getItemAt(pos)]});
+				      	  continue;
+					   }
+					}
+					
+				}
+				
+				//_factList.refresh();
+				_factListSorted.refresh();
+				
+				// now add the number of similar instances belonging to the same father path
+				for each (obj in _factListSorted) {
+					if(obj.hasOwnProperty(UStringConstants.LABEL)) {
+					   // overwrite teh position value with the nzumber of instances per confidence bucket
+					   pos = (obj.children as Array).length;
+					   //if(pos > 0) {
+					      obj.label = (obj.label as String) + "  -  (" + pos + ")";
+					      _factListSorted.itemUpdated(obj);
+					   //}
+					}
+				}
+				
+				//_factListSorted.refresh();
+				
+				//_factList.refresh();
+				//_factListSorted.refresh();
+			}
+			
+			private function handleLineageItemClick(event:ListEvent):void {
+				var obj:Object = LineageAvailabilityTree.selectedItem;
+				if(!obj.hasOwnProperty("id"))
+				   return;
+				var lineageEvent:ULineageEvent = new ULineageEvent(ULineageEvent.PRODUCE_LINEAGE_GRAPH,obj.id,true); 							
+				LineageAvailabilityTree.dispatchEvent(lineageEvent);
+			}
+			
+			private function handleItemClick(event:ListEvent):void {
+				var obj:Object = FactsTree.selectedItem;
+				if(obj.hasOwnProperty(UStringConstants.KEY)) {
+					switch(obj.key) {
+						case UStringConstants.FACT: {
+							if(UFlareVis.lineageMode)
+				               return;
+							_selectedNode = obj.value as String;
+						    //trace("Selected Node : " + _selectedNode); 
+						    FactsTree.dispatchEvent(new UFactSelectEvent(UFactSelectEvent.FACT_SELECT_EVENT,_selectedNode,true)); 
+						    break;
+						}
+						case UStringConstants.SUBJECT: {
+							if(UFlareVis.lineageMode)
+				               return;
+							_selectedNode = obj.value as String;
+						    //trace("Selected Node : " + _selectedNode); 
+						    FactsTree.dispatchEvent(new URootNodeUpdateEvent(URootNodeUpdateEvent.UPDATE_ROOT_NODE,null,_selectedNode,true)); 
+						    break;
+						}
+						case UStringConstants.PREDICATE: {
+							if(UFlareVis.lineageMode)
+				               return;
+							//_selectedFact = obj.id as String;
+						    //trace("Selected Fact : " + _selectedFact.label); 
+			                var filterEvent:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+			                filterEvent.typeOfFilter = UFilterEvent.PREDICATE_FILTER_EVENT;
+			                filterEvent.predicate = (obj.value as String);
+			                FactsTree.dispatchEvent(filterEvent);	
+			                break;						    
+						}
+						case UStringConstants.OBJECT: {
+							if(UFlareVis.lineageMode)
+				               return;
+							_selectedNode = obj.value as String;
+						    //trace("Selected Node : " + _selectedNode); 
+						    FactsTree.dispatchEvent(new URootNodeUpdateEvent(URootNodeUpdateEvent.UPDATE_ROOT_NODE,null,_selectedNode,true)); 
+						    break;
+						}
+						case UStringConstants.CONFIDENCE: {
+							if(UFlareVis.lineageMode)
+				               return;
+							_selectedNode = obj.value as String;
+						    var filterEvent2:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+			                filterEvent2.typeOfFilter = UFilterEvent.CONFIDENCE_FILTER_EVENT;
+			                filterEvent2.confidence = (obj.value as String);
+			                FactsTree.dispatchEvent(filterEvent2);	
+			                break;
+						}
+						case UStringConstants.TRUTH_VALUE: {
+							if(UFlareVis.lineageMode)
+				               return;
+							_selectedNode = obj.value as String;
+						    var filterEvent3:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+			                filterEvent3.typeOfFilter = UFilterEvent.TRUTH_VALUE_FILTER_EVENT;
+			                filterEvent3.truthValue = (obj.value as String);
+			                FactsTree.dispatchEvent(filterEvent3);	
+			                break;
+						}
+						default : {
+						    break;
+						}
+					}
+				}
+			}
+			
+			// the event handler for the selection of query results		
+			private function handleResultClusterClick(event:ListEvent):void {
+				
+				// we are already in the lineage mode
+				if(UFlareVis.lineageMode)
+				   return;
+			    
+			    var obj:Object = QueryResultsTree.selectedItem;
+			    if(obj.hasOwnProperty(UStringConstants.KEY)) {
+			    	switch(obj.key) {
+			    		case UStringConstants.QUERY_RESULT: {
+			    			var rootUpdateEvent:URootNodeUpdateEvent = 
+			    			new URootNodeUpdateEvent(URootNodeUpdateEvent.UPDATE_ROOT_NODE,null,(obj.value as String),true);
+					        rootUpdateEvent.useResultCluster = true;
+					        QueryResultsTree.dispatchEvent(rootUpdateEvent);
+					        break;
+			    		}
+			    		case UStringConstants.LINEAGE_FACTS: {
+			    			var lineageEvent:ULineageEvent = new ULineageEvent(ULineageEvent.PRODUCE_LINEAGE_GRAPH,null,true);
+					        //lineageEvent.fullLineage = true;
+					        lineageEvent.typeOfLineage = ULineageEvent.MATCHED_PATTERN_LINEAGE;
+					        lineageEvent.lineageFacts = (obj[UStringConstants.LINEAGE_FACTS] as ULineageAnd);
+					        QueryResultsTree.dispatchEvent(lineageEvent);
+					        break;
+			    		}
+			    		case UStringConstants.COMPLETE_RESULT_LINEAGE: {
+			    			var lineageFullEvent:ULineageEvent = new ULineageEvent(ULineageEvent.PRODUCE_LINEAGE_GRAPH,null,true);
+					        //lineageEvent.fullLineage = true;
+					        lineageFullEvent.typeOfLineage = ULineageEvent.FULL_LINEAGE;
+					        lineageFullEvent.completeResultLineage = (obj.value as Array);
+					        lineageFullEvent.queryString = (obj.query as String);
+					        QueryResultsTree.dispatchEvent(lineageFullEvent);
+					        break;
+			    		}
+			    	}
+			    }
+			    
+			}
+            
+            private function handlePredicateClick():void {
+				var predicate:String = this.PredicateList.selectedItem as String;
+				if(!_selectedPredicates.contains(predicate))
+				   _selectedPredicates.addItem(predicate);
+			}
+			
+			private function handleNodeClick():void {
+				var node:String = this.SubjectObjectList.selectedItem as String;
+				if(!_selectedNodes.contains(node))
+				   _selectedNodes.addItem(node);
+			}	
+			
+			private function handlePredicateDeseletAllClick():void {
+				_selectedPredicates.removeAll();
+				_selectedPredicates.refresh();
+			}
+			
+			private function handleNodeDeseletAllClick():void {
+				_selectedNodes.removeAll();
+				_selectedNodes.refresh();
+			}
+			
+			private function handlePredicateFilterClick():void {
+				if(_selectedPredicates.length == 0)
+				   return;
+				var filterEvent:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+                filterEvent.typeOfFilter = UFilterEvent.PREDICATE_FILTER_EVENT;
+                filterEvent.multiplePredicates = true;
+                filterEvent.predicates = _selectedPredicates;
+                this.dispatchEvent(filterEvent);	
+			}
+			
+			private function handleNodeFilterClick():void {
+				if(_selectedNodes.length == 0)
+				   return;
+				var filterEvent:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+                filterEvent.typeOfFilter = UFilterEvent.NODE_FILTER_EVENT;
+                filterEvent.nodes = _selectedNodes;
+                this.dispatchEvent(filterEvent);	
+			}
+			
+			private function handleConfidenceFilterClick():void {
+				var filterEvent:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+                filterEvent.typeOfFilter = UFilterEvent.CONFIDENCE_FILTER_EVENT;
+                filterEvent.multipleConfidences = true;
+                filterEvent.minConfidence = ConfidenceSlider.values[0];//parseFloat(MinConfidenceValueLabel.text);
+                filterEvent.maxConfidence = ConfidenceSlider.values[1];//parseFloat(MaxConfidenceValueLabel.text);
+                this.dispatchEvent(filterEvent);	
+			}	
+			
+			private function handleTruthFilterClick():void {
+				var filterEvent:UFilterEvent = new UFilterEvent(UFilterEvent.FILTER_EVENT,true);
+                filterEvent.typeOfFilter = UFilterEvent.TRUTH_VALUE_FILTER_EVENT;
+                filterEvent.multipleTruthValues = true;
+                //var truthValues:Object = new Object();
+                if(this.TrueFilter.selected)
+                	filterEvent.truthValues["true"] = "true";
+                if(this.FalseFilter.selected)
+                	filterEvent.truthValues["false"] = "false";
+                if(this.UnknownFilter.selected)
+                	filterEvent.truthValues["unknown"] = "unknown";
+               // for (var key:String in filterEvent.truthValues) {
+                //	trace("truth value is : " + key);
+                //}
+                this.dispatchEvent(filterEvent);	
+			}
+			
+			private function toggleFactDetailHelpButtonVisibility():void {
+			    FactDetailsToolTip.visible = !FactDetailsToolTip.visible;
+			    FactsTree.visible = !FactsTree.visible;
+			}
+			
+			private function toggleFilterHelpButtonVisibility():void {
+			    FilterToolTip.visible = !FilterToolTip.visible;
+			    FilterViewStack.selectedChild.visible = !FilterViewStack.selectedChild.visible;
+			}
+			
+			private function toggleLineageButtonVisibility():void {
+			    LineageToolTip.visible = !LineageToolTip.visible;
+			    LineageAvailabilityTree.visible = !LineageAvailabilityTree.visible;
+			}
+			
+			private function toggleResultHelpButtonVisibility():void {
+			    ResultToolTip.visible = !ResultToolTip.visible;
+			    QueryResultsTree.visible = !QueryResultsTree.visible;
+			}
+			
+			private function toggleComparisonHelpButtonVisibility():void {
+			    ComparisonToolTip.visible = !ComparisonToolTip.visible;
+			    AvailableClustersList.visible = !AvailableClustersList.visible;
+			    BlackClusterLabel.visible = !BlackClusterLabel.visible;
+			    BlackClusterTextArea.visible = !BlackClusterTextArea.visible;
+			    WhiteClusterLabel.visible = !WhiteClusterLabel.visible;
+			    WhiteClusterTextArea.visible = !WhiteClusterTextArea.visible;
+			}		
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+
+		.buttons
+		{
+			font-family: "Verdana";
+			font-color: white;
+			color: white;
+			fill-color: #3F3F3F;
+			font-size: 10px;
+			letter-spacing: 1px;
+			selected-color: #00ff12;
+			roll-over-color: #00ff12;
+            padding-left: 2;
+            padding-right: 2
+		}
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+
+		       
+	    <mx:ViewStack 
+	   	  id="GraphAccessViewStack" 
+	   	  width="100%" 
+	   	  height="100%" 
+	   	  creationPolicy="all" 
+	   	  fontSize="10" 
+	   	  dropShadowEnabled="false"
+	   	  backgroundAlpha="0.0" 
+	   	  borderStyle="none" 
+	   	  borderThickness="3" 
+	   	  cornerRadius="10"
+	   	  backgroundColor="#3F3F3F" selectedIndex="0">
+	      
+	      <mx:Panel 
+	      	 label="Fact Details" 
+	      	 width="100%" 
+	      	 height="100%" 
+		     id="FactsPanel" 
+		     fontSize="10" 
+		     dropShadowEnabled="false" 
+		     alpha="1.0" 
+		     backgroundAlpha="0.0" 
+		     horizontalAlign="center" 
+		     verticalAlign="middle"
+		     textAlign="center"
+		     headerHeight="0" 
+		     verticalGap="5" borderStyle="none"
+		     hideEffect="DissolveOut" showEffect="DissolveIn"
+		     paddingTop="5" backgroundColor="#3F3F3F">
+		        <mx:HBox width="100%" height="25" verticalAlign="middle" horizontalAlign="center" 
+		        	verticalGap="0" horizontalGap="10" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+		        	<mx:Label text="Show Fact Details (Leaf items are clickable for selection):" id="FactsDetailsLabel" 
+		        		color="#FDFDFD" fontWeight="bold" fontSize="12" textAlign="center"/>
+		        	<mx:Button color="#FFFFFF" id="FactDetailsHelpButton" fontWeight="bold" fontSize="12" 
+		        		enabled="true" width="50" 
+		        		cornerRadius="5" height="20" label="Help"
+		        	    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" click="toggleFactDetailHelpButtonVisibility();" 
+		        	    fillAlphas="[0.0, 0.0, 1.0, 1.0]" fillColors="[#F9FAF9, #FAFBFA, #61FF01, #61FF01]"/>
+		        </mx:HBox>
+		        
+		        <mx:HRule width="90%"/>
+		        
+		        <mx:TextArea id="FactDetailsToolTip" width="450" height="175" editable="false" 
+		        	enabled="true" visible="false" includeInLayout="false"
+		            textAlign="left" paddingBottom="0" paddingLeft="0" paddingRight="0" 
+		            paddingTop="0" cornerRadius="5" backgroundColor="#EDEDCD"
+		            showEffect="wipeToBottomOut" hideEffect="wipeToTopIn" right="{FactDetailsHelpButton.x + FactDetailsHelpButton.width}"
+		            top="{FactDetailsHelpButton.y + FactDetailsHelpButton.height + 20}" borderStyle="solid" 
+		            borderThickness="0" kerning="false" letterSpacing="0" textIndent="0" condenseWhite="true"
+		            wordWrap="true" leading="0" alpha="1.0" backgroundAlpha="1.0" verticalScrollPolicy="off">
+		        	<mx:htmlText>
+				   	     <![CDATA[  
+				   	      <textformat leading="2"><p align="left"><font color="#0072ff" size="9">
+				   	         This menu shows details about received facts and provides options for analyzing this data. Clicking on predicates, confidences or truth values 
+				   	         can lead to a broken layout if the <b>Radial</b> layout is used. 
+				   	       </font>
+				   	       <font color="#000000" size="9">
+				   	       <br>- You can sort the data according to the fact itself, its contained subject, the predicate, the contained object, the confidence of the fact, and the truth value of the fact.
+				   	       <br>- By clicking on a button labeled with <b>Fact: ...</b>, the subject and object node as well as the predicate representing the fact will be selected.
+				   	       <br>- Clicking on a button labeled with <b>Subject: ...</b> or <b>Object: ...</b> simply selects all facts (subject node, predicate edge, object node) that contain the respective subject or object.	   	       
+				   	       <br>- Clicking on a button labeled with <b>Predicate: ...</b> selects all facts (subject node, predicate edge, object node) that contain the clicked predicate.	   	       
+				   	       <br>- By clicking on a button labeled with <b>Confidence: ...</b>, all visualized facts having this particular confidence will be selected.
+				   	       <br>- A click on a button labeled with <b>Truth Value: ...</b> selects all visualized facts having this specified truth value.					  
+				   	       </font>
+				   	       </p></textformat>
+				   	     ]]>
+			   	      </mx:htmlText>  	      
+              	 
+                 </mx:TextArea>		    
+		        
+		        <mx:Tree 
+					width="95%"
+				    height="85%" 
+					dataProvider="{_factListSorted}" 
+					selectedIndex="-1" 
+					enabled="true" 
+					editable="false"
+					id="FactsTree"
+					showDataTips="true"
+			    	dataTipFunction="dataTipProducer"
+			        backgroundAlpha="0" color="#FDFFFF" 
+			        borderStyle="none" fontWeight="bold"
+			        showRoot="false"
+			        textAlign="left"
+			        labelField="label"
+			        change="handleItemClick(event);" itemRenderer="uviface.ui.options.UButtonTreeItemRenderer"/>	
+			    
+			    <mx:HRule width="90%"/>
+			        
+			    <mx:HBox horizontalAlign="center" verticalAlign="middle" 
+		        	horizontalGap="2" textAlign="center">
+		        	<mx:Label id="SortLabel" fontSize="12" text="Facets: " fontWeight="bold" color="#FEFEFE"/>
+		        	<mx:ToggleButtonBar 
+			        	id="FactsSortButtonBar" 
+			        	dataProvider="{_factsButtons}"
+			            itemClick="changeSortField(event);"
+			            color="#3F3F3F" buttonStyleName="buttons" barColor="#3F3F3F" disabledColor="#3F3F3F"/>			    			        		       		    	
+		        </mx:HBox>    			     
+			     
+		  </mx:Panel>
+		  
+		  <mx:Panel 
+	      	 label="Data Filter" 
+	      	 width="100%" 
+	      	 height="100%" 
+		     id="FilterPanel" 
+		     fontSize="10" 
+		     dropShadowEnabled="false" 
+		     alpha="1.0" 
+		     backgroundAlpha="0.0" 
+		     horizontalAlign="center" 
+		     verticalAlign="middle"
+		     textAlign="center"
+		     headerHeight="0" 
+		     verticalGap="5" borderStyle="none"
+		     hideEffect="DissolveOut" showEffect="DissolveIn"
+		     paddingTop="5" backgroundColor="#3F3F3F">
+		     
+		     <mx:HBox width="100%" height="25" verticalAlign="middle" horizontalAlign="center" 
+		        	verticalGap="0" horizontalGap="10" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+		        	<mx:Label text="Apply filters to the graph data:" id="FilterTextLabel" 
+		        	  color="#FDFDFD" fontWeight="bold" fontSize="12" textAlign="center"/>
+		        	<mx:Button color="#FFFFFF" id="FilterHelpButton" fontWeight="bold" fontSize="12" 
+		        		enabled="true" width="50" 
+		        		cornerRadius="5" height="20" label="Help"
+		        	    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" click="toggleFilterHelpButtonVisibility();" 
+		        	    fillAlphas="[0.0, 0.0, 1.0, 1.0]" fillColors="[#F9FAF9, #FAFBFA, #61FF01, #61FF01]"/>
+		     </mx:HBox>
+		     
+		     <mx:HRule width="90%"/>
+		     
+		     <mx:TextArea id="FilterToolTip" width="450" height="225" editable="false" 
+	        	enabled="true" visible="false" includeInLayout="false"
+	            textAlign="left" paddingBottom="0" paddingLeft="0" paddingRight="0" 
+	            paddingTop="0" cornerRadius="5" backgroundColor="#EDEDCD"
+	            showEffect="wipeToBottomOut" hideEffect="wipeToTopIn" right="{FilterHelpButton.x + FilterToolTip.width}"
+	            top="{FilterHelpButton.y + FilterToolTip.height + 20}" borderStyle="solid" 
+	            borderThickness="0" kerning="false" letterSpacing="0" textIndent="0" condenseWhite="true"
+	            wordWrap="true" leading="0" alpha="1.0" backgroundAlpha="1.0" verticalScrollPolicy="off">
+	        	<mx:htmlText>
+			   	     <![CDATA[  
+			   	      <textformat leading="2"><p align="left"><font color="#0072ff" size="9">
+			   	         This menu provides several filter options to show only specific facts.	These filter work temporarily and 
+			   	         are destroyed by manually selecting new focus nodes with node exploration, selecting of nodes or results. The filters work
+			   	          only properly with the <b>Force</b> layout, because the <b>Radial</b> layout essentially is a tree layout. Consequently, this tree layout can be 
+			   	          destroyed by unconnected filtered facts. 
+			   	       </font>
+			   	       <font color="#000000" size="9">
+			   	       <br>- You can apply a <b>node</b> ('Subject' and 'Object' combined) filter, filter for fact with specific <b>predicates</b>, 
+			   	       or select facts according to <b>confidence ranges</b> or <b>truth values</b> For every filter option, there is a distinct 
+			   	       <b>Apply Filter</b> button to apply the respective filter type.
+			   	       <br>- By clicking on an available <b>Subject</b>/<b>Object</b>, this entry becomes selected for filtering. A previous selection 
+			   	       list can be cleaned by clicking on the <b>Deselect All</b> button.
+			   	       <br>- The <b>predicate</b> filter provides the same functionality as the node filter, but this time for the predicates. Thereby, all the 
+			   	       supported UViz predicates currently used by the received facts are shown. Using the predicate filter selects all facts containing one of 
+			   	       the specified predicates.	   	       
+			   	       <br>- The <b>confidence</b> filter allows to specify the confidence range. Facts belonging to this range are selected this way.
+			   	       <br>- Finally, a <b>truth value</b> filter can be specified to select facts holding one of the selected truth values.					  
+			   	       </font>
+			   	       </p></textformat>
+			   	     ]]>
+		   	      </mx:htmlText>  	      
+          	 
+             </mx:TextArea>		  
+		     
+		     <mx:ViewStack id="FilterViewStack" width="95%" height="85%" selectedIndex="0">
+		        
+		        <mx:VBox id="SubjectObjectHBox" label="Subject/Object" 
+		        	horizontalAlign="center" verticalAlign="middle" verticalGap="2"
+		        	 visible="true" showEffect="DissolveIn" hideEffect="DissolveOut" backgroundColor="#3F3F3F">
+		        	
+			        <mx:HBox width="100%" 
+			        	horizontalAlign="center" verticalAlign="middle"
+			        	horizontalGap="5" label="Subject/Object"
+			            height="87%">
+			              <mx:VBox width="50%" height="100%" horizontalAlign="center" 
+			              	verticalAlign="middle" verticalGap="6" backgroundColor="#3F3F3F">
+			                    <mx:Label text="Available Subjects/Objects:" color="#FDFFFF" 
+			                    	fontSize="12" fontWeight="bold" id="SubObjFilterLabel" enabled="true" textDecoration="normal"/>
+			                    <mx:List width="100%" height="90%" 
+			                    	id="SubjectObjectList" enabled="true" 
+			                    	selectedIndex="-1" backgroundAlpha="0.25" 
+			                    	dataProvider="{_nodeList}" allowMultipleSelection="false" 
+			                    	editable="false" borderStyle="solid" borderThickness="0"
+			                    	backgroundColor="#3F3F3F" cornerRadius="5" color="#FBFDFD" change="handleNodeClick();" dropShadowEnabled="true"/>
+			              </mx:VBox>
+			              <mx:VBox width="50%" height="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="6">
+			                    <mx:Label text="Filter Subjects/Objects:" color="#FDFFFF" fontSize="12" 
+			                    	fontWeight="bold" id="SelectedSubObjFilterLabel" enabled="true" textDecoration="normal"/>
+			                    <mx:List width="100%" height="90%" 
+			                    	id="SelectedSubjectObjectList" enabled="true" 
+			                    	selectedIndex="-1" backgroundAlpha="0.25"
+			                    	backgroundColor="#3F3F3F" cornerRadius="5" borderThickness="0"
+			                        dataProvider="{_selectedNodes}" color="#FCFEFE" dropShadowEnabled="true"/>
+			              </mx:VBox>
+			        </mx:HBox>
+			        
+			        <mx:HBox width="95%" height="12%" horizontalAlign="center" verticalAlign="middle" horizontalGap="10">
+			           <mx:Button label="Deselect All Filter Values" id="DeselectAllNodesButton" 
+			              	enabled="true" color="#FDFEFE" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+			              	fillColors="[#29FB00, #29FB00, #29FB00, #29FB00]" click="handleNodeDeseletAllClick();" fontSize="10"/>
+			           <mx:Button label="Apply Filter" id="NodesFilterButton" 
+			              	enabled="true" color="#FDFEFE" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+			              	fillColors="[#29FB00, #29FB00, #29FB00, #29FB00]" click="handleNodeFilterClick();" fontSize="10"/>
+			        </mx:HBox>
+			        
+		        </mx:VBox>
+		        
+		        <mx:VBox id="PredicateHBox" label="Predicate" horizontalAlign="center" 
+		        	verticalAlign="middle" verticalGap="2" visible="false"
+		        	showEffect="DissolveIn" hideEffect="DissolveOut" backgroundColor="#3F3F3F">
+		        	
+			        <mx:HBox width="100%"  height="87%" 
+			        	horizontalAlign="center" verticalAlign="middle" 
+			        	horizontalGap="5">
+			              <mx:VBox width="50%" height="100%" horizontalAlign="center" 
+			              	verticalAlign="middle" verticalGap="6" backgroundColor="#3F3F3F">
+			                    <mx:Label text="Available Predicates:" color="#FDFFFF" fontSize="12" 
+			                    	fontWeight="bold" id="PredicateFilterLabel" enabled="true" textDecoration="normal"/>
+			                    <mx:List width="100%" height="90%" 
+			                    	id="PredicateList" enabled="true" 
+			                    	selectedIndex="-1" backgroundAlpha="0.25"  
+			                    	dataProvider="{_predicates}" 
+			                    	allowMultipleSelection="false" editable="false"
+			                    	backgroundColor="#3F3F3F" color="#FAFBFB" change="handlePredicateClick();" dropShadowEnabled="true" cornerRadius="5" borderThickness="0"/>
+			              </mx:VBox>
+			              <mx:VBox width="50%" height="100%" horizontalAlign="center" verticalAlign="middle" verticalGap="6">
+			                    <mx:Label text="Filter Predicates: " color="#FDFFFF" fontSize="12" 
+			                    	fontWeight="bold" id="SelectedPredicateFilterLabel" enabled="true" textDecoration="normal"/>
+			                    <mx:List width="100%" height="90%" 
+			                    	id="SelectedPredicateList" enabled="true" 
+			                    	selectedIndex="-1" backgroundAlpha="0.25"
+			                    	backgroundColor="#3F3F3F" dataProvider="{_selectedPredicates}" color="#FCFDFD" dropShadowEnabled="true" cornerRadius="5" borderThickness="0"/>
+			              </mx:VBox>
+			        </mx:HBox>
+			        
+			        <mx:HBox width="95%" height="12%" horizontalAlign="center" 
+			        	verticalAlign="middle" horizontalGap="10">
+			           <mx:Button label="Deselect All Filter Values" id="DeselectAllPredicatesButton" 
+			              	enabled="true" color="#FDFEFE" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+			              	fillColors="[#29FB00, #29FB00, #29FB00, #29FB00]" click="handlePredicateDeseletAllClick();" fontSize="10"/>
+			           <mx:Button label="Apply Filter" id="PredicatesFilterButton" 
+			              	enabled="true" color="#FDFEFE" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+			              	fillColors="[#29FB00, #29FB00, #29FB00, #29FB00]" click="handlePredicateFilterClick();" fontSize="10"/>
+			        </mx:HBox>
+		        
+		        </mx:VBox>
+		        
+		        <mx:VBox id="ConfidenceTruthVBox" width="95%" height="10%" horizontalAlign="center" 
+		        	      verticalAlign="middle" horizontalGap="5" visible="false" label="Confidence/Truth Value"
+		        	      showEffect="DissolveIn" hideEffect="DissolveOut" backgroundColor="#3F3F3F">
+		        	  <mx:VBox width="100%" height="50%" horizontalAlign="center" verticalAlign="middle" 
+		        	  	horizontalGap="1" borderStyle="solid" cornerRadius="5" borderThickness="0" 
+		        	  	dropShadowEnabled="true" verticalGap="10">
+		        	  	  
+	                    <mx:Label text="Confidence Filter Range , [min. , max.]  : " color="#FEFEFE" id="ConfidenceSliderLabel" fontWeight="bold" fontSize="12"/>
+	                    <mx:HSlider id="ConfidenceSlider" allowTrackClick="true" minimum="0" 
+	                    	maximum="1.0" snapInterval="0.01" enabled="true" 
+	                    	liveDragging="true" width="350" showTrackHighlight="true" 
+	                    	tickInterval="0.1" 
+	                    	values="[0.3,0.7]" allowThumbOverlap="false" thumbCount="2"
+	                        labels="[0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]"
+	                        labelStyleName="MySliderLabel" height="52"/>
+			              <mx:Button label="Apply Filter" id="ConfidenceFilterButton" 
+			              	enabled="true" color="#FDFEFE" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+			              	fillColors="[#29FB00, #29FB00, #29FB00, #29FB00]" click="handleConfidenceFilterClick();" fontSize="10"/>        			              
+		              </mx:VBox>
+		              
+		        	  <mx:VBox width="95%" height="45%" horizontalAlign="center" verticalAlign="middle" horizontalGap="1" dropShadowEnabled="true" borderStyle="solid" cornerRadius="5" borderThickness="0" verticalGap="10">
+		        	  	  <mx:Label text="Truth Filter Values : " color="#FEFEFE" id="TruthValueLabel" fontWeight="bold" fontSize="12"/>
+		        	  	  <mx:HBox width="75%" height="41" horizontalAlign="center" 
+		        	  	  	  verticalAlign="middle" horizontalGap="15" borderStyle="solid" 
+		        	  	  	  borderThickness="0" cornerRadius="5" 
+		        	  	  	  backgroundAlpha="0.25" verticalGap="5">		        	  	
+		        	  	        <mx:CheckBox label="true" id="TrueFilter" selected="false" enabled="true" color="#FBFDFE" fontWeight="bold"/>
+		        	  	        <mx:CheckBox label="false" id="FalseFilter" selected="false" enabled="true" color="#FBFDFE" fontWeight="bold"/>
+		        	  	        <mx:CheckBox label="unknown" id="UnknownFilter" selected="false" enabled="true" color="#FBFDFE" fontWeight="bold"/>
+		        	  	  </mx:HBox>
+		        	  	  <mx:Button label="Apply Filter" id="TruthValueFilterButton" enabled="true" 
+		        	  	  	color="#FDFEFE" fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+		        	  	  	fillColors="[#29FB00, #29FB00, #29FB00, #29FB00]" click="handleTruthFilterClick();" fontSize="10"/>
+		        	  </mx:VBox>
+		        </mx:VBox>
+			   
+			 </mx:ViewStack>  
+			        
+			    <mx:HBox horizontalAlign="center" verticalAlign="middle" 
+		        	horizontalGap="2" textAlign="center">
+		        	<mx:Label id="FilterSelectLabel" fontSize="12" text="Select Filter : " fontWeight="bold" color="#FEFEFE"/>
+		        	<mx:ToggleButtonBar 
+			        	id="FilterButtonBar" 
+			        	dataProvider="{FilterViewStack}"
+			            color="#3F3F3F" buttonStyleName="buttons" 
+			            barColor="#3F3F3F" disabledColor="#3F3F3F" 
+			            selectedIndex="1" fontWeight="bold" fontSize="12"/>			    			        		       		    	
+		        </mx:HBox>		        			     
+			     
+		  </mx:Panel>
+	      
+	      <mx:Panel 
+	      	 label="Fact Lineage" 
+	      	 width="100%" 
+	      	 height="100%" 
+		     id="LineageAvailabilityPanel" 
+		     fontSize="10" 
+		     dropShadowEnabled="false" 
+		     alpha="1.0" 
+		     backgroundAlpha="0.0" 
+		     horizontalAlign="center" 
+		     verticalAlign="middle"
+		     textAlign="center"
+		     headerHeight="0" 
+		     verticalGap="5" borderStyle="none"
+		     hideEffect="DissolveOut" showEffect="DissolveIn"
+		     paddingTop="5" backgroundColor="#3F3F3F">
+			    
+			    <mx:HBox width="100%" height="25" verticalAlign="middle" horizontalAlign="center" 
+		        	verticalGap="0" horizontalGap="10" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+		        	<mx:Label id="LineageAvailabilityLabel"
+		        	text="Facts with available Lineage Information:" 
+		        	color="#FDFDFD" fontWeight="bold" fontSize="12" textAlign="center" fontFamily="Verdana" textDecoration="normal"/>
+		        	<mx:Button color="#FFFFFF" id="LineageHelpButton" fontWeight="bold" fontSize="12" 
+		        		enabled="true" width="50" 
+		        		cornerRadius="5" height="20" label="Help"
+		        	    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" click="toggleLineageButtonVisibility();" 
+		        	    fillAlphas="[0.0, 0.0, 1.0, 1.0]" fillColors="[#F9FAF9, #FAFBFA, #61FF01, #61FF01]"/>
+		        </mx:HBox>	
+		        
+		        <mx:HRule width="90%"/>
+		    	
+		    	<mx:TextArea id="LineageToolTip" width="450" height="55" editable="false" 
+		        	enabled="true" visible="false" includeInLayout="false"
+		            textAlign="left" paddingBottom="0" paddingLeft="0" paddingRight="0" 
+		            paddingTop="0" cornerRadius="5" backgroundColor="#EDEDCD"
+		            showEffect="wipeToBottomOut" hideEffect="wipeToTopIn" right="{LineageHelpButton.x + LineageToolTip.width}"
+		            top="{LineageHelpButton.y + LineageToolTip.height + 20}" borderStyle="solid" 
+		            borderThickness="0" kerning="false" letterSpacing="0" textIndent="0" condenseWhite="true"
+		            wordWrap="true" leading="0" alpha="1.0" backgroundAlpha="1.0"
+		            verticalScrollPolicy="off">
+		        	<mx:htmlText>
+			   	     <![CDATA[  
+			   	      <textformat leading="2"><p align="left"><font color="#0072ff" size="9">
+			   	         This menu provides an easy way to see which facts contain lineage information and to show the lineage 
+			   	         (derivation/explanation) tree for the selected fact. To show such a tree, it is necessary to click on the fact and the on
+			   	          on the respective button that appears. 
+			   	       </font>
+			   	       </p></textformat>
+			   	     ]]>
+		   	      </mx:htmlText>  	      
+          	 
+                </mx:TextArea>		  
+		    	
+		    	<mx:Tree 
+					width="90%"
+				    height="80%" 
+					dataProvider="{_lineageFactList}" 
+					selectedIndex="-1" 
+					enabled="true" 
+					editable="false"
+					id="LineageAvailabilityTree"
+					showDataTips="true"
+			    	dataTipFunction="dataTipProducer"
+			        backgroundAlpha="0" color="#FDFFFF" 
+			        borderStyle="none" fontWeight="bold"
+			        showRoot="false"
+			        textAlign="left"
+			        change="handleLineageItemClick(event);" itemRenderer="uviface.ui.options.UButtonTreeItemRenderer"/>
+		    
+		  </mx:Panel>
+	          
+	      <mx:Panel 
+	      	 label="Result Selection/Lineage" 
+	      	 width="100%" 
+	      	 height="100%" 
+		     id="QueryResultPanel" 
+		     fontSize="10" 
+		     dropShadowEnabled="false" 
+		     alpha="1.0" 
+		     backgroundAlpha="0.0" 
+		     horizontalAlign="center" 
+		     verticalAlign="middle"
+		     textAlign="center"
+		     headerHeight="0" 
+		     verticalGap="5" borderStyle="none"
+		     hideEffect="DissolveOut" showEffect="DissolveIn"
+		     backgroundColor="#3F3F3F" paddingTop="5">
+	          
+			 <mx:HBox width="100%" height="25" verticalAlign="middle" horizontalAlign="center" 
+	        	verticalGap="0" horizontalGap="8" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+	        	<mx:Label id="ResultClusterAccessLabel" height="22" fontSize="12" 
+    	 	        text="Selection and Lineage Application for complete Query Results." 
+    	 	        fontWeight="bold" color="#FEFEFE"/>
+	        	<mx:Button color="#FFFFFF" id="ResultHelpButton" fontWeight="bold" fontSize="12" 
+	        		enabled="true" width="50" 
+	        		cornerRadius="5" height="20" label="Help"
+	        	    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" click="toggleResultHelpButtonVisibility();" 
+	        	    fillAlphas="[0.0, 0.0, 1.0, 1.0]" fillColors="[#F9FAF9, #FAFBFA, #61FF01, #61FF01]"/>
+		     </mx:HBox>   	
+	    	 
+	    	 <mx:HRule width="90%"/>
+	    	
+	    	 <mx:TextArea id="ResultToolTip" width="450" height="275" editable="false" 
+	        	enabled="true" visible="false" includeInLayout="false"
+	            textAlign="left" paddingBottom="0" paddingLeft="0" paddingRight="0" 
+	            paddingTop="0" cornerRadius="5" backgroundColor="#EDEDCD"
+	            showEffect="wipeToBottomOut" hideEffect="wipeToTopIn" right="{ResultHelpButton.x + ResultToolTip.width}"
+	            top="{ResultHelpButton.y + ResultToolTip.height + 20}" borderStyle="solid" 
+	            borderThickness="0" kerning="false" letterSpacing="0" textIndent="0" condenseWhite="true"
+	            wordWrap="true" leading="0" alpha="1.0" backgroundAlpha="1.0"
+	            verticalScrollPolicy="off">
+	        	<mx:htmlText>
+			   	     <![CDATA[  
+			   	      <textformat leading="2"><p align="left"><font color="#0072ff" size="9">
+			   	         This menu provides an easy way to see which facts are contained in which 'query result' and 
+			   	         to select these results and show their explanation tree.
+			   	         Thereby, here a 'query result' can be a regular query result or a result produced by a node exploration 
+			   	         (data loading). The exploration results also include every action done in <b>Comparison Mode</b> 
+			   	         (regular query and exploration). Moreover, the results are always divided into the set of answers for a query 
+			   	         (only facts matching the query patterns are contained) and into the <b>Dependency Graph</b> containing all 
+			   	         facts produced during the reasoning process of URDF. Implicitly, this menu represents a history of accomplished actions.
+			   	       </font>
+			   	       <font color="#000000" size="9">
+			   	       <br><b>There are one or more clickable buttons available per result. These buttons trigger different actions:</b> 
+			   	       <br>- Clicking on a button labeled with the command to select different list of result facts will result in the selection 
+			   	       and displaying of all nodes and edges representing exactly all the facts contained in the specific result.
+			   	       <br>- Clicking on a button labeled with the command to show the explanation graph of the respective result will force the visualization
+			   	        to display the explanation tree for all facts contained in the complete result. If several answers for the repsective query
+			   	         exist, these explanation trees can become quite big. Consequently, these trees represent disjunctions of the distinct query answers.
+			   	       <br>- Clicking on a button labeled with the command to show the explanation tree for the specified answer forces the visualization
+			   	        to only display the explanation graph for this answer (matching of the query patterns).			  
+			   	       </font>
+			   	       </p></textformat>
+			   	     ]]>
+		   	      </mx:htmlText>  	      
+          	 
+             </mx:TextArea>		
+	    	
+	    	 <mx:Tree 
+				width="90%"
+			    height="90%" 
+				dataProvider="{_resultClusterList}" 
+				selectedIndex="-1" 
+				enabled="true" 
+				editable="false"
+				id="QueryResultsTree"
+				showDataTips="true"
+		    	dataTipFunction="dataTipProducer"
+		        backgroundAlpha="0" color="#FDFFFF" 
+		        borderStyle="none" fontWeight="bold"
+		        showRoot="false"
+		        textAlign="left" allowMultipleSelection="false"
+		        change="handleResultClusterClick(event);" itemRenderer="uviface.ui.options.UButtonTreeItemRenderer"/>
+		    
+		  </mx:Panel>
+		    
+		  <mx:Panel 
+          	 label="Result Comparison" 
+          	 width="100%" 
+          	 height="100%" 
+    	     id="ClusterComparisonPanel" 
+    	     fontSize="10" 
+    	     dropShadowEnabled="false" 
+    	     alpha="1.0" 
+    	     backgroundAlpha="0.0" 
+    	     horizontalAlign="center" 
+    	     verticalAlign="middle"
+    	     textAlign="center"
+    	     headerHeight="0" 
+    	     verticalGap="3" 
+    	     borderStyle="none"
+    	     hideEffect="DissolveOut" showEffect="DissolveIn"
+    	     backgroundColor="#3F3F3F">
+			  
+			   <mx:HBox width="100%" height="25" verticalAlign="middle" horizontalAlign="center" 
+	        	verticalGap="0" horizontalGap="10" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+	        	<mx:Label text="Available Query Results (including Node Exploration):" 
+	        		id="AvailableResultLabel" enabled="true" fontWeight="bold" fontSize="12" color="#FDFEFE"/>
+	        	<mx:Button color="#FFFFFF" id="ComparisonHelpButton" fontWeight="bold" fontSize="12" 
+	        		enabled="true" width="50" 
+	        		cornerRadius="5" height="20" label="Help"
+	        	    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" click="toggleComparisonHelpButtonVisibility();" 
+	        	    fillAlphas="[0.0, 0.0, 1.0, 1.0]" fillColors="[#F9FAF9, #FAFBFA, #61FF01, #61FF01]"/>
+		      </mx:HBox>  
+			  
+			  <mx:TextArea id="ComparisonToolTip" width="450" height="210" editable="false" 
+	        	enabled="true" visible="false" includeInLayout="false"
+	            textAlign="left" paddingBottom="0" paddingLeft="0" paddingRight="0" 
+	            paddingTop="0" cornerRadius="5" backgroundColor="#EDEDCD"
+	            showEffect="wipeToBottomOut" hideEffect="wipeToTopIn" right="{ComparisonHelpButton.x + ComparisonToolTip.width}"
+	            top="{ComparisonHelpButton.y + ComparisonToolTip.height + 20}" borderStyle="solid" 
+	            borderThickness="0" kerning="false" letterSpacing="0" textIndent="0" condenseWhite="true"
+	            wordWrap="true" leading="0" alpha="1.0" backgroundAlpha="1.0" verticalScrollPolicy="off">
+	        	<mx:htmlText>
+			   	     <![CDATA[  
+			   	      <textformat leading="2"><p align="left"><font color="#0072ff" size="9">
+			   	         This menu provides an easy way to compare two lists of result facts and is only accessible in 
+			   	         <b>Comparison Mode</b>. In this mode, the nodes obtain a special coloring. By also selecting the 
+			   	         <b>Glow Mode</b>, the edges will be colored the same way. Thereby, the lists to compare are represented 
+			   	         by all the obtained lists of result facts, including regular queries, data loading (node exploration) and queries 
+			   	         sent in comparison mode. 
+			   	       </font>
+			   	       <font color="#000000" size="9">
+			   	       <br>- It is always only possible to select one result at a time from the list. By clicking on the button for the 'white' or the 'black' 
+			   	       result list, the specified result list is set as the respective comparison list. By clicking the <b>Compare Results</b> button, 
+			   	       the two specified result lists will be compared in the following way:
+			   	       <br>  a) Facts (subject node, predicate edge, object node) belonging only to the black result list of facts will obtain a thick black border.
+			   	       <br>  b) Facts belonging only to the white result list of facts will obtain a thick white border.
+			   	       <br>  c) Facts belonging to both the result lists obtain a thick yellow border.
+			   	       <br>  d) If only a subject or object node of a fact belongs to both result lists, only the node obtains a yellow border.
+			   	       </font>
+			   	       </p></textformat>
+			   	     ]]>
+		   	      </mx:htmlText>  	      
+          	 
+             </mx:TextArea>	
+			  
+			  <mx:List  
+			  	id="AvailableClustersList"  
+			  	cornerRadius="5" 
+			  	borderStyle="solid" 
+			  	borderThickness="0" 
+			  	rowCount="10" 
+			  	dataProvider="{_resultClusterArray}" 
+			    selectedIndex="-1" 
+			    enabled="true"  
+			  	backgroundColor="#555454"
+			    labelField="label"
+			    width="95%" 
+			    height="160" 
+			    borderColor="#FFFFFF"
+			    itemRollOver="showTooltip(event);"
+			    itemRollOut="hideTooltip();" color="#FEFDFD" alpha="1.0" dropShadowEnabled="true"/>
+			   <mx:Label text="Black Result Fact List (nodes and edges will be colored black):" id="BlackClusterLabel" enabled="true" fontWeight="bold" color="#FFFFFF"/>
+			   <mx:TextInput editable="false" enabled="true" id="BlackClusterTextArea" width="95%" height="30" 
+			   	borderStyle="solid" cornerRadius="5" borderThickness="0" color="#FEFEFE" backgroundColor="#555454" 
+			   	dropShadowEnabled="true" fontWeight="bold" fontSize="12" textAlign="center"/>
+			   <mx:Label text="White Result Fact List (nodes and edges will be colored white):" id="WhiteClusterLabel" enabled="true" fontWeight="bold" color="#FDFDFD"/>
+			   <mx:TextArea width="95%" height="30" borderStyle="solid" borderThickness="0" cornerRadius="5" 
+			   	id="WhiteClusterTextArea" color="#FFFFFF" editable="false" enabled="true" dropShadowEnabled="true" 
+			   	backgroundColor="#555454" fontWeight="bold" fontSize="12" textAlign="center"/>
+			  
+			  <mx:HBox width="95%" horizontalAlign="center" verticalAlign="middle" borderStyle="solid" cornerRadius="10" borderThickness="0" 
+			  	backgroundColor="#F0EFEF" borderColor="#888989" backgroundAlpha="0.0" height="28" color="#FFFEFE">
+			  	  <mx:Button 
+			  	  	label="Select Black Result" 
+			  	  	id="SelectBlackClusterButton" 
+			  	  	fontSize="10" 
+			  	  	cornerRadius="10" 
+			  	  	click="handleBlackClusterButtonClicked();" 
+			  	  	fillAlphas="[1.0, 1.0]" 
+			  	  	fillColors="[#3F3F3F, #3F3F3F, #66FD01, #66FD01]"
+			  	  	toolTip="Select the black (first) result cluster of nodes and edges to compare." paddingLeft="1" paddingRight="1"/>
+			  	  <mx:Button 
+			  	  	label="Select White Result" 
+			  	  	id="SelectWhiteClusterButton" 
+			  	  	fontSize="10" 
+			  	  	cornerRadius="10" 
+			  	  	click="handleWhiteClusterButtonClicked();" 
+			  	  	fillAlphas="[1.0, 1.0, 1.0, 1.0]" 
+			  	  	fillColors="[#3F3F3F, #3F3F3F, #66FD01, #66FD01]"
+			  	  	toolTip="Select the white (second) result cluster of nodes and edges to compare." paddingLeft="1" paddingRight="1"/>
+			  	  <mx:Button 
+			  	  	id="ClusterCompareButton" 
+			  	  	label="Compare Results" 
+			  	  	cornerRadius="10" 
+			  	  	click="handleCompareButtonClick();" 
+			  	  	fillAlphas="[1.0, 1.0]" 
+			  	  	fillColors="[#3F3F3F, #3F3F3F, #66FD01, #66FD01]"
+			  	  	toolTip="Compare the black result cluster of nodes and edges with the white one." 
+			  	  	fontSize="15" width="195" height="24" paddingLeft="1" paddingRight="1"/>
+				  </mx:HBox>
+				
+			</mx:Panel>  
+		    	
+	          
+	   </mx:ViewStack>
+	   
+	   <!--
+	   <mx:htmlText>
+	   	     <![CDATA[
+	   	       <font color="#000000" size="10">
+	   	         - You can sort the data according to the fact itself, its contained subject, the predicate, the contained object, the confidence of the fact, and the truth value of the fact.	
+	   	       </font>
+	   	      ]]>
+	   	   </mx:htmlText>
+	   	   <mx:htmlText>
+	   	     <![CDATA[
+	   	       <font color="#000000" size="10">
+	   	         - By clicking on a row named 'Fact', the subject and object node as well as the predicate representing the fact will be selected.
+	   	       </font>
+	   	      ]]>
+	   	   </mx:htmlText>
+	   	   <mx:htmlText>
+	   	     <![CDATA[
+	   	       <font color="#000000" size="10">
+	   	         - Clicking the subject or object simply selects all facts (subject node, predicate edge, object node) that contain the respective subject or object.
+	   	       </font>
+	   	      ]]>
+	   	   </mx:htmlText>
+	   	   <mx:htmlText>
+	   	     <![CDATA[
+	   	       <font color="#000000" size="10">
+	   	         - Clicking on the row named 'Confidence' selects all visualized facts having this particular confidence.	
+	   	       </font>
+	   	      ]]>
+	   	   </mx:htmlText>
+	   	   <mx:htmlText>
+	   	     <![CDATA[
+	   	       <font color="#000000" size="10">
+	   	         - A click on the row named 'Truth Value' selects all visualized facts having this specified truth value.	
+	   	       </font>
+	   	      ]]>
+	   	   </mx:htmlText>
+	   	   
+	   	   <mx:TextArea id="FactDetailsToolTip" width="90%" height="70%" wordWrap="true" editable="false" 
+		        	enabled="true" visible="true" includeInLayout="false"
+		            textAlign="left" paddingBottom="0" paddingLeft="0" paddingRight="0" 
+		            paddingTop="0" cornerRadius="5" backgroundColor="#EDEDCD"
+		            showEffect="wipeToBottomOut" hideEffect="wipeToTopIn" right="{FactDetailsHelpButton.x + FactDetailsHelpButton.width}"
+		            top="{FactDetailsHelpButton.y + FactDetailsHelpButton.height + 20}">
+		        	   <mx:htmlText>
+				   	     <![CDATA[  
+				   	       <font color="#0072ff" size="10">
+				   	         This menu shows details about received facts and provides options for analyzing this data.	
+				   	       </font>
+				   	       <font color="#000000" size="9">
+				   	       <p>
+				   	       - You can sort the data according to the fact itself, its contained subject, the predicate, the contained object, the confidence of the fact, and the truth value of the fact.	
+				   	       </p>
+				   	       <p>
+				   	       - By clicking on a row named <b>'Fact'</b>, the subject and object node as well as the predicate representing the fact will be selected.
+				   	       </p>
+				   	       <p>
+				   	       - Clicking on a <b>'Subject'</b> or <b>'Object'</b> row simply selects all facts (subject node, predicate edge, object node) that contain the respective subject or object.	   	       
+				   	       </p>
+				   	       <p>
+				   	       - The click on a <b>'Predicate'</b> row selects all facts (subject node, predicate edge, object node) that contain the clicked predicate.	   	       
+				   	       </p>
+				   	       <p>
+				   	       - Clicking on the row named <b>'Confidence'</b> selects all visualized facts having this particular confidence.	
+				   	       </p>
+				   	       <p>
+				   	        - A click on the row named <b>'Truth Value'</b> selects all visualized facts having this specified truth value.	
+				   	       </p>
+				   	       </font>
+				   	     ]]>
+			   	   </mx:htmlText>  	   
+		              	 
+		        </mx:TextArea>
+		        
+		        <mx:htmlText>
+				   	     <![CDATA[  
+				   	      <TEXTFORMAT LEADING="2"><P ALIGN="LEFT"><font color="#0072ff" size="10">
+				   	         This menu shows details about received facts and provides options for analyzing this data.	
+				   	       </font>
+				   	       <font color="#000000" size="9">
+				   	       - You can sort the data according to the fact itself, its contained subject, the predicate, the contained object, the confidence of the fact, and the truth value of the fact.
+				   	       - By clicking on a row named <b>'Fact'</b>, the subject and object node as well as the predicate representing the fact will be selected.
+				   	       - Clicking on a <b>'Subject'</b> or <b>'Object'</b> row simply selects all facts (subject node, predicate edge, object node) that contain the respective subject or object.	   	       
+				   	       - The click on a <b>'Predicate'</b> row selects all facts (subject node, predicate edge, object node) that contain the clicked predicate.	   	       
+				   	       - Clicking on the row named <b>'Confidence'</b> selects all visualized facts having this particular confidence.
+				   	       - A click on the row named <b>'Truth Value'</b> selects all visualized facts having this specified truth value.					  
+				   	       </font>
+				   	       </P></TEXTFORMAT>
+				   	     ]]>
+			   	      </mx:htmlText>  	
+	   -->
+	   
+	   <mx:WipeDown id="wipeToBottomOut" duration="350"/>
+	   <mx:WipeUp id="wipeToTopIn" duration="350"/> 
+	   
+	   <mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="500"/>
+        
+       <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="500"/>
+	   
+	   <mx:Dissolve
+         id="DissolveOut"
+         alphaFrom="1.0"
+         alphaTo="0"
+         duration="250"/>
+        
+       <mx:Dissolve
+         id="DissolveIn"
+         alphaFrom="0"
+         alphaTo="1.0"
+         duration="500"/>
+	
+</mx:Panel>

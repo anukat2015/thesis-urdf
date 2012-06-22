@@ -1,0 +1,793 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="500" 
+	height="350"
+	horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#3F3F3F" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1" 
+    verticalAlign="middle"
+    fontFamily="Arial"
+    creationComplete="init();">
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			import uviface.viz.util.UStringConstants;
+			import uviface.viz.util.UColors;
+			import uviface.event.UPulsateEvent;
+			import uviface.event.URadiusDistanceEvent;
+			import uviface.event.UForceLayoutEvent;
+			import uviface.event.ULayoutEvent;
+			import uviface.event.UDataSpriteEvent;
+			import uviface.event.ULineageLayoutEvent;
+			import uviface.event.UGraphConfigEvent;
+			import flare.util.Orientation;
+			
+			import uviface.event.UGraphConfigEvent;
+			import mx.events.ItemClickEvent;
+			
+			import uviface.viz.UFlareVis;
+			
+			import flash.utils.getTimer;
+			import uviface.viz.layout.UForceDirectedLayout;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			[Bindable]
+			private var _forceToolTip:String = "The refresh rate slider determines how many update steps should pass between " + 
+					"each iteration of the force layout. The lower the value the smoother the layout and the more " + 
+					"impact the layout computation has on the GUI performance.";
+	                          
+			
+			private var _lineageLayout:String = Orientation.TOP_TO_BOTTOM; // means radial
+			// the cluster timer for the force layout
+			private var _clusterTimer:Timer = new Timer(4000,1);
+			private var _pulsatingTimer:Timer = new Timer(1000,0);
+   		    private var _doPull:Boolean = true;	
+   		    
+   		    private var _forceLayoutStopped:Boolean = false;	
+   		    private var _doPulsating:Boolean = false;	
+			
+			private function init():void {
+				_clusterTimer.addEventListener(TimerEvent.TIMER,resetClustering,false,0,true);
+				_pulsatingTimer.addEventListener(TimerEvent.TIMER,doPull,false,0,true);
+			}
+			
+			public function resetValues(event:UGraphConfigEvent):void {
+
+                // reset the visual items
+                resetGraphConfigValues()
+
+				var radiusIncrement:Number = (RadiusSlider.value)
+				   
+				//var graphConfigEvent:UGraphConfigEvent = new UGraphConfigEvent(UGraphConfigEvent.GRAPH_CONFIG_EVENT, 0, radiusIncrement, UFlareVis.RADIAL_LAYOUT, true);
+				
+				addForceLayoutValuesToEvent(event);
+				// add lineage related values to the event
+				event.depthSpacing = DepthSpacingSlider.value;
+				event.breadthSpacing = BreadthSpacingSlider.value;
+				event.subtreeSpacing = SubtreeSpacingSlider.value;
+				event.lineageLayout = _lineageLayout;
+				
+				//this.dispatchEvent(event);
+			}			
+			
+			private function addForceLayoutValuesToEvent(event:UGraphConfigEvent):void {
+				event.particleMass = DefaultParticleMassSlider.value;
+				event.springLength = DefaultSpringLengthSlider.value;
+				event.springTension = DefaultSpringTensionSlider.value;
+				event.iterations = _forceLayoutStopped ? 0 : 1;
+				event.nBodyGravitation = NBodyGravitationSlider.value;
+			}
+			
+			private function addLineageValuesToEvent(event:ULineageLayoutEvent):void {
+				// the lineage parameters
+				event.depthSpacing = DepthSpacingSlider.value;
+				event.breadthSpacing = BreadthSpacingSlider.value;
+				event.subtreeSpacing = SubtreeSpacingSlider.value;
+				event.orientation = _lineageLayout;
+			}
+			
+			private function handleLineageLayoutChange():void {
+				  
+				  
+				  if(LeftToRightSwitchButton.selected) {
+				    _lineageLayout = Orientation.LEFT_TO_RIGHT;
+				    //return;
+				  }
+				  else if(RightToLeftSwitchButton.selected) {
+				    _lineageLayout = Orientation.RIGHT_TO_LEFT;
+				    //return;
+				  }
+				  else if(TopToBottomSwitchButton.selected) {
+				    _lineageLayout = Orientation.TOP_TO_BOTTOM;
+				    //return;
+				  }
+				  else if(BottomToTopSwitchButton.selected) {
+				    _lineageLayout = Orientation.BOTTOM_TO_TOP;
+				    //return;
+				  }	
+				  
+				  var lineageLayoutEvent:ULineageLayoutEvent = new ULineageLayoutEvent(ULineageLayoutEvent.LINEAGE_LAYOUT_EVENT,true);
+				  
+				  addLineageValuesToEvent(lineageLayoutEvent); 
+				  
+				  this.dispatchEvent(lineageLayoutEvent);
+			}
+			
+			private function resetGraphConfigValues():void {
+				
+				// the radius increment for the radial layout
+				RadiusSlider.value = 200;
+				
+				// the force layout parameters
+				DefaultParticleMassSlider.value = 1;
+				DefaultSpringLengthSlider.value = 200;
+				DefaultSpringTensionSlider.value = 0.05;//0.001;
+				StartStopButton.selected = false;
+				PulsatingButton.selected = false;
+				ForceLayoutClusterButton.selected = false;
+				_forceLayoutStopped = false;
+				_doPulsating = false;
+				StartStopButton.label = "STOP";	
+				PulsatingButton.label = "PULSATING";
+				NBodyGravitationSlider.value = -10;
+				
+				// the lineage parameters
+				DepthSpacingSlider.value = 50;
+				BreadthSpacingSlider.value = 20;
+				SubtreeSpacingSlider.value = 30;
+				_lineageLayout = Orientation.TOP_TO_BOTTOM;
+				
+				// the layout switch
+				//_layout = UGraphConfigEvent.RADIAL;
+				//RadialLayoutSwitchButton.selected = true;
+				//ForceLayoutSwitchButton.selected = false;
+				//ForceLayoutPanel.enabled = false;
+				//ForceLayoutPanel.filters = _filters;
+				//RadiusIncrementHBox.enabled = true;
+				//RadiusIncrementHBox.filters = null;
+				
+				//resetValues();
+			}
+			
+			private function updateForceLayout():void {
+				var forceLayoutEvent:UForceLayoutEvent = new UForceLayoutEvent(UForceLayoutEvent.FORCE_LAYOUT_EVENT,true);
+	
+				forceLayoutEvent.particleMass = DefaultParticleMassSlider.value;
+				forceLayoutEvent.springLength = DefaultSpringLengthSlider.value;
+				forceLayoutEvent.springTension = DefaultSpringTensionSlider.value;
+				forceLayoutEvent.iterations = _forceLayoutStopped ? 0 : 1;	
+				forceLayoutEvent.nBodyGravitation = NBodyGravitationSlider.value;
+				//forceLayoutEvent.enforceBounds = EnforceBoundsButton.selected;
+				
+				DefaultParticleMassSlider.dispatchEvent(forceLayoutEvent);
+			}
+			
+			private function updateRadiusIncrement():void {
+				var radiusAndDistanceEvent:URadiusDistanceEvent = 
+				   new URadiusDistanceEvent(URadiusDistanceEvent.RADIUS_AND_DISTANCE_EVENT,URadiusDistanceEvent.INCREMENT_RADIUS,0,RadiusSlider.value,true);
+				
+				RadiusSlider.dispatchEvent(radiusAndDistanceEvent);
+			}
+			
+			public function updateLayout(layoutType:int):void {
+				
+				//_layout = ForceLayoutSwitchButton.selected ? 1 : 0;
+				
+				if(layoutType == UFlareVis.FORCE_LAYOUT) {
+					//ForceLayoutSwitchButton.selected = true;
+					//RadialLayoutSwitchButton.selected = false;
+					ForceLayoutPanel.enabled = true;
+					ForceLayoutPanel.filters = null;
+					//RadiusIncrementHBox.enabled = false;
+					//RadiusIncrementHBox.filters = _filters;
+				}
+				else {
+					//RadialLayoutSwitchButton.selected = true;
+					//ForceLayoutSwitchButton.selected = false;
+					ForceLayoutPanel.enabled = false;
+					ForceLayoutPanel.filters = _filters;
+					//RadiusIncrementHBox.enabled = true;
+					//RadiusIncrementHBox.filters = null;
+				}
+				
+			}
+			
+			public function hideNonLineageProperties():void {
+				RadialLayoutPanel.enabled = false;
+				RadialLayoutPanel.filters = _filters;
+				
+				// if the force layout is selected, disable the box
+				//if(ForceLayoutSwitchButton.selected) {
+			    ForceLayoutPanel.enabled = false;
+				ForceLayoutPanel.filters = _filters;
+				//}
+				
+				// enable the lineage parameter box
+				LineageLayoutPanel.enabled = true;
+				LineageLayoutPanel.filters = null;
+				
+				// the selected view changes
+				LayoutsViewStack.selectedIndex = 2;//selectedChild = LineageLayoutPanel;
+			}
+			
+			public function showNonLineageProperties():void {
+				
+				RadialLayoutPanel.enabled = true;
+				RadialLayoutPanel.filters = null;
+				
+				ForceLayoutPanel.enabled = true;
+				ForceLayoutPanel.filters = null;
+				
+				// disable the lineage parameter box
+				LineageLayoutPanel.enabled = false;
+				LineageLayoutPanel.filters = _filters;
+				
+				// the selected view changes
+				LayoutsViewStack.selectedIndex = 0;//selectedChild = RadialLayoutPanel;
+			}
+			
+			private function doPulsating():void { 
+			    
+			    _doPulsating = !_doPulsating;
+			    
+			    if(_doPulsating) {
+			    	// start the cluster timer 
+				    _pulsatingTimer.start();
+				    // change the particle mass
+				    //DefaultParticleMassSlider.value = 10;
+				    DefaultSpringLengthSlider.value = DefaultSpringLengthSlider.value + 200;
+				    //DefaultSpringTensionSlider.value = 0.0001;
+				    // update the force layout
+				    updateForceLayout(); 
+				    // change the button label
+				    PulsatingButton.label = "NO PULSATING";
+			    }
+			    else {
+			    	// start the cluster timer 
+				    _pulsatingTimer.stop();
+				    // change the particle mass
+				    //DefaultParticleMassSlider.value = 1;
+				    DefaultSpringLengthSlider.value = DefaultSpringLengthSlider.value - 200;
+				    //DefaultSpringTensionSlider.value = 0.1;
+				    // update the force layout
+				    updateForceLayout(); 
+				     // change the flag
+				    _doPull = true;
+				    // change the button label
+				    PulsatingButton.label = "PULSATING";
+			    }
+			    
+			    return;
+			}
+            
+            private function doPull(event:TimerEvent):void {
+			    
+			    _doPull = !_doPull;
+			    
+			    if(_doPull) {
+			    	// change the particle mass
+			        //DefaultParticleMassSlider.value = 10;
+			        DefaultSpringLengthSlider.value = DefaultSpringLengthSlider.value + 200;
+				    //DefaultSpringTensionSlider.value = 0.0001;
+			        // update the force layout
+			        updateForceLayout(); 
+			    }
+			    else {
+			    	// change the particle mass
+			        //DefaultParticleMassSlider.value = 1;
+			        DefaultSpringLengthSlider.value = DefaultSpringLengthSlider.value -200;
+				    //DefaultSpringTensionSlider.value = 0.1;
+			        // update the force layout
+			        updateForceLayout(); 
+			    }
+			   
+			}
+			
+			private function doAutomaticClustering():void {
+			    //renderTimer = new Timer(3000,1);
+			    //renderTimer.addEventListener(TimerEvent.TIMER,resetClustering,false,0,true);
+			    
+			    // change the particle mass
+			    DefaultParticleMassSlider.value = 25;
+			    DefaultSpringLengthSlider.value = DefaultSpringLengthSlider.value * 1.5;
+				DefaultSpringTensionSlider.value = 0.05;
+			    // start the cluster timer 
+			    _clusterTimer.start();
+			    // update the force layout
+			    updateForceLayout(); 
+			}
+            
+			private function resetClustering(event:TimerEvent):void {
+			    
+			    // change the particle mass
+			    DefaultParticleMassSlider.value = 1;
+			    DefaultSpringLengthSlider.value = DefaultSpringLengthSlider.value * 0.75;
+				DefaultSpringTensionSlider.value = 0.1;
+			    // start the cluster timer 
+			    _clusterTimer.stop();
+			    // update the force layout
+			    updateForceLayout(); 
+			 
+			    ForceLayoutClusterButton.selected = false;    
+			}
+			
+			private function startStopForceLayout():void {
+				
+				_forceLayoutStopped = !_forceLayoutStopped; 
+				
+				// change the button label
+				if(_forceLayoutStopped) {
+				   StartStopButton.label = "START FORCE";
+				}
+				else {
+				   StartStopButton.label = "STOP FORCE";
+				}
+				  
+				// now update the force layout;
+				updateForceLayout();
+			}
+			
+			private function togglePulsating():void {
+				 
+				_doPulsating = !_doPulsating;
+				
+				if(_doPulsating) {
+				   // change the button label
+				   PulsatingButton.label = "NO PULSATING";
+			    }
+			    else {
+				    // change the button label
+				    PulsatingButton.label = "PULSATING";
+			    }
+			    
+			    PulsatingButton.dispatchEvent(new UPulsateEvent(UPulsateEvent.PULSATE_EVENT,_doPulsating,true));
+			    
+			    return;
+				
+			}
+			
+			private function updateForceRefreshRate():void {
+				UForceDirectedLayout.refreshRate = this.RefreshRateSliderSlider.value;
+			}
+			
+		]]>
+	</mx:Script>
+	
+	
+	
+	<mx:VBox 
+		horizontalAlign="center" 
+		verticalGap="5" 
+		verticalAlign="middle" 
+		left="10" 
+		right="10" 
+		top="10" 
+		bottom="10" 
+		borderStyle="none" 
+		cornerRadius="20" 
+		borderColor="#5F5751" backgroundColor="#3F3F3F"  backgroundAlpha="1.0"
+	    verticalScrollPolicy="off" horizontalScrollPolicy="off">
+	      
+	       <mx:ViewStack 
+	       	  id="LayoutsViewStack" 
+	       	  width="95%" 
+	       	  height="280" 
+	       	  creationPolicy="all" 
+	       	  fontSize="10" 
+	       	  dropShadowEnabled="false"
+	       	  backgroundAlpha="1.0" borderStyle="none" 
+	       	  borderThickness="3" cornerRadius="10" alpha="1.0"
+	       	  backgroundColor="#3F3F3F" >	              
+	              
+               <mx:Panel 
+              	 label="Radial Layout" 
+              	 width="98%" 
+              	 height="98%" 
+	    	     id="RadialLayoutPanel" 
+	    	     fontSize="10" 
+	    	     dropShadowEnabled="false" 
+	    	     alpha="1.0" 
+	    	     backgroundAlpha="0.0" 
+	    	     horizontalAlign="center" 
+	    	     verticalAlign="middle"
+	    	     textAlign="center"
+	    	     headerHeight="0" borderStyle="none" backgroundColor="#3F3F3F" 
+	    	     hideEffect="DissolveOut" showEffect="DissolveIn">
+                     <mx:VBox width="375" height="125" horizontalAlign="center" verticalAlign="middle" 
+                     	backgroundColor="#767675" borderStyle="solid" borderThickness="0" 
+                     	cornerRadius="10" backgroundAlpha="0.0" dropShadowEnabled="true">
+                           <mx:Label id="RadiusIncrementLabel" text="Radius Increment between Tree Levels:" fontWeight="bold" color="#FFFFFF" fontFamily="Arial" fontSize="12"/>
+                           <mx:HSlider 
+                           	 id="RadiusSlider"
+                           	 value="200" 
+                           	 minimum="0"
+                              maximum="1000"
+                            	 tickInterval="100" 
+                            	 liveDragging="true"
+                            	 showDataTip="true"
+                            	 showTrackHighlight="true"
+                            	 dataTipPlacement="top"
+                            	 allowTrackClick="true"
+                            	 dataTipPrecision="0"
+                            	 thumbCount="1"
+                            	 labels="[0,500,1000]"
+                            	 toolTip="Radius increment between levels in the radial graph."
+                            	 tickColor="white" 
+                            	 trackColors="white" 
+                            	 width="330" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" change="updateRadiusIncrement();" height="61"/>
+                     </mx:VBox>
+                     	  			                  
+              </mx:Panel>
+	              
+              <mx:Panel 
+              	 label="Force Layout" 
+              	 width="98%" 
+              	 height="98%"  
+	    	     id="ForceLayoutPanel" 
+	    	     fontSize="10" 
+	    	     dropShadowEnabled="false" 
+	    	     alpha="1.0" 
+	    	     backgroundAlpha="0.0" 
+	    	     horizontalAlign="center" 
+	    	     verticalAlign="middle"
+	    	     textAlign="center"
+	    	     headerHeight="0" 
+	    	     verticalGap="10" 
+	    	     borderStyle="none" 
+	    	     backgroundColor="#3F3F3F"  paddingTop="15"
+	    	     hideEffect="DissolveOut" showEffect="DissolveIn">
+                 
+                 <mx:HBox height="35%" width="100%" horizontalAlign="center" verticalAlign="middle" horizontalGap="4" borderStyle="solid" borderThickness="0" cornerRadius="10">    	                  
+                     <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="4" backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" dropShadowEnabled="true" backgroundAlpha="0.0">
+                         <mx:Label id="DefaultParticleMassLabel" text="Particle Mass:" fontWeight="bold" color="#FFFFFF" fontFamily="Arial" fontSize="12"/>
+                         <mx:HSlider 
+                      	  id="DefaultParticleMassSlider"
+                      	  value="1" 
+                      	  minimum="1"
+	                      maximum="25"
+	                      tickInterval="5"
+	                      liveDragging="true"
+	                      showDataTip="true"
+	                      showTrackHighlight="true"
+	                      dataTipPlacement="top"
+	                      allowTrackClick="true"
+	                      dataTipPrecision="0"
+	                      thumbCount="1"
+	                      labels="[1,5,10,15,20,25]"
+	                      snapInterval="1"
+	                      toolTip="The default particle mass to use for the force layout."
+	                      tickColor="white" 
+	                      trackColors="white" 
+	                      width="150" 
+	                      borderColor="#FEFEFE" 
+	                      fillAlphas="[1.0, 1.0]" 
+	                      fillColors="[#030000, #030000]" 
+	                      labelStyleName="MySliderLabel" 
+	                      change="updateForceLayout();"/>
+                     </mx:VBox>   
+                     <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="4" backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundAlpha="0.0" dropShadowEnabled="true">                                         
+	                      <mx:Label id="DefaultSpringLengthLabel" text="Spring Length:" fontWeight="bold" color="#FFFFFF" fontSize="12"/>                   
+	                      <mx:HSlider 
+	                      	  id="DefaultSpringLengthSlider"
+	                      	  value="200" 
+	                      	  minimum="0"
+	                          maximum="1000"
+	                          tickInterval="250"
+	                          liveDragging="true"
+	                          showDataTip="true"
+	                          showTrackHighlight="true"
+	                          dataTipPlacement="top"
+	                          allowTrackClick="true"
+	                          dataTipPrecision="0"
+	                          thumbCount="1"
+	                          labels="[0,500,1000]"
+	                          toolTip="The default spring length to use for the force layout."
+	                          tickColor="white" 
+	                          trackColors="white" 
+	                          width="150" 
+	                          borderColor="#FEFEFE" 
+	                          fillAlphas="[1.0, 1.0]" 
+	                          fillColors="[#030000, #030000]" 
+	                          labelStyleName="MySliderLabel" 
+	                          change="updateForceLayout();"/>	                                         
+              	      </mx:VBox>                   
+                  </mx:HBox> 
+                  
+                  <mx:HBox height="35%" width="100%" horizontalAlign="center" verticalAlign="middle" horizontalGap="4" borderStyle="solid" cornerRadius="10" borderThickness="0">    	                  
+                      <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="4" backgroundColor="#767675" borderStyle="solid" borderThickness="0" cornerRadius="10" dropShadowEnabled="true" backgroundAlpha="0.0">
+	                      <mx:Label id="DefaultSpringTensionLabel" text="Spring Tension:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>                    
+	                      <mx:HSlider 
+	                      	  id="DefaultSpringTensionSlider"
+	                      	  value="0.05" 
+	                      	  minimum="0.0001"
+	                          maximum="0.1"
+	                          liveDragging="true"
+	                          showDataTip="true"
+	                          showTrackHighlight="true"
+	                          dataTipPlacement="top"
+	                          allowTrackClick="true"
+	                          dataTipPrecision="4"
+	                          thumbCount="1"
+	                          labels="[0.0001,0.1]"
+	                          toolTip="The default spring tension to use for the force layout."
+	                          tickColor="white" 
+	                          trackColors="white" 
+	                          width="200" 
+	                          borderColor="#FEFEFE" 
+	                          fillAlphas="[1.0, 1.0]" 
+	                          fillColors="[#030000, #030000]" 
+	                          labelStyleName="MySliderLabel" 
+	                          enabled="true" 
+	                          change="updateForceLayout();"/>	                                                               
+                      </mx:VBox>
+                      <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="4" backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundAlpha="0.0" dropShadowEnabled="true">
+	                      <mx:Label id="NBodyGravitation" text="NBody Force Constant:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>                     
+	                      <mx:HSlider 
+	                          id="NBodyGravitationSlider"
+	                          value="-10" 
+	                          minimum="-10"
+	                          maximum="10"
+	                          liveDragging="true"
+	                          showDataTip="true"
+	                          showTrackHighlight="true"
+	                          dataTipPlacement="top"
+	                          allowTrackClick="true"
+	                          dataTipPrecision="2"
+	                          thumbCount="1"
+	                          tickInterval="5"
+	                          labels="[-10,-5,0,5,10]"
+	                          toolTip="The gravitational constant for the NBody Force."
+	                          tickColor="white" 
+	                          trackColors="white" 
+	                          width="150" 
+	                          borderColor="#FEFEFE" 
+	                          fillAlphas="[1.0, 1.0]" 
+	                          fillColors="[#030000, #030000]" 
+	                          labelStyleName="MySliderLabel" 
+	                          enabled="true" 
+	                          change="updateForceLayout();"/>	                     	                   
+                     </mx:VBox>                   
+                 </mx:HBox>
+                 <mx:HBox height="35%" width="100%" horizontalAlign="center" verticalAlign="middle" horizontalGap="4" 
+                 	borderStyle="solid" cornerRadius="10" borderThickness="0">    	                  
+                      <mx:VBox height="62" width="50%" horizontalAlign="center" 
+                      	verticalAlign="middle" verticalGap="4" backgroundColor="#767675" 
+                      	borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundAlpha="0.0" 
+                      	dropShadowEnabled="true">
+	                      <mx:Label id="RefresfrateLabel" text="Refresh Rate (every i-th step):" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>                     
+	                      <mx:HSlider 
+	                          id="RefreshRateSliderSlider"
+	                          value="1" 
+	                          minimum="1"
+	                          maximum="5"
+	                          liveDragging="true"
+	                          showDataTip="true"
+	                          showTrackHighlight="true"
+	                          dataTipPlacement="top"
+	                          allowTrackClick="true"
+	                          dataTipPrecision="2"
+	                          thumbCount="1"
+	                          tickInterval="1"
+	                          labels="[1,2,3,4,5]"
+	                          toolTip="{_forceToolTip}"
+	                          tickColor="white" 
+	                          trackColors="white" 
+	                          width="150" 
+	                          borderColor="#FEFEFE" 
+	                          fillAlphas="[1.0, 1.0]" 
+	                          fillColors="[#030000, #030000]" 
+	                          labelStyleName="MySliderLabel" 
+	                          enabled="true" 
+	                          change="updateForceRefreshRate();" height="29" 
+	                          snapInterval="1"/>	                     	                   
+                     </mx:VBox>                   
+                 </mx:HBox>
+                 <mx:HBox id="NBodyForceBox" width="400" horizontalAlign="center" verticalAlign="middle" horizontalGap="10"
+                    borderStyle="solid" borderThickness="0" cornerRadius="10" backgroundColor="#767675" 
+                    backgroundAlpha="0.0" borderColor="#FBFBFB" label="NBody Force" dropShadowEnabled="true">
+                    
+                    <mx:Button 
+                     id="StartStopButton" 
+                     label="STOP FORCE" 
+                     fontWeight="bold" 
+                     fontSize="10" 
+                     cornerRadius="10" 
+                     fillAlphas="[1.0, 1.0]" 
+                     fillColors="[#5F5751, #5F5751, #55FD02, #55FD02]" 
+                     borderColor="#FCFDFD" 
+                     color="#FCFEFE" 
+                     alpha="0.0" 
+                     themeColor="#00FFC6"
+                     toolTip="Stop the force layout."
+                     click="startStopForceLayout();" enabled="true"/>
+                    
+                    <mx:Button 
+                     id="ForceLayoutClusterButton" 
+                     label="AUTOMATIC CLUSTERING" 
+                     fontWeight="bold" 
+                     fontSize="10" 
+                     cornerRadius="10" 
+                     fillAlphas="[1.0, 1.0]" 
+                     fillColors="[#5F5751, #5F5751, #55FD02, #55FD02]" 
+                     borderColor="#FCFDFD" 
+                     color="#FCFEFE" 
+                     alpha="0.0" 
+                     themeColor="#00FFC6"
+                     toolTip="Cluster the Nodes automatically."
+                     click="doAutomaticClustering();" enabled="true"/>
+                    
+                    <mx:Button 
+                     id="PulsatingButton" 
+                     label="PULSATING" 
+                     fontWeight="bold" 
+                     fontSize="10" 
+                     cornerRadius="10" 
+                     fillAlphas="[1.0, 1.0]" 
+                     fillColors="[#5F5751, #5F5751, #55FD02, #55FD02]" 
+                     borderColor="#FCFDFD" 
+                     color="#FCFEFE" 
+                     alpha="0.0" 
+                     themeColor="#00FFC6"
+                     toolTip="Cluster the Nodes automatically."
+                     click="togglePulsating();" enabled="true" fontFamily="Arial"/>
+                    
+                 </mx:HBox>
+              	
+              </mx:Panel>
+              
+              <mx:Panel 
+              	 label="Lineage Layout" 
+              	 width="98%" 
+              	 height="98%" 
+	    	     id="LineageLayoutPanel" 
+	    	     fontSize="10" 
+	    	     dropShadowEnabled="false" 
+	    	     alpha="1.0" 
+	    	     backgroundAlpha="0.0" 
+	    	     horizontalAlign="center" 
+	    	     verticalAlign="middle"
+	    	     textAlign="center"
+	    	     headerHeight="0" verticalGap="10" borderStyle="none" 
+	    	     backgroundColor="#3F3F3F"  paddingTop="5"
+	    	     hideEffect="DissolveOut" showEffect="DissolveIn">
+                     
+                     <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="0" 
+                     	backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundAlpha="0.0" dropShadowEnabled="true">	                     		                         
+                         <mx:Label id="DepthSpacingLabel" text="Depth:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+                         <mx:HSlider 
+                         	  id="DepthSpacingSlider"
+                         	  value="50" 
+                         	  minimum="0"
+                              maximum="250"
+                              liveDragging="true"
+                              showDataTip="true"
+                              showTrackHighlight="true"
+                              dataTipPlacement="top"
+                              allowTrackClick="true"
+                              dataTipPrecision="0"
+                              thumbCount="1"
+                              tickInterval="50"
+                              labels="[0,250]"
+                              toolTip="The depth space between levels in the Lineage Tree."
+                              tickColor="white" 
+                              trackColors="white" 
+                              width="150" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true" change="handleLineageLayoutChange();"/>
+                    </mx:VBox>
+                    <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="0" 
+                     	backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" dropShadowEnabled="true" backgroundAlpha="0.0">	                     		                    
+                         <mx:Label id="BreadthSpacingLabel" text="Breadth:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+                         <mx:HSlider 
+                         	  id="BreadthSpacingSlider"
+                         	  value="20" 
+                         	  minimum="0"
+	                          maximum="250"
+	                          liveDragging="true"
+	                          showDataTip="true"
+	                          showTrackHighlight="true"
+	                          dataTipPlacement="top"
+	                          allowTrackClick="true"
+	                          dataTipPrecision="0"
+	                          thumbCount="1"
+	                          tickInterval="50"
+	                          labels="[0,250]"
+	                          toolTip="The breadth space between nodes in the Lineage Tree."
+	                          tickColor="white" 
+	                          trackColors="white" 
+	                          width="150" 
+	                          borderColor="#FEFEFE" 
+	                          fillAlphas="[1.0, 1.0]" 
+	                          fillColors="[#030000, #030000]" 
+	                          labelStyleName="MySliderLabel" 
+	                          enabled="true" 
+	                          change="handleLineageLayoutChange();"/>
+                    </mx:VBox>    
+                    <mx:VBox height="100%" width="50%" horizontalAlign="center" verticalAlign="middle" verticalGap="0" 
+                     	backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundAlpha="0.0" dropShadowEnabled="true">	                    		                   
+                         <mx:Label id="SubtreeSpacingLabel" text="Subtree Spacing:" fontWeight="bold" color="#FFFFFF" textDecoration="normal" fontSize="12"/>
+                         <mx:HSlider 
+                         	  id="SubtreeSpacingSlider"
+                         	  value="30" 
+                         	  minimum="0"
+	                          maximum="250"
+	                          liveDragging="true"
+	                          showDataTip="true"
+	                          showTrackHighlight="true"
+	                          dataTipPlacement="top"
+	                          allowTrackClick="true"
+	                          dataTipPrecision="0"
+	                          thumbCount="1"
+	                          tickInterval="50"
+	                          labels="[0,250]"
+	                          toolTip="The breadth space between siblings in a subtree of the Lineage Tree."
+	                          tickColor="white" 
+	                          trackColors="white" 
+	                          width="150" 
+	                          borderColor="#FEFEFE" 
+	                          fillAlphas="[1.0, 1.0]" 
+	                          fillColors="[#030000, #030000]" 
+	                          labelStyleName="MySliderLabel" 
+	                          enabled="true" 
+	                          change="handleLineageLayoutChange();"/>
+                    </mx:VBox>	    
+                    
+                     <mx:VBox height="100%" width="400" horizontalAlign="center" verticalAlign="middle" verticalGap="0" 
+                     	backgroundColor="#767675" borderStyle="solid" cornerRadius="10" borderThickness="0" dropShadowEnabled="true" backgroundAlpha="0.0">	
+                        <mx:Label text="Orientation:" color="#FAFCFD" fontWeight="bold" fontFamily="Verdana" id="ConfigurationLabel" fontSize="12"/>	                      
+                        <mx:HBox id="LineageLayoutSwitchBox" width="380" horizontalAlign="center" verticalAlign="middle" horizontalGap="5"
+                     	  borderStyle="none" borderThickness="0" cornerRadius="10" borderColor="#FFFFFF" backgroundColor="#3F3F3F" backgroundAlpha="0.0">
+                     	  
+	                      <mx:RadioButtonGroup id="LineageLayoutSwitch"/>
+	                      <mx:RadioButton label="leftToRight" groupName="LineageLayoutSwitch" color="#FCFDFD" selected="false" enabled="true" id="LeftToRightSwitchButton"
+	                         click="handleLineageLayoutChange();" themeColor="#12FF00"/>
+	                      <mx:RadioButton label="rightToLeft" groupName="LineageLayoutSwitch" color="#FEFEFE" selected="false" enabled="true" id="RightToLeftSwitchButton"
+	                      	  click="handleLineageLayoutChange();" themeColor="#12FF00"/>
+	                      <mx:RadioButton label="topToBottom" groupName="LineageLayoutSwitch" color="#FEFEFE" selected="true" enabled="true" id="TopToBottomSwitchButton"
+	                      	  click="handleLineageLayoutChange();" themeColor="#12FF00"/>
+	                      <mx:RadioButton label="bottomToTop" groupName="LineageLayoutSwitch" color="#FEFEFE" selected="false" enabled="true" id="BottomToTopSwitchButton"
+	                      	  click="handleLineageLayoutChange();" themeColor="#12FF00"/>	                     	  
+                     </mx:HBox> 
+              	   </mx:VBox>	 
+              	   
+              </mx:Panel>
+	              
+	      </mx:ViewStack>
+	
+	  </mx:VBox>
+	  
+	<mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+	  
+</mx:Panel>

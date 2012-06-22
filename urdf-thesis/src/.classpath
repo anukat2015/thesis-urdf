@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path=""/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/axis.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/axis-ant.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/backport-util-concurrent.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/basics2_20101104.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/cfgatewayadapter.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/classes12.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/colt.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/commons-codec-1.3.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/commons-discovery.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/commons-httpclient-3.0.1.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/commons-logging.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/concurrent.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/flex-messaging-common.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/flex-messaging-core.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/flex-messaging-opt.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/flex-messaging-proxy.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/flex-messaging-remoting.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/javatools_20101101.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/jaxrpc.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/log4j-1.2.8.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/MPII_SPARQL_endpoint.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/mysql-connector-java-5.1.12-bin.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/postgresql-8.4-701.jdbc4.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/saaj.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/wsdl4j-1.5.1.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/xalan.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/xercesImpl.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/xml-apis.jar"/>
+	<classpathentry kind="lib" path="C:/Work/URDF/lib/LiveGraph.2.0.beta01.Complete.jar"/>
+	<classpathentry kind="output" path=""/>
+</classpath>

@@ -1,0 +1,396 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="698" 
+	height="612"
+	horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#5F5751" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1" 
+    verticalAlign="middle"
+    fontFamily="Arial">
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			import flare.util.Orientation;
+			
+			import uviface.event.UGraphConfigEvent;
+			import mx.events.ItemClickEvent;
+			
+			import uviface.viz.UStringConstants;
+			import urdf.api.URelation;
+			
+			[Bindable]
+			private var _predicates:ArrayCollection = URelation.getRelations();
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			
+			[Bindable]
+			private var _availableButtonLabels:Array = ["SELECT","SELECT ALL"];
+			[Bindable]
+			private var _selectedButtonLabels:Array = ["DESELECT","DESELECT ALL"];
+			
+			/*
+			private function init():void {
+				// initiliaze the event
+				_graphConfigEvent = new UGraphConfigEvent(UGraphConfigEvent.GRAPH_CONFIG_EVENT, _hopSize, _radiusIncrement, _newLayout, true);
+			}
+			*/
+			
+			private function handleValueChange():void {
+				var hopSize:int = int(HopSlider.value);
+				var radiusIncrement:Number = (RadiusSlider.value)
+				//if(hopSize == _hopSize && radiusIncrement == _radiusIncrement && _layout == _newLayout)
+				   //return;
+				   
+				var graphConfigEvent:UGraphConfigEvent = new UGraphConfigEvent(UGraphConfigEvent.GRAPH_CONFIG_EVENT, hopSize, radiusIncrement, _layout, true);
+				//graphConfigEvent.hopSize = hopSize;
+				//graphConfigEvent.radiusIncrement = radiusIncrement;
+				//graphConfigEvent.layout = _newLayout;
+				
+				graphConfigEvent.enforceBounds = EnforceBoundsButton.selected;
+				// if we have the force layout selected -> add corresponding values to the event
+				if(_layout == UGraphConfigEvent.FORCE)
+				   addForceLayoutValuesToEvent(graphConfigEvent);
+				// add lineage related values to the event
+				addLineageValuesToEvent(graphConfigEvent);
+				// add node and edge related values to the event
+				addSpriteValuesToEvent(graphConfigEvent);
+				
+				GraphConfigUpdateButton.dispatchEvent(graphConfigEvent);
+			}
+			
+			private function addForceLayoutValuesToEvent(event:UGraphConfigEvent):void {
+				event.particleMass = DefaultParticleMassSlider.value;
+				event.springLength = DefaultSpringLengthSlider.value;
+				event.springTension = DefaultSpringTensionSlider.value;
+				event.iterations = IterationsStepper.value;
+				event.ticks = TicksStepper.value;
+				event.nBodyGravitation = NBodyGravitationSlider.value;
+				event.nBodyMinDist = NBodyMinDistSlider.value;
+				event.nBodyMaxDist = NBodyMaxDistSlider.value;
+				//event.enforceBounds = EnforceBoundsButton.selected;
+			}
+			
+			private function addLineageValuesToEvent(event:UGraphConfigEvent):void {
+				// the lineage parameters
+				event.depthSpacing = DepthSpacingSlider.value;
+				event.breadthSpacing = BreadthSpacingSlider.value;
+				event.subtreeSpacing = SubtreeSpacingSlider.value;
+				event.lineageLayout = _lineageLayout;
+			}
+			
+			private function addSpriteValuesToEvent(event:UGraphConfigEvent):void {
+				event.nodeBitmapCaching = NodesBitmapCachingActivateButton.selected;
+				event.nodeShadowEnabled = NodesShadowActivateButton.selected;
+				event.nodeShadowLength = NodesShadowLengthSlider.value;
+				event.nodeShadowAlpha = NodesShadowAlphaSlider.value;
+				event.edgeBitmapCaching = EdgesBitmapCachingActivateButton.selected;
+				event.edgeShadowEnabled = EdgesShadowActivateButton.selected;
+				event.edgeShadowLength = EdgesShadowLengthSlider.value;
+				event.edgeShadowAlpha = EdgesShadowAlphaSlider.value;
+			}
+			
+			private function handleLayoutSwitchClick():void {
+				/*
+				var index:int = event.index;
+				switch(index) {
+					case 0: _newLayout = 0;break;
+					case 1: _newLayout = 1;break;
+					default: return;
+				}
+				*/
+				
+				_layout = ForceLayoutSwitchButton.selected ? 1 : 0;
+				
+				if(ForceLayoutSwitchButton.selected) {
+					ForceLayoutPropertiesBox.enabled = true;
+					ForceLayoutPropertiesBox.filters = null;
+					//RadiusIncrementHBox.enabled = false;
+					//RadiusIncrementHBox.filters = _filters;
+				}
+				else {
+					ForceLayoutPropertiesBox.enabled = false;
+					ForceLayoutPropertiesBox.filters = _filters;
+					//RadiusIncrementHBox.enabled = true;
+					//RadiusIncrementHBox.filters = null;
+				}
+				
+			}
+			
+			private function handleLineageLayoutSwitchClick():void {
+				  if(LeftToRightSwitchButton.selected) {
+				    _lineageLayout = Orientation.LEFT_TO_RIGHT;
+				    return;
+				  }
+				  if(RightToLeftSwitchButton.selected) {
+				    _lineageLayout = Orientation.RIGHT_TO_LEFT;
+				    return;
+				  }
+				  if(YesSwitchButton.selected) {
+				    _lineageLayout = Orientation.TOP_TO_BOTTOM;
+				    return;
+				  }
+				  if(BottomToTopSwitchButton.selected) {
+				    _lineageLayout = Orientation.BOTTOM_TO_TOP;
+				    return;
+				  }	 
+			}
+			
+			private function resetGraphConfigValues():void {
+				
+				// the hop size
+				HopSlider.value = 1;
+				// the radius increment for the radial layout
+				RadiusSlider.value = 200;
+				
+				// common properties
+				EnforceBoundsButton.selected = false;
+				
+				// the force layout parameters
+				DefaultParticleMassSlider.value = 20;
+				DefaultSpringLengthSlider.value = 30;
+				DefaultSpringTensionSlider.value = 0.001;
+				IterationsStepper.value = 1;
+				TicksStepper.value = 1;
+				NBodyGravitationSlider.value = 0;
+				NBodyMinDistSlider.value = 2;
+				NBodyMaxDistSlider.value = 200;
+				NodesBitmapCachingDeactivateButton.selected = true;
+				NodesShadowActivateButton.selected = true;
+				NodesShadowLengthSlider.value = 10;
+				NodesShadowAlphaSlider.value = 0.7;
+				EdgesBitmapCachingDeactivateButton.selected = true;
+				EdgesShadowActivateButton.selected = true;
+				EdgesShadowLengthSlider.value = 10;
+				EdgesShadowAlphaSlider.value = 0.7;
+				
+				// the lineage parameters
+				DepthSpacingSlider.value = 30;
+				BreadthSpacingSlider.value = 20;
+				SubtreeSpacingSlider.value = 30;
+				_lineageLayout = Orientation.TOP_TO_BOTTOM;
+				
+				// the layout switch
+				_layout = UGraphConfigEvent.RADIAL;
+				RadialLayoutSwitchButton.selected = true;
+				ForceLayoutPropertiesBox.enabled = false;
+				ForceLayoutPropertiesBox.filters = _filters;
+				//RadiusIncrementHBox.enabled = true;
+				//RadiusIncrementHBox.filters = null;
+			}
+			
+			private function centerVisualization():void {
+				CenterVisualizationChangeButton.dispatchEvent(new Event(UStringConstants.CENTER_VISUALIZATION,true));
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:VBox 
+		horizontalAlign="center" 
+		verticalGap="5" 
+		verticalAlign="middle" 
+		left="10" 
+		right="10" 
+		top="10" 
+		bottom="10" 
+		borderStyle="solid" 
+		cornerRadius="20" 
+		borderThickness="4" 
+		borderColor="#FDFEFE">
+		<mx:HBox id="DisableGraphDistanceFilterSwitchBox" width="400" horizontalAlign="center" verticalAlign="middle" horizontalGap="10"
+			borderStyle="solid" borderThickness="4" cornerRadius="20" borderColor="#FFFFFF" backgroundColor="#4B0101">
+			  
+			  <mx:Label id="DisableGraphDistanceFilterSwitchLabel" text="Disable Graph Distance Filter:" fontWeight="bold" color="#FFFFFF" fontSize="10" fontStyle="normal" textDecoration="normal"/>
+			  
+		<mx:RadioButtonGroup id="DisableGraphDistanceFilterSwitch"/>
+		<mx:RadioButton label="yes" groupName="DisableGraphDistanceFilterSwitch" color="#FEFEFE" selected="false" enabled="true" id="YesSwitchButton"
+		 	  click="handleGraphDistanceFilterSwitchClick();" themeColor="#12FF00"/>
+		<mx:RadioButton label="No" groupName="DisableGraphDistanceFilterSwitch" color="#FEFEFE" selected="true" enabled="true" id="NoSwitchButton"
+		 	  click="handleGraphDistanceFilterSwitchClick();" themeColor="#12FF00"/>
+			  
+		</mx:HBox>
+		<mx:HBox 
+		id="PredicatesBox" 
+		textAlign="center" 
+		backgroundColor="#CFCDCD" 
+		width="480" 
+		height="240" 
+		cornerRadius="15" 
+		borderStyle="solid" 
+		borderThickness="3">
+		
+		<mx:Panel 
+			id="AvailablePredicates" 
+			title="Available Predicates" 
+			width="260" 
+			height="230" 
+			horizontalAlign="center" 
+			backgroundColor="#FEFDFD" 
+			borderColor="white" 
+			cornerRadius="15" 
+		     borderStyle="solid" 
+		     borderThickness="3" 
+			verticalAlign="middle"
+			roundedBottomCorners="true">
+			  
+			  <mx:List  
+			  	id="AvailablePredicatesList"  
+			  	cornerRadius="5" 
+			  	borderStyle="solid" 
+			  	borderThickness="2" 
+			  	rowCount="10" 
+			  	dataProvider="{_predicates}" 
+			    selectedIndex="-1" 
+			    enabled="true"  
+			  	backgroundColor="#FEFDFD"
+			    labelField="label"
+			    width="218" 
+			    height="150"
+			    itemClick="handleAvailableSoftRuleListClick();" />
+			  <mx:LinkBar 
+			  	id="AvailableRulesButtonBar" 	
+			  	dataProvider="{_availableRulesButtonLabels}" fontSize="10" fontWeight="bold"
+			  	itemClick="handleAvailableRulesButtonClick();"/>
+			
+		</mx:Panel>  
+		
+		<mx:Panel 
+			id="FilterPredicates" 
+			title="Predicates to Filter" 
+			width="205" 
+			height="230"  
+			horizontalAlign="center" 
+			backgroundColor="#FEFDFD" 
+			borderColor="white" 
+			cornerRadius="15" 
+		     borderStyle="solid" 
+		     borderThickness="3" 
+			verticalAlign="middle"
+			roundedBottomCorners="true">
+			
+			<mx:List  
+			 	id="FilteredPredicatesList"  
+			 	cornerRadius="5" 
+			 	borderStyle="solid" 
+			 	borderThickness="2" 
+			 	rowCount="10" 
+			 	selectedIndex="-1"
+			 	enabled="true"  
+			 	dataProvider="{_selectedSoftRules}" 
+			 	backgroundColor="#FEFEFE"
+			 	labelField="label" width="178" height="150"/>
+			
+			<mx:LinkBar 
+			  	id="SelectedRulesButtonBar" 	
+			  	dataProvider="{_selectedRulesButtonLabels}" fontSize="10" fontWeight="bold" 
+			  	itemClick="handleSelectedRulesButtonClick();"/>
+			
+		</mx:Panel>
+		
+		</mx:HBox>
+		<mx:HBox 
+		id="RuleManagementHBox0" 
+		textAlign="center" 
+		backgroundColor="#CFCDCD" 
+		width="480" 
+		height="240" 
+		cornerRadius="15" 
+		borderStyle="solid" 
+		borderThickness="3">
+		
+		<mx:Panel 
+			id="AvailableClusters" 
+			title="Available Clusters" 
+			width="260" 
+			height="230" 
+			horizontalAlign="center" 
+			backgroundColor="#FEFDFD" 
+			borderColor="white" 
+			cornerRadius="15" 
+		     borderStyle="solid" 
+		     borderThickness="3" 
+			verticalAlign="middle"
+			roundedBottomCorners="true">
+			  
+			  <mx:List  
+			  	id="AvailableClusters"  
+			  	cornerRadius="5" 
+			  	borderStyle="solid" 
+			  	borderThickness="2" 
+			  	rowCount="10" 
+			  	dataProvider="{_availableSoftRules}" 
+			         selectedIndex="-1" 
+			         enabled="true"  
+			  	backgroundColor="#FEFDFD"
+			      labelField="label"
+			      width="218" 
+			      height="150"
+			      itemClick="handleAvailableSoftRuleListClick();" />
+			  <mx:LinkBar 
+			  	id="AvailableRulesButtonBar0" 	
+			  	dataProvider="{_availableRulesButtonLabels}" fontSize="10" fontWeight="bold"
+			  	itemClick="handleAvailableRulesButtonClick();"/>
+			
+		</mx:Panel>  
+		
+		<mx:Panel 
+			id="FilterCLusters" 
+			title="Clusters to Filter" 
+			width="205" 
+			height="230"  
+			horizontalAlign="center" 
+			backgroundColor="#FEFDFD" 
+			borderColor="white" 
+			cornerRadius="15" 
+		     borderStyle="solid" 
+		     borderThickness="3" 
+			verticalAlign="middle"
+			roundedBottomCorners="true">
+			
+			<mx:List  
+			 	id="FilteredClusters"  
+			 	cornerRadius="5" 
+			 	borderStyle="solid" 
+			 	borderThickness="2" 
+			 	rowCount="10" 
+			 	selectedIndex="-1"
+			 	enabled="true"  
+			 	dataProvider="{_selectedSoftRules}" 
+			 	backgroundColor="#FEFEFE"
+			 	labelField="label" width="178" height="150"/>
+			
+			<mx:LinkBar 
+			  	id="SelectedRulesButtonBar0" 	
+			  	dataProvider="{_selectedRulesButtonLabels}" fontSize="10" fontWeight="bold" 
+			  	itemClick="handleSelectedRulesButtonClick();"/>
+			
+		</mx:Panel>
+		
+		</mx:HBox>
+	  </mx:VBox>
+	
+</mx:Panel>

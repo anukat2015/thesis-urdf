@@ -1,0 +1,31 @@
+S1:difference(?Y, ?Z, 85)<=wasBornOnDate(?X, ?Y, 1);diedOnDate(?X, ?Z, 1);[0.8618338659807208]
+S2:difference(?Y, ?Z, 65)<=wasBornOnDate(?X, ?Y, 1);yearBefore(?Y, 1900, 1);diedOnDate(?X, ?Z, 1);[0.3887551100408803]
+S3:yearBefore(?Z, ?A, 1)<=hasChild(?X, ?Y, 1);wasBornOnDate(?Y, ?Z, 1);diedOnDate(?X, ?A, 1);[0.9720730397422127]
+S4:diedIn(?X, ?Y, 1)<=wasBornIn(?X, ?Y, 1);livesIn(?X, ?Y, 1);[0.13095238095238096]
+S5:wasBornIn(?X, ?Z, 1)<=isCitizenOf(?X, ?Y, 1);isLocatedIn(?Z, ?Y, 1);livesIn(?X, ?Z, 1);[0.0784313725490196]
+S6:yearBefore(?Z, ?A, 1)<=graduatedFrom(?X, ?Y, 1);establishedOnDate(?Y, ?Z, 1);wasBornOnDate(?X, ?A, 1);[0.9451054059695262]
+S7:worksAt(?Z, ?Y, 1)<=graduatedFrom(?X, ?Y, 1);hasAcademicAdvisor(?X, ?Z, 1);[0.1920838183934808]
+S8:graduatedFrom(?Z, ?A, 1)<=hasAcademicAdvisor(?X, ?Y, 1);hasAcademicAdvisor(?Z, ?Y, 1);graduatedFrom(?X, ?A, 1);[0.5032863849765258]
+S9:wasBornIn(?X, ?Z, 1)<=isMarriedTo(?X, ?Y, 1);wasBornIn(?Y, ?Z, 1);[0.100169779286927]
+S10:livesIn(?Y, ?Z, 1)<=isMarriedTo(?X, ?Y, 1);livesIn(?X, ?Z, 1);[1.0]
+S11:livesIn(?Y, ?Z, 1)<=isMarriedTo(?X, ?Y, 1);wasBornIn(?X, ?Z, 1);wasBornIn(?Y, ?Z, 1);[1.0]
+S12:isMarriedTo(?X, ?Y, 1)<=hasChild(?X, ?Z, 1);hasChild(?Y, ?Z, 1);notEquals(?X, ?Y, 1);[0.3775322283609576]
+S13:notEquals(?Y, ?Z, 1)<=hasChild(?X, ?Y, 1);isMarriedTo(?X, ?Z, 1);[0.9928057553956835]
+S14:wasBornIn(?C, ?Y, 1)<=livesIn(?X, ?Y, 1);livesIn(?Z, ?Y, 1);isMarriedTo(?X, ?Z, 1);hasChild(?X, ?C, 1);hasChild(?Z, ?C, 1);[0.25]
+S15:notEquals(?X, ?Z, 1)<=directed(?X, ?Y, 1);actedIn(?Z, ?Y, 1);[0.980632743895104]
+S16:isMarriedTo(?X, ?Z, 1)<=actedIn(?X, ?Y, 1);actedIn(?Z, ?Y, 1);notEquals(?X, ?Z, 1);[1.0]
+H1:wasBornIn(?X, ??Y, 1);
+H2:diedIn(?X, ??Y, 1);
+H3:wasBornOnDate(?X, ??Y, 1);
+H4:isMarriedTo(?X, ??Y, 1);
+H5:diedOnDate(?X, ??Y, 1);
+Q1:livesIn(Al_Gore, ?X, 1);
+Q2:isMarriedTo(Woody_Allen, ?X, 1);
+Q3:actedIn(?X, Total_Recall, 1);isMarriedTo(?X, ?Y, 1);
+Q4:actedIn(Arnold_Schwarzenegger, ?X, 1);actedIn(?Y, ?X, 1);wasBornIn(?Y, ?Z, 1);notEquals(Arnold_Schwarzenegger, ?Y, 1);
+Q5:wasBornIn(?X, Oxford, 1);graduatedFrom(?X, ?Y, 1);hasAcademicAdvisor(?X, ?Z, 1);graduatedFrom(?Z, University_of_Cambridge, 1);
+Q6:wasBornIn(?X, Paris, 1);isCitizenOf(?X, ?Y, 1);isLocatedIn(Paris, ?Z, 1);notEquals(?Y, ?Z, 1);
+Q7:wasBornIn(?GUY, ?BIRTHPLACE, 1);livesIn(?GUY, ?LIVESIN, 1);wasBornOnDate(?GUY, ?BIRTHDATE, 1);isMarriedTo(?GUY, ?SPOUSE, 1);actedIn(?GUY, Total_Recall, 1);
+Q8:hasWonPrize(?X, Nobel_Prize_in_Physics, 1);wasBornIn(?X, Ulm, 1);wasBornOnDate(?X, ?Z, 1);yearBefore(?Z, 1900, 1);type(?X, wikicategory_Patent_examiners, 1);
+Q9:isMarriedTo(Emma_Thompson, ?SPOUSE, 1);actedIn(Emma_Thompson, ?MOVIE, 1);actedIn(?SPOUSE, ?MOVIE, 1);
+Q10:directed(Martin_Scorsese, ?MOVIE, 1);actedIn(?GUY1, ?MOVIE, 1);actedIn(?GUY2, ?MOVIE, 1);notEquals(?GUY1, ?GUY2, 1);notEquals(?GUY1, Martin_Scorsese, 1);notEquals(?GUY2, Martin_Scorsese, 1);

@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TextArea xmlns:mx="http://www.adobe.com/2006/mxml"
+	borderThickness="0" 
+	color="#030303" 
+	backgroundColor="#FEFDFD"  
+	backgroundAlpha="1.0"
+	editable="true"
+	alpha="1.0"
+	enabled="true" 
+	cornerRadius="10" 
+	fontSize="10" 
+	fontFamily="Verdana" 
+	borderColor="#010101" 
+	fontWeight="bold" 
+	textAlign="center"
+    paddingLeft="2" 
+    paddingRight="2"
+    width="600" wordWrap="true" height="49"
+    text="You can use this text field to parse a query string !"
+    textInput="onTextInput(event);">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import uviface.event.UTextAreaEvent;
+			import mx.core.UIComponent;
+            import mx.events.FocusRequestDirection;
+            import mx.controls.textClasses.TextRange;
+            
+            private var _indexBegin:int = 0;
+            private var _indexEnd:int = 0;
+			
+			override protected function createChildren ():void
+		    {
+		        super.createChildren();
+		        textField.addEventListener(MouseEvent.CLICK, onTextFieldMouseClick);
+		    }
+		
+		    private function onTextFieldMouseClick(event:MouseEvent):void
+		    {
+		        var lineIndex:int = textField.getLineIndexAtPoint(event.localX, event.localY);
+		        if (lineIndex == -1)
+		                return;
+		        var lineOffset:int = textField.getLineOffset(lineIndex);
+		        var lineLength:int = textField.getLineLength(lineIndex);
+		        if (lineLength > 0)
+		                textField.setTextFormat(new TextFormat(null, null, 0xFF0000), lineOffset, lineOffset+lineLength);
+		    }
+		    
+		    private function checkConditions():Boolean {
+			     _indexBegin = this.selectionBeginIndex;
+			     var lineText:String = textField.text;
+			     if(_indexBegin == 0) {
+			         //_indexEnd = lineText.indexOf(",",_indexBegin);
+			         //if(_indexEnd < 0)
+			         _indexEnd = lineText.indexOf("(",_indexBegin); 
+			         if(_indexEnd < 0) {	
+			            _indexEnd = _indexBegin;	           	       
+			         }		              
+			      }
+			      else if(lineText.charAt(_indexBegin-1) == "^") {
+			      	_indexEnd = lineText.indexOf("(",_indexBegin); 
+			          if(_indexEnd < 0) {	
+			         	  _indexEnd = _indexBegin;	           	       
+			          }
+			      }  
+			      else if(lineText.charAt(_indexBegin-1) == ",") {
+			         //lineText.charAt(_indexBegin-1) == "");
+			      }
+			      
+			      return true;
+		    }
+		    
+		    private function replaceString(text:String):Boolean
+		    {
+		        //var lineIndex:int = textField.caretIndex;
+		        var lineText:String = textField.text;//getLineText(_indexBegin);
+		        var leftCondition:Boolean = false;
+		        var rightCondition:Boolean = false;
+		        //var range:TextRange;
+		        /*
+		        if(lineText == null)
+		           return false;
+		        if(_indexBegin == 0) {
+		           //_indexEnd = lineText.indexOf(",",_indexBegin);
+		           //if(_indexEnd < 0)
+		           _indexEnd = lineText.indexOf("(",_indexBegin); 
+		           if(_indexEnd < 0) {	
+		           	  _indexEnd = _indexBegin;	           	       
+		           }
+		              
+		        }
+		        else if(lineText.charAt(_indexBegin-1) == "^") {
+		        	_indexEnd = lineText.indexOf("(",_indexBegin); 
+		            if(_indexEnd < 0) {	
+		           	  _indexEnd = _indexBegin;	           	       
+		            }
+		        } 
+		         
+		        else if(lineText.charAt(_indexBegin-1) == ",") {
+		        lineText.charAt(_indexBegin-1) == "")
+		        */
+		       //range = new TextRange(this,false,_indexBegin,_indexEnd); 
+		       //var nextIndex:int = this.selectionBeginIndex+range.text.length;
+		       _indexEnd = _indexBegin;
+	           this.setSelection(_indexBegin, _indexEnd);
+	           textField.replaceText(_indexBegin, _indexEnd, text);
+		        
+                //_text_field.replaceText(i,i, '[some text]')
+		        
+		        //if (lineIndex == -1)
+		          //      return;
+		        //var lineOffset:int = textField.getLineOffset(lineIndex);
+		        //var lineLength:int = textField.getLineLength(lineIndex);
+		        //if (lineLength > 0)
+		          //      textField.setTextFormat(new TextFormat(null, null, 0xFF0000), lineOffset, lineOffset+lineLength);
+		        //this.dispatchEvent(new UTextAreaEvent(UTextAreaEvent.DROP_DOWN_OPEN_EVENT,lineINdex,lineOffset,true));
+		        return true;
+		    }
+		    
+		  
+		    protected override function keyDownHandler(event:KeyboardEvent):void {
+		       switch(event.keyCode) {
+		         case Keyboard.DOWN:
+		                event.preventDefault();
+		                var char:String = String.fromCharCode(event.charCode).toUpperCase();
+		                trace("The char code is : " + char);
+
+			           /* create text range at the location of the cursor */
+			           _indexBegin = event.currentTarget.selectionBeginIndex;
+			           this.dispatchEvent(new UTextAreaEvent(UTextAreaEvent.DROP_DOWN_OPEN_EVENT,_indexBegin,0,true));
+			           /* move focus back to your text box */
+			           //focusManager.moveFocus(FocusRequestDirection.BACKWARD);
+			           break;
+		       }
+		    }
+		    
+		    private function onTextInput(event:TextEvent):void{
+              trace(event.type); // link
+              trace(event.text); // myEvent
+              if (event.text==""){
+                    event.preventDefault();
+                    event.stopImmediatePropagation();
+                   // trace(event.type); // link
+                   // trace(event.text); // myEvent
+
+              }
+            }
+
+		    
+		    public function replaceText(text:String):void {
+	           /* create text range at the location of the cursor */
+	           _indexBegin = this.selectionBeginIndex;
+	           replaceString(text); 
+	           //_indexEnd
+	           //var range:TextRange = new TextRange(event.currentTarget as UIComponent,
+	             //                false,
+	               //              indexBegin,
+	                 //            indexBegin);
+	           /* insert tab code at location of cursor
+	           use range.text = "    "; if you prefer not
+	           to use tab stops. */
+	           // range.text = "\t";
+	           /* move cursor forward */
+	           //var idxNext:int = event.currentTarget.selectionBeginIndex+range.text.length;
+	           //event.currentTarget.setSelection(idxNext, idxNext);
+	           /* move focus back to your text box */
+	           focusManager.moveFocus(FocusRequestDirection.FORWARD);
+		   }
+
+			
+		]]>
+	</mx:Script>    
+	
+</mx:TextArea>

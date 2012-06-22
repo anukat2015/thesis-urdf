@@ -1,0 +1,425 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml" 
+    xmlns:ac="com.hillelcoren.components.*" 
+	width="467" 
+	height="25"
+	paddingTop="0"  
+	paddingLeft="0" 
+	paddingRight="0" 
+	paddingBottom="0"
+    xmlns:query="uviface.ui.query.*" 
+    cornerRadius="12">
+	 
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.FlexEvent;
+			import uviface.event.UQueryEvent;
+			import util.UStringUtil;
+			
+			import com.hillelcoren.components.autoComplete.*;
+			
+			import mx.collections.ArrayCollection;
+			import urdf.api.URelation;
+			import uviface.ui.query.UQueryErrorPanel;
+			
+			[Bindable]
+			private var _relations:ArrayCollection = URelation.getRelations();
+			
+			public function get firstArgument():String {
+			    return QueryLiteralArg1Input.text;
+			}
+			
+			public function set firstArgument(firstArgument:String):void {
+			    QueryLiteralArg1Input.text = firstArgument;
+			}
+			
+			public function get relation():String {
+				if(QueryLiteralRelationInputAutoComplete.searchText == "")
+				   return QueryLiteralRelationInputAutoComplete.selectedItem;
+				else
+				   return QueryLiteralRelationInputAutoComplete.searchText;
+			}
+			
+			public function set relation(relation:String):void {
+				
+				if(UStringUtil.startsWith(relation,"?")) {
+				    QueryLiteralRelationInputAutoComplete.searchText = relation;
+				    this.dispatchEvent(new Event(Event.CHANGE,true));
+				}
+				else
+				    //trace("_relations.contains(relation) : " + _relations.contains(relation));
+				    
+				    //if(_relations.contains(relation)) {
+				    {
+				       //trace("selectedItem is : " + QueryLiteralRelationInputAutoComplete.selectedItem);
+				       //QueryLiteralRelationInputAutoComplete.selectedItems.addItem(relation);
+				       QueryLiteralRelationInputAutoComplete.selectedItem = relation;
+					   this.dispatchEvent(new Event(Event.CHANGE,true));
+				       //QueryLiteralRelationInputAutoComplete.invalidateDisplayList();
+				       //trace("selectedItem is : " + QueryLiteralRelationInputAutoComplete.selectedItem);
+				    }
+				    
+			}
+			
+			public function get secondArgument():String {
+				return QueryLiteralArg2Input.text;
+			}
+			
+			public function set secondArgument(secondArgument:String):void {
+				QueryLiteralArg2Input.text = secondArgument;
+			}
+			
+			/** Checks that the relation name is either a constant from the list
+			 * or a variable that starts with a "?". 
+			 * 
+			 * Is neither of these cases holds -> create an error popup.
+			 * */
+			public function validateRelationInput():void {
+				if(!_relations.contains(QueryLiteralRelationInputAutoComplete.selectedItem) 
+				    //QueryLiteralRelationInputAutoComplete.searchText
+				    && QueryLiteralRelationInputAutoComplete.textInput.text != ""
+				    && !UStringUtil.startsWith(QueryLiteralRelationInputAutoComplete.textInput.text, "?")) {
+				    // create the error popup
+				    mx.core.Application.application.UVizErrorPanel.writePredicateError();
+		    	    mx.core.Application.application.UVizErrorPanel.show();
+		        }
+			}
+			
+			/** Checks that the relation name is either a constant from the list
+			 * or a variable that starts with a "?". 
+			 * 
+			 * Is neither of these cases holds -> return false.
+			 * */
+			public function checkRelationInput():Boolean {
+				if(!_relations.contains(QueryLiteralRelationInputAutoComplete.selectedItem) 
+				    && QueryLiteralRelationInputAutoComplete.searchText != ""
+				    && !UStringUtil.startsWith(QueryLiteralRelationInputAutoComplete.searchText, "?"))
+				    // create the error popup
+				    return false;
+				return true;
+			}
+			
+			public function isEmpty():Boolean {
+				if(QueryLiteralArg1Input.text == "" 
+				  && ((QueryLiteralRelationInputAutoComplete.selectedItem == null && QueryLiteralRelationInputAutoComplete.searchText == "")
+				   || (QueryLiteralRelationInputAutoComplete.selectedItem == "" && QueryLiteralRelationInputAutoComplete.searchText == "")) 
+				   && QueryLiteralArg2Input.text == "")
+				   return true;
+				else
+				   return false;
+			}
+			
+			public function literalString():String {
+				if(QueryLiteralRelationInputAutoComplete.searchText.length == 0) {
+				  if(QueryLiteralRelationInputAutoComplete.selectedItem == undefined || QueryLiteralRelationInputAutoComplete.selectedItem == "")
+				     return "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ")";
+				  else 
+				     return QueryLiteralRelationInputAutoComplete.selectedItem + "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ")";
+				}
+				else
+				   return QueryLiteralRelationInputAutoComplete.searchText + "(" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ")";
+				   //return "";
+			}
+			
+			public function buildLiteralStringSPARQL():String {
+				if(QueryLiteralRelationInputAutoComplete.searchText.length == 0) {
+				  if(QueryLiteralRelationInputAutoComplete.selectedItem == undefined || QueryLiteralRelationInputAutoComplete.selectedItem == "")
+				     return "<" + QueryLiteralArg1Input.text + "," + QueryLiteralArg2Input.text + ">";
+				  else 
+				     return "<" + QueryLiteralArg1Input.text + "," + QueryLiteralRelationInputAutoComplete.selectedItem 
+				             + "," +  QueryLiteralArg2Input.text + ">";
+				}
+				else
+				   return "<" + QueryLiteralArg1Input.text + "," + QueryLiteralRelationInputAutoComplete.searchText 
+				           + "," +  QueryLiteralArg2Input.text + ">";
+				   //return "";
+			}
+			
+			public function parseLiteralStringSPARQL(literalString:String):Boolean {
+				
+				// check if the string starts with the typical SPARQL pattern initializer "<"
+				// and ends with ">"
+				if(!(UStringUtil.startsWith(literalString,"<") && UStringUtil.endsWith(literalString,">")))
+				   return false;
+				 
+				if(literalString.indexOf(",") < 0)
+				   return false; 
+				 
+				// set a temporary literal string 
+				//var tempLiteralString:String = new String(literalString); 
+				var tempLiteralArray:Array = new Array();
+				// set a temporary literal string and eliminate the "<" and the ">"
+				var tempLiteralString:String = literalString.substring(1,literalString.length -1);
+				// split the literal string into an array of substrings
+				tempLiteralArray = tempLiteralString.split(",");
+				
+				// set the string for the subject of the literal
+				QueryLiteralArg1Input.text = tempLiteralArray[0] as String;
+				// set the string for the object of the literal
+				QueryLiteralArg2Input.text = tempLiteralArray[2] as String;
+				
+				// the relation string
+				var relationString:String = tempLiteralArray[1] as String;
+				
+				// we have a variable as relation string -> set the relation search text
+				if(UStringUtil.startsWith(relationString,"?"))
+				   QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				else
+				  // we have a predefined predicate -> select it
+				  if(_relations.contains(relationString)) {
+				     QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				     this.relation = relationString;
+				     //QueryLiteralRelationInputAutoComplete.selectedItem = relationString;//_relations.getItemAt(_relations.getItemIndex(relationString));
+				     //QueryLiteralRelationInputAutoComplete.handleFlowBoxChange(new Event(AutoComplete.SEARCH_CHANGE));
+				     //QueryLiteralRelationInputAutoComplete.handleFlowBoxChange(new Event(AutoComplete.SEARCH_CHANGE));
+				  }
+				else
+				  // neither of the aforementioned two cases holds -> return false
+				  return false;
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function parseLiteralStringDatalog(literalString:String):Boolean {
+				
+				// check if the string contains the Datalog-style notation "predicate(subject,object)"
+				if((literalString.indexOf("(") < 0) || (literalString.indexOf(")") < 0))
+				   return false;
+				
+				if(literalString.indexOf(",") < 0)
+				   return false; 
+				 
+				// set a temporary literal string 
+				var tempLiteralString:String = new String(literalString); 
+				var tempLiteralArray:Array = new Array();
+				tempLiteralArray = tempLiteralString.split("(");
+				
+				// the relation string
+				var relationString:String = tempLiteralArray[0] as String;
+				
+				// we have a variable as relation string -> set the relation search text
+				if(UStringUtil.startsWith(relationString,"?"))
+				   QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				else
+				  // we have a predefined predicate -> select it
+				  if(_relations.contains(relationString)) {
+				     QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				     this.relation = relationString;
+				  }
+				else
+				  // neither of the aforementioned two cases holds -> return false
+				  return false;
+				
+				if(tempLiteralArray.length < 2)
+				   return false;
+				
+				// set a temporary literal string and eliminate the ")"
+				tempLiteralString = tempLiteralArray[1] as String;
+				tempLiteralString = tempLiteralString.substring(0,tempLiteralString.length -1);
+				// split the literal string into an array of substrings
+				tempLiteralArray = tempLiteralString.split(",");
+				
+				// set the string for the subject of the literal
+				QueryLiteralArg1Input.text = tempLiteralArray[0] as String;
+				// set the string for the object of the literal
+				QueryLiteralArg2Input.text = tempLiteralArray[1] as String;
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function parseLiteralFromURL(literal:Array):Boolean {
+				
+				if(literal.length < 3)
+				   return false;
+				
+				// set the string for the subject of the literal
+				QueryLiteralArg1Input.text = literal[0] as String;
+				
+				// the relation string
+				var relationString:String = literal[1] as String;
+				
+				// we have a variable as relation string -> set the relation search text
+				if(UStringUtil.startsWith(relationString,"?")) {
+				   QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				   this.relation = relationString;
+				}
+				else
+				  // we have a predefined predicate -> select it
+				  if(_relations.contains(relationString)) {
+				     QueryLiteralRelationInputAutoComplete.searchText = relationString;
+				     this.relation = relationString;
+				  }
+				else
+				  // neither of the aforementioned two cases holds -> return false
+				  return false;
+				
+				// set the string for the object of the literal
+				QueryLiteralArg2Input.text = literal[2] as String;
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function onClearButtonClick():void {
+				QueryLiteralArg1Input.text = "";
+				QueryLiteralRelationInputAutoComplete.selectedItem = undefined;
+				QueryLiteralRelationInputAutoComplete.searchText = "";
+				QueryLiteralArg2Input.text = "";
+				QueryLiteralRelationInputAutoComplete.invalidateProperties();
+				this.dispatchEvent(new Event(Event.CHANGE,true));
+			}
+			
+			public function adjustArguments():void {
+				adjustArgumentOne();
+				adjustArgumentTwo();
+			}
+			
+			private function adjustArgumentOne():void {
+				// adjust the first literal argument
+				var argument:String = QueryLiteralArg1Input.text;
+				var temp1:String;
+				var temp2:String;
+				var argArray:Array = argument.split(" ",2);
+				//if(argArray.length == 0) 
+				  // argArray = argument.split(" + ",2);
+				
+				if(argArray.length == 2) {
+					temp1 = (String)(argArray[0]);
+					temp2 = (String)(argArray[1]);
+					//QueryLiteralArg1Input.text = temp1.charAt(0).toUpperCase().concat(temp1.substr(1,temp1.length -1))
+					  //                         + "_" + temp2.charAt(0).toUpperCase().concat(temp2.substr(1,temp2.length -1));
+					QueryLiteralArg1Input.text = temp1 + "_" + temp2;
+				}
+				//else
+				    //QueryLiteralArg1Input.text = argument.charAt(0).toUpperCase().concat(argument.substr(1,argument.length -1));
+				
+			}
+			
+			private function adjustArgumentTwo():void {
+				// adjust the second literal argument
+				var argument:String = QueryLiteralArg2Input.text;
+				var temp1:String;
+				var temp2:String;
+				var argArray:Array = argument.split(" ",2);
+				//if(argArray.length == 0) 
+				  // argArray = argument.split(" + ",2);
+				
+				if(argArray.length == 2) {
+					temp1 = (String)(argArray[0]);
+					temp2 = (String)(argArray[1]);
+					//QueryLiteralArg2Input.text = temp1.charAt(0).toUpperCase().concat(temp1.substr(1,temp1.length -1))
+					  //                         + "_" + temp2.charAt(0).toUpperCase().concat(temp2.substr(1,temp2.length -1));
+					QueryLiteralArg2Input.text = temp1 + "_" + temp2;
+				}
+				//else
+				  //  QueryLiteralArg2Input.text = argument.charAt(0).toUpperCase().concat(argument.substr(1,argument.length -1));
+			}
+			
+			
+			public function validateHardRuleLiteral():Boolean {
+				if(!checkRelationInput())
+				   return false;
+				if(UStringUtil.startsWith(QueryLiteralArg1Input.text,"?") 
+				    && (QueryLiteralArg1Input.text.indexOf("?") == QueryLiteralArg1Input.text.lastIndexOf("?"))) {
+					if(UStringUtil.startsWith(QueryLiteralArg2Input.text,"??") 
+				          && (QueryLiteralArg1Input.text.indexOf("??") == QueryLiteralArg1Input.text.lastIndexOf("??")))
+				          return true;
+				    return false;
+				}
+				return false;
+			}
+			
+			public function validateSoftRuleLiteral():Boolean {
+				if(!checkRelationInput())
+				   return false;
+				if(UStringUtil.startsWith(QueryLiteralArg1Input.text,"?") 
+				    && (QueryLiteralArg1Input.text.indexOf("?") == QueryLiteralArg1Input.text.lastIndexOf("?"))) {
+					if(UStringUtil.startsWith(QueryLiteralArg2Input.text,"?") 
+				          && (QueryLiteralArg1Input.text.indexOf("?") == QueryLiteralArg1Input.text.lastIndexOf("?")))
+				          return true;
+				    return false;
+				}
+				return false;
+			}
+			
+			private function onLiteralChange():void {
+				this.dispatchEvent(new UQueryEvent(UQueryEvent.QUERY_STRING_UPDATE_EVENT,null,true));
+			}
+			 
+		]]> 
+	</mx:Script> 
+	
+	<mx:Grid 
+	    x="0"	
+		width="100%"  
+		paddingTop="0" 
+	    paddingLeft="0" 
+	    paddingRight="0" 
+	    paddingBottom="0" 
+	    height="100%"
+	    id="LiteralInputGrid">	
+	    
+	    <mx:GridRow 
+	    	x="0"
+	    	width="100%" 
+	    	height="100%"
+	    	id="LiteralInputGridRow">
+	    	
+	    	<mx:GridItem>
+	    		<mx:TextInput 
+	    			width="150" 
+	    			height="100%" 
+	    			id="QueryLiteralArg1Input" 
+	    			textAlign="center" 
+	    			borderThickness="2"
+	    			mouseOut="adjustArgumentOne();"	
+	    		    keyFocusChange="adjustArgumentOne();"	
+	    			borderStyle="none" cornerRadius="0" change="onLiteralChange();"/>
+	    	</mx:GridItem>
+	    	
+	    	<mx:GridItem borderStyle="none" borderThickness="2" cornerRadius="20">
+	    		<ac:AutoComplete id="QueryLiteralRelationInputAutoComplete" 
+		          	label="Predicate" 
+		          	textAlign="center" 
+		          	dataProvider="{_relations}" 
+		          	width="150" 
+		          	height="100%"
+		          	allowMultipleSelection="false" 
+		          	allowNewValues="false" 
+		          	allowEditingNewValues="true"
+		            labelField="Predicate" 
+		            matchType="word" 
+		            dropDownRowCount="10" 
+		            selectedItemStyleName="none"
+		            borderThickness="2"
+	    		    keyFocusChange="validateRelationInput();"	
+	    		    mouseFocusChange="validateRelationInput();" 
+	    		    backspaceAction="remove" 
+	    		    borderStyle="none" 
+	    		    cornerRadius="20" 
+	    		    change="onLiteralChange();">
+                </ac:AutoComplete>
+	    	</mx:GridItem>
+	    	
+	    	<mx:GridItem>
+	    		<mx:TextInput 
+	    			width="150" 
+	    			height="100%" 
+	    			id="QueryLiteralArg2Input" 
+	    			textAlign="center" 
+	    			borderThickness="2"
+	    			mouseOut="adjustArgumentTwo();"
+	    			keyFocusChange="adjustArgumentTwo();" 
+	    			cornerRadius="0" 
+	    			borderStyle="none" 
+	    			change="onLiteralChange();"/>
+	    	</mx:GridItem>
+   	
+      </mx:GridRow>
+	
+	</mx:Grid>
+	
+</mx:Canvas>

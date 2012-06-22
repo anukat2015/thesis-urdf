@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="672" 
+	height="460"
+	horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#3F3F3F" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1" 
+    verticalAlign="middle"
+    fontFamily="Arial">
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			import flare.util.Orientation;
+			
+			import uviface.event.UGraphConfigEvent;
+			import mx.events.ItemClickEvent;
+			
+			import uviface.viz.UStringConstants;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+    <!--  the background color -->
+	<mx:Label 
+		x="{this.width/2 - GeneralLabel.width/2}" 
+		y="5" 
+		text="General:" 
+		id="GeneralLabel" 
+		fontSize="12" 
+		color="#FDFFFF" 
+		fontWeight="bold"/>
+	
+	<!--  the colors for the exploration mode -->
+	<mx:Label 
+		x="{this.width/2 - ExplorationModeLabel.width/2}" 
+		y="79" 
+		text="Exploration Mode:" 
+		id="ExplorationModeLabel" 
+		fontSize="12" 
+		color="#FDFFFF" 
+		fontWeight="bold"/>
+	<mx:HBox left="5" right="5" height="25" horizontalAlign="center" verticalAlign="middle" 
+		borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" 
+		backgroundAlpha="0.0" horizontalGap="10" borderColor="#FCFAFA" fontSize="10" 
+		color="#030303" y="101" id="NodeConfigurationBox" fontWeight="bold" fontFamily="Verdana" dropShadowEnabled="true">
+		<mx:Label id="NodeColorLabel" text="Node Color:" color="#FDFAFA" fontSize="10" fontWeight="bold"/>
+		<mx:ColorPicker 
+			id="NodeColorPicker" change="handleNodeOrLabelColorChange(false)" width="15" height="15" toolTip="Set the node color for UViz."/>
+		<mx:VRule height="22" strokeColor="#010101"/>
+		<mx:Label id="NodeAlphaLabel" text="Node Alpha [0,1]:" color="#FDFBFB" fontSize="10" fontWeight="bold"/>
+		<mx:HSlider width="150" minimum="0" maximum="1" enabled="true" 
+			height="20" 
+			value="1"
+		    snapInterval="0.1" 
+			id="NodeAlphaSlider" 
+			change="handleNodeOrLabelColorChange(false)" 
+			borderColor="#FEFEFE"
+			labels="[0,2,4,6,8,1.0]"
+			toolTip="Set the node alpha value for UViz." 
+			labelStyleName="MySliderLabel" 
+			labelOffset="0"/>
+		<mx:VRule height="22" strokeColor="#010101"/>
+		<mx:Label id="NodeLabelColorLabel" text="Node Label Color:" color="#FFFFFF" fontSize="10" fontWeight="bold"/>
+		<mx:ColorPicker 
+			id="NodeLabelColorPicker" 
+			change="handleNodeOrLabelColorChange(true)" 
+			width="15" 
+			height="15"
+			toolTip="Set the node label color for UViz."/>	
+	</mx:HBox>
+	<mx:HBox left="5" right="5" height="25" horizontalAlign="center" verticalAlign="middle" borderStyle="solid" 
+			cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" backgroundAlpha="0.0" 
+			horizontalGap="10" borderColor="#FCFAFA" fontSize="10" color="#030303" y="131" 
+			id="EdgeConfigurationBox" fontFamily="Verdana" dropShadowEnabled="true">	
+			<mx:Label id="EdgeLabelColorLabel" text="Edge Label Color:" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+			<mx:ColorPicker 
+				id="EdgeLabelColorPicker" 
+				change="handleEdgeLabelColorChange()" 
+				width="15" 
+				height="15"
+				toolTip="Set the edge label color for UViz." selectedColor="0xffffffff"/>
+			<mx:VRule height="22" strokeColor="#010101"/>
+		    <mx:Label id="TrueEdgesColorLabel" text="Edge Color (True Facts):" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+			<mx:ColorPicker 
+				id="TrueEdgeColorPicker" 
+				change="handleEdgeColorChange(true)" 
+				width="15" 
+				height="15"
+				toolTip="Set the color for true-edges (set to true by the URDF reasoner) in UViz." enabled="true"/>
+			<mx:VRule height="22" strokeColor="#010101"/>
+		    <mx:Label id="FalseEdgesColorLabel" text="Edge Color (False Facts):" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+			<mx:ColorPicker 
+				id="FalseEdgeColorPicker" 
+				change="handleEdgeColorChange(false)" 
+				width="15" 
+				height="15"
+				toolTip="Set the color for false-edges (set to false by the URDF reasoner) in UViz." enabled="true"/>
+		</mx:HBox>
+	<mx:HBox left="5" right="5" height="25" horizontalAlign="center" verticalAlign="middle" borderStyle="solid" 
+			cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" backgroundAlpha="0.0" 
+			horizontalGap="10" borderColor="#FCFAFA" fontSize="10" color="#030303" y="161" 
+			id="EdgeConfigurationBox2" dropShadowEnabled="true">	
+			<mx:CheckBox 
+				id="EdgeAlphaCheckBox" 
+				label="Use Edge Alpha?" 
+				color="#FEFCFC" 
+				selected="true" 
+				enabled="true" 
+				fontSize="9" 
+				fontWeight="bold" 
+				fontFamily="Verdana" 
+				click="handleEdgeAlphaChange();"
+				toolTip="Specify if fact confidences should influence the alpha value encodings for the edges."/>
+			<mx:VRule height="22" strokeColor="#010101"/>
+			<mx:CheckBox 
+				id="EdgeLabelsUsedCheckBox" 
+				label="Use Edge Labels (all modes)?" 
+				color="#FCFBFB" 
+				selected="false" 
+				enabled="true" 
+				fontWeight="bold" 
+				fontSize="9" 
+				click="handleEdgeLabelVisibilityChange();"
+				toolTip="Decide if UViz should display edge labels or not." fontFamily="Verdana"/>
+			<mx:VRule height="22" strokeColor="#010101"/>
+			<mx:CheckBox 
+				id="LineageIndicationBox" 
+				label="Indicate Lineage?" 
+				color="#FEFCFC" 
+				selected="false" 
+				enabled="true" 
+				fontSize="9" 
+				fontWeight="bold" 
+				fontFamily="Verdana" 
+				click="handleEdgeLineageIndicationChange();"
+				toolTip="Specify if a cross on the edge should indicate available lineage information."/>
+		</mx:HBox>
+	
+	<!--  the colors for the comparison mode -->	
+	<mx:Label 
+		x="{this.width/2 - ComparisonModeLabel.width/2}" 
+		y="194" 
+		text="Comparison Mode:" 
+		id="ComparisonModeLabel" 
+		fontSize="12" 
+		fontWeight="bold" 
+		color="#FDFDFD"/>
+	<mx:HBox left="5" right="5" height="25" horizontalAlign="center" verticalAlign="middle" 
+		borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" 
+		backgroundAlpha="0.0" horizontalGap="10" borderColor="#FCFAFA" fontSize="10" 
+		color="#030303" y="218" id="ComparisonConfigurationBox" fontWeight="bold" fontFamily="Verdana" dropShadowEnabled="true">
+		<mx:Label id="BlackClusterColorLabel" text="Black Cluster Color:" color="#FDFAFA" fontSize="10" fontWeight="bold"/>
+		<mx:ColorPicker 
+			id="BlackClusterColorPicker" change="handleNodeOrLabelColorChange(false)" width="15" height="15" toolTip="Set the node color for UViz."/>
+		<mx:VRule height="22" strokeColor="#010101"/>
+		<mx:Label id="YellowClusterColorLabel" text="Yellow (Shared) Cluster Color:" color="#FDFAFA" fontSize="10" fontWeight="bold"/>
+		<mx:ColorPicker 
+			id="YellowClusterColorPicker" change="handleNodeOrLabelColorChange(false)" width="15" height="15" toolTip="Set the node color for UViz."/>
+		<mx:VRule height="22" strokeColor="#010101"/>
+		<mx:Label id="WhiteClusterColorLabel" text="White Cluster Color:" color="#FDFAFA" fontSize="10" fontWeight="bold"/>
+		<mx:ColorPicker 
+			id="WhiteClusterColorPicker" change="handleNodeOrLabelColorChange(false)" width="15" height="15" toolTip="Set the node color for UViz."/>
+	</mx:HBox>
+	
+	<!--  the colors for the explanation mode -->
+	<mx:Label 
+		x="{this.width/2 - ExplanationModeLabel.width/2}" 
+		y="329" 
+		text="Explanation Mode" 
+		id="ExplanationModeLabel" 
+		color="#FBFDFD" 
+		fontWeight="bold" 
+		fontSize="12"/>
+	<mx:HBox left="5" right="5" y="25">
+		<mx:HBox width="140" horizontalAlign="center" verticalAlign="middle">
+			<mx:Label 
+				text="Background Color:" 
+				id="BackgroundColorLabel" 
+				fontWeight="bold" 
+				color="#FEFEFE"/>
+			<mx:ColorPicker id="BackgroundColorPicker"/>
+		</mx:HBox>
+	</mx:HBox>
+    
+	
+</mx:Panel>

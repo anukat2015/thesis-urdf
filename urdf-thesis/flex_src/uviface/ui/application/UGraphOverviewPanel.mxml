@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas xmlns:mx="http://www.adobe.com/2006/mxml"  
+	 label="Graph Overview" 
+  	 width="320" 
+  	 height="255" 
+     fontSize="10" 
+     alpha="1.0" 
+     backgroundAlpha="1.0" 
+     borderStyle="solid" backgroundColor="#3F3F3F"  
+     verticalScrollPolicy="off" horizontalScrollPolicy="off" 
+     cornerRadius="10"
+     creationComplete="init();" xmlns:tooltip="uviface.ui.tooltip.*"
+     includeInLayout="false" visible="true" 
+     paddingLeft="0" paddingBottom="0" paddingRight="0" paddingTop="0" 
+     borderThickness="0" borderColor="#7E7D7D" dropShadowEnabled="true">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import uviface.event.UPanZoomEvent;
+			import mx.controls.Image;
+			import uviface.event.UGraphOverviewEvent;
+			import uviface.viz.util.UColors;
+			import uviface.viz.UFlareVis;
+			import uviface.ui.tooltip.OverviewHelpToolTip;
+			
+			import flash.utils.getTimer;
+			import flash.display.BitmapData;
+			
+			private var _refreshTimer:Timer = new Timer(1000,0);
+			
+			[Bindable]
+			private var _overviewBitmap:BitmapData = new BitmapData(300,200);
+			private var _overviewImage:Image;
+			[Bindable]
+			private var _overviewBitmapImage:Bitmap;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			[Bindable]
+			private static var _forceLayoutActive:Boolean = false;
+			
+			private var _glowFilter:GlowFilter = new GlowFilter(UColors.green(7),1,6.0,6.0,15);
+		    //private static var _filters:Array;
+		    [Bindable]
+		    private var _glowFilterArray:Array = [_glowFilter];
+		    
+		   // private var _coinFlip:Boolean = true;
+		    private var _cameraPositioningActivated:Boolean = false;
+			
+			private function init():void {
+				_refreshTimer.addEventListener(TimerEvent.TIMER,doRefreshing,false,0,true);
+				_overviewBitmapImage = new Bitmap();
+				_overviewImage = new Image();
+				_overviewBitmapImage.bitmapData = _overviewBitmap;
+				_overviewImage.source = _overviewBitmapImage;
+				//_overviewImage.bitmapData = _overviewBitmap;
+				OverviewCanvas.addChild(_overviewImage);//rawChildren.addChild(_overviewImage);
+				// swap the child positions of the overview image and the red selection circle
+				// -> the circle is drawn above the image
+				//OverviewCanvas.swapChildren(_overviewImage,SelectionCircle);
+				//OverviewCanvas.swapChildren(SelectionCircle,OverviewHelpToolTip);
+				OverviewCanvas.setChildIndex(_overviewImage,0);
+				OverviewCanvas.setChildIndex(OverviewHelpToolTip,1);
+				OverviewCanvas.setChildIndex(SelectionCircle,2);
+			}
+			
+			private function toggleRefreshing():void {
+				if(StartStopRefreshingButton.label == "Start") {
+					StartStopRefreshingButton.label = "Stop";
+					StartStopRefreshingButton.filters = _glowFilterArray;
+					_refreshTimer.start();
+					//var event:UGraphOverviewEvent = new UGraphOverviewEvent(UGraphOverviewEvent.OVERVIEW_EVENT,true);
+					//event.overviewBitmap = _overviewBitmap;
+					//this.dispatchEvent(event);
+				}
+				else {
+					StartStopRefreshingButton.label = "Start";
+					StartStopRefreshingButton.filters = null;
+					_refreshTimer.stop();
+				}
+			}
+			
+			private function doRefreshing(event:TimerEvent):void {
+				//_refreshTimer.start();
+				var overviewEvent:UGraphOverviewEvent = new UGraphOverviewEvent(UGraphOverviewEvent.OVERVIEW_EVENT,true);
+				_overviewBitmap.fillRect(_overviewBitmap.rect,0);
+				overviewEvent.overviewBitmap = _overviewBitmap;
+				this.dispatchEvent(overviewEvent);
+			}
+			
+			public function updateOverview(overviewBitmap:BitmapData):void {
+				_overviewBitmap = overviewBitmap;
+			}
+			
+			private function changeRefreshCycle():void {
+				if(_refreshTimer.running)
+				   _refreshTimer.stop();
+				
+				_refreshTimer.delay = RefreshSlider.value;
+				
+				if(StartStopRefreshingButton.label == "Start")
+				   return;
+				
+				_refreshTimer.start();
+				//var overviewEvent:UGraphOverviewEvent = new UGraphOverviewEvent(UGraphOverviewEvent.OVERVIEW_EVENT,true);
+				//overviewEvent.overviewBitmap = _overviewBitmap;
+				//this.dispatchEvent(overviewEvent);
+			}
+			
+			private function positionCamera(event:MouseEvent):void {
+				
+				SelectionCircle.x = event.localX-5;
+				SelectionCircle.y = event.localY-5;
+				//_coinFlip = !_coinFlip;
+				if(_cameraPositioningActivated) {
+					//SelectionCircle.x = event.localX;
+					//SelectionCircle.y = event.localY;
+					//SelectionCircle.x = event.localX-5;
+					//SelectionCircle.y = event.localY-5;
+					var positionEvent:UPanZoomEvent = new UPanZoomEvent(UPanZoomEvent.ZOOM_EVENT,false,true);
+					//positionEvent.orgPoint = new Point(_orgPoint.x,_orgPoint.y);
+					//positionEvent.orgPoint = new Point(OverviewCanvas.width/2,OverviewCanvas.height/2);
+					positionEvent.orgPoint = new Point(150,100);
+					// adjust the original point
+	                positionEvent.sourceCanvas = OverviewCanvas;
+	                positionEvent.shiftedPoint = new Point(event.localX,event.localY);
+	                //positionEvent.shiftedPoint = new Point(SelectionCircle.x,SelectionCircle.y);
+	               // trace("org point is : " + _orgPoint.toString());
+	                this.dispatchEvent(positionEvent);
+                }
+			}
+			
+			private function activateCameraPositioning(event:MouseEvent):void {
+				_cameraPositioningActivated = true;
+			}
+			
+			private function deactivateCameraPositioning(event:MouseEvent):void {
+				_cameraPositioningActivated = false;
+			}
+			
+			private function toggleHelpToolTipVisibility():void {
+				if(OverviewHelpToolTip.visible) {
+				   RefreshHelpButton.filters = null; 
+				   SelectionCircle.visible = true;
+				}
+				else {
+				   RefreshHelpButton.filters = _glowFilterArray;
+				   SelectionCircle.visible = false;
+				}
+	            OverviewHelpToolTip.visible = !OverviewHelpToolTip.visible;
+			}
+			
+			private function changeGraphOverViewColor():void {
+				this.setStyle("backgroundColor",GraphOverviewColorPicker.selectedColor);
+			}
+			
+			public function show():void {
+				//this.visible = true;
+				if(DissolveIn.isPlaying || DissolveOut.isPlaying)
+				  return;
+				//ZoomIn.play([this]);
+				this.visible = true;
+			}
+			
+			public function hide():void {
+				if(DissolveIn.isPlaying || DissolveOut.isPlaying)
+				  return;
+				//ZoomOut.play([this]);
+				this.visible = false;
+			}
+				
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+		
+     <mx:Canvas id="OverviewCanvas" width="300" height="200"
+        mouseMove="positionCamera(event);" borderStyle="solid" borderThickness="0" cornerRadius="10" 
+        mouseDown="activateCameraPositioning(event);" mouseUp="deactivateCameraPositioning(event);"
+        horizontalScrollPolicy="off" verticalScrollPolicy="off" y="2" x="8" dropShadowEnabled="false">
+     	<mx:Canvas id="SelectionCircle" width="15" height="15"
+     	   borderStyle="solid" borderThickness="4" borderColor="#FF0000" backgroundAlpha="0.0" x="150" y="100" cornerRadius="20"/>
+ 	    <tooltip:OverviewHelpToolTip id="OverviewHelpToolTip" x="{OverviewCanvas.width/2 - OverviewHelpToolTip.width/2}"
+    	   y="{OverviewCanvas.height/2 - OverviewHelpToolTip.height/2}" visible="false" fontSize="10"
+           showEffect="ZoomIn" hideEffect="ZoomOut"/>
+     </mx:Canvas>
+    <mx:Label text="ms / Refresh : " color="#FEFEFE" y="207" x="3"/>
+    <mx:HSlider id="RefreshSlider" allowTrackClick="true" minimum="0" maximum="1000" 
+    	snapInterval="10" enabled="true" liveDragging="true"
+        labels="[0,200,400,600,800,1000]" 
+        tickColor="white" trackColors="white" tickInterval="100" 
+	    borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" 
+	    fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" 
+	    labelOffset="0" change="changeRefreshCycle();" width="225" value="1000" 
+	    showDataTip="true" showTrackHighlight="true" x="90" y="204"
+	    toolTip="Changing the refresh rate influences how accurately the bitmap engine mirrors the ongoing action in the visualization in this small overview panel."/>
+    <mx:Button label="Start" id="StartStopRefreshingButton" enabled="true" click="toggleRefreshing();" 
+    	paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" 
+    	cornerRadius="5" fontFamily="Verdana" height="18" fillAlphas="[1.0, 1.0]" 
+    	fillColors="[#3F3F3F, #3F3F3F, #4EFE00, #4EFE00]" color="#FEFEFE" fontSize="12" width="55" x="137" y="233"
+        toolTip="Start/Stop the graph overview drawing (high refresh rates can reduce overall performance)."/>
+    <mx:Button label="Help" id="RefreshHelpButton" enabled="true" 
+    	paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" 
+    	cornerRadius="5" fontFamily="Verdana" height="18" fillAlphas="[1.0, 1.0]" 
+    	fillColors="[#3F3F3F, #3F3F3F, #4EFE00, #4EFE00]" color="#FEFEFE"
+        click="toggleHelpToolTipVisibility();" x="27" y="233"
+        toolTip="Show/Hide help text for the graph overview panel."/>
+     <mx:ColorPicker 
+     	x="7" 
+     	y="234" 
+     	id="GraphOverviewColorPicker" 
+     	enabled="true" 
+     	change="changeGraphOverViewColor();" width="15" height="15"
+        toolTip="Change the background color of this graph overview panel."/>
+     
+     <mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+        
+     <mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="500"/>
+        
+     <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="500"/>	    	
+	
+</mx:Canvas>

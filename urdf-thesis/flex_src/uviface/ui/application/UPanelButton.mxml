@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:TextInput 
+	xmlns:mx="http://www.adobe.com/2006/mxml"
+	text="Panel Button"
+	enabled="true" fontSize="12" 
+	color="#FCFDFD" backgroundColor="#3F3F3F" rollOver="changeButtonColor(true);" rollOut="changeButtonColor(false);" 
+	cornerRadius="10" borderColor="#FFFFFF" styleName="myButtonStyle" fontFamily="Verdana" 
+	fontWeight="normal" editable="false" useHandCursor="true" buttonMode="true" borderStyle="solid" 
+	borderThickness="1" width="75" textAlign="center" mouseChildren="false" includeInLayout="false" paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" condenseWhite="true" textIndent="0" dropShadowEnabled="true">
+    <!--   
+    showEffect="{FadeIn}" hideEffect="{FadeOut}">
+	-->
+	<mx:Script>
+		<![CDATA[
+			
+			private function changeButtonColor(rollover:Boolean):void {
+				if(rollover)
+				   this.setStyle("backgroundColor","#01C5FD");
+				else
+				   this.setStyle("backgroundColor","#3F3F3F");
+			}
+			
+			public function hide():void {
+				//this.visible = false;
+				this.alpha = 0.0;
+				this.includeInLayout = false;
+				//FadeOut.play([this]);
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+			}
+			
+			public function show():void {
+				//this.visible = true;
+				FadeIn.play([this]);
+				//this.includeInLayout = true;
+			}
+			
+			public function moveButton(x:Number):void {
+				FadeOut.play([this]);
+				this.x = x;
+				FadeIn.play([this]);
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+		
+		.myButtonStyle {
+            embedFonts: true;
+        }			
+		
+	</mx:Style>
+	
+	<mx:Fade id="FadeIn" alphaFrom="0.0" alphaTo="1.0" duration="2000"/>
+	<mx:Fade id="FadeOut" alphaFrom="1.0" alphaTo="0.0" duration="500"/>
+	
+</mx:TextInput>
