@@ -1,0 +1,27 @@
+//Examples Covered:
+select count ?a where {?a <bornIn> ?b . ?a <livesIn> ?c}
+
+//Positive Exemples Covered:
+select count ?a where {?a <bornIn> ?b . ?a <livesIn> ?b}
+
+//Examples Covered (livesIn(x,y):-hasChild(x,z), bornIn(z,y))
+select count ?x where {?x <hasChild> ?z . ?z <bornIn> ?y, ?x <livesIn> ?w}
+
+//Examples Covered (livesIn(x,y):-diedIn(x,y), bornIn(x,y))
+select count ?x where {?x <diedIn> ?y . ?x <bornIn> ?y . ?x <livesIn> ?w}
+
+//Examples Covered (livesIn(x,y):-bornIn(x,y), hasChild(x,z))
+select count ?x where {?x <bornIn> ?y . ?x <hasChild> ?z . ?x <livesIn> ?w}
+
+//Examples Covered  [Case3] (livesIn(x,y):-bornIn(x,y))
+select count ?x where {?x <bornIn> ?y . ?x <livesIn> ?z} or {?x <bornIn> ?y . z? <livesIn> ?y}
+
+//Possible Positive Examples to be Covered (livesIn(x,y):-bornIn(x,y))
+select count ?x {?x <bornIn> ?y . ?x <livesIn> ?z}
+
+//Possible Positive Examples to be Covered  [Case3] (livesIn(x,y):-bornIn(x,y))
+select count ?x where {?x <bornIn> ?y . ?x <livesIn> ?z} or {?x <bornIn> ?y . ?z <livesIn> ?y}
+
+//Sampling
+SELECT arg1 as sub, arg2 as super FROM facts WHERE relation='subClassOf' AND arg1 IN ((SELECT arg2 FROM facts WHERE relation='range') UNION (SELECT arg2 FROM facts WHERE relation='domain')) AND arg2 IN ((SELECT arg2 FROM facts WHERE relation='range') UNION (SELECT arg2 FROM facts WHERE relation='domain'))
+select ?x ?y where {?x <subClassOf> ?y . {{?a <range> ?x} union {?b <domain> ?x}}}

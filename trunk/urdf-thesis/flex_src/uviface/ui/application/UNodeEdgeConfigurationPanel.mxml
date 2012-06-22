@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="672" 
+	height="460"
+	horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#5F5751" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1" 
+    verticalAlign="middle"
+    fontFamily="Arial">
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			import flare.util.Orientation;
+			
+			import uviface.event.UGraphConfigEvent;
+			import mx.events.ItemClickEvent;
+			
+			import uviface.viz.UStringConstants;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			
+			//private var _graphConfigEvent:UGraphConfigEvent;
+			
+			private var _layout:int = UGraphConfigEvent.RADIAL; // means radial
+			private var _lineageLayout:String = Orientation.TOP_TO_BOTTOM; // means radial
+			//private var _newLayout:int = UGraphConfigEvent.RADIAL; // means radial
+			
+			[Bindable]
+			private var _menuButtons:Array = ["Radial","Force"];
+			
+			/*
+			private function init():void {
+				// initiliaze the event
+				_graphConfigEvent = new UGraphConfigEvent(UGraphConfigEvent.GRAPH_CONFIG_EVENT, _hopSize, _radiusIncrement, _newLayout, true);
+			}
+			*/
+			
+			private function handleValueChange():void {
+				var hopSize:int = int(HopSlider.value);
+				var radiusIncrement:Number = (RadiusSlider.value)
+				//if(hopSize == _hopSize && radiusIncrement == _radiusIncrement && _layout == _newLayout)
+				   //return;
+				   
+				var graphConfigEvent:UGraphConfigEvent = new UGraphConfigEvent(UGraphConfigEvent.GRAPH_CONFIG_EVENT, hopSize, radiusIncrement, _layout, true);
+				//graphConfigEvent.hopSize = hopSize;
+				//graphConfigEvent.radiusIncrement = radiusIncrement;
+				//graphConfigEvent.layout = _newLayout;
+				
+				graphConfigEvent.enforceBounds = EnforceBoundsButton.selected;
+				// if we have the force layout selected -> add corresponding values to the event
+				if(_layout == UGraphConfigEvent.FORCE)
+				   addForceLayoutValuesToEvent(graphConfigEvent);
+				// add lineage related values to the event
+				addLineageValuesToEvent(graphConfigEvent);
+				// add node and edge related values to the event
+				addSpriteValuesToEvent(graphConfigEvent);
+				
+				GraphConfigUpdateButton.dispatchEvent(graphConfigEvent);
+			}
+			
+			private function addForceLayoutValuesToEvent(event:UGraphConfigEvent):void {
+				event.particleMass = DefaultParticleMassSlider.value;
+				event.springLength = DefaultSpringLengthSlider.value;
+				event.springTension = DefaultSpringTensionSlider.value;
+				event.iterations = IterationsStepper.value;
+				event.ticks = TicksStepper.value;
+				event.nBodyGravitation = NBodyGravitationSlider.value;
+				event.nBodyMinDist = NBodyMinDistSlider.value;
+				event.nBodyMaxDist = NBodyMaxDistSlider.value;
+				//event.enforceBounds = EnforceBoundsButton.selected;
+			}
+			
+			private function addLineageValuesToEvent(event:UGraphConfigEvent):void {
+				// the lineage parameters
+				event.depthSpacing = DepthSpacingSlider.value;
+				event.breadthSpacing = BreadthSpacingSlider.value;
+				event.subtreeSpacing = SubtreeSpacingSlider.value;
+				event.lineageLayout = _lineageLayout;
+			}
+			
+			private function addSpriteValuesToEvent(event:UGraphConfigEvent):void {
+				event.nodeBitmapCaching = NodesBitmapCachingActivateButton.selected;
+				event.nodeShadowEnabled = NodesShadowActivateButton.selected;
+				event.nodeShadowLength = NodesShadowLengthSlider.value;
+				event.nodeShadowAlpha = NodesShadowAlphaSlider.value;
+				event.edgeBitmapCaching = EdgesBitmapCachingActivateButton.selected;
+				event.edgeShadowEnabled = EdgesShadowActivateButton.selected;
+				event.edgeShadowLength = EdgesShadowLengthSlider.value;
+				event.edgeShadowAlpha = EdgesShadowAlphaSlider.value;
+			}
+			
+			private function handleLayoutSwitchClick():void {
+				/*
+				var index:int = event.index;
+				switch(index) {
+					case 0: _newLayout = 0;break;
+					case 1: _newLayout = 1;break;
+					default: return;
+				}
+				*/
+				
+				_layout = ForceLayoutSwitchButton.selected ? 1 : 0;
+				
+				if(ForceLayoutSwitchButton.selected) {
+					ForceLayoutPropertiesBox.enabled = true;
+					ForceLayoutPropertiesBox.filters = null;
+					//RadiusIncrementHBox.enabled = false;
+					//RadiusIncrementHBox.filters = _filters;
+				}
+				else {
+					ForceLayoutPropertiesBox.enabled = false;
+					ForceLayoutPropertiesBox.filters = _filters;
+					//RadiusIncrementHBox.enabled = true;
+					//RadiusIncrementHBox.filters = null;
+				}
+				
+			}
+			
+			private function handleLineageLayoutSwitchClick():void {
+				  if(LeftToRightSwitchButton.selected) {
+				    _lineageLayout = Orientation.LEFT_TO_RIGHT;
+				    return;
+				  }
+				  if(RightToLeftSwitchButton.selected) {
+				    _lineageLayout = Orientation.RIGHT_TO_LEFT;
+				    return;
+				  }
+				  if(TopToBottomSwitchButton.selected) {
+				    _lineageLayout = Orientation.TOP_TO_BOTTOM;
+				    return;
+				  }
+				  if(BottomToTopSwitchButton.selected) {
+				    _lineageLayout = Orientation.BOTTOM_TO_TOP;
+				    return;
+				  }	 
+			}
+			
+			private function resetGraphConfigValues():void {
+				
+				// the hop size
+				HopSlider.value = 1;
+				// the radius increment for the radial layout
+				RadiusSlider.value = 200;
+				
+				// common properties
+				EnforceBoundsButton.selected = false;
+				
+				// the force layout parameters
+				DefaultParticleMassSlider.value = 20;
+				DefaultSpringLengthSlider.value = 30;
+				DefaultSpringTensionSlider.value = 0.001;
+				IterationsStepper.value = 1;
+				TicksStepper.value = 1;
+				NBodyGravitationSlider.value = 0;
+				NBodyMinDistSlider.value = 2;
+				NBodyMaxDistSlider.value = 200;
+				NodesBitmapCachingDeactivateButton.selected = true;
+				NodesShadowActivateButton.selected = true;
+				NodesShadowLengthSlider.value = 10;
+				NodesShadowAlphaSlider.value = 0.7;
+				EdgesBitmapCachingDeactivateButton.selected = true;
+				EdgesShadowActivateButton.selected = true;
+				EdgesShadowLengthSlider.value = 10;
+				EdgesShadowAlphaSlider.value = 0.7;
+				
+				// the lineage parameters
+				DepthSpacingSlider.value = 30;
+				BreadthSpacingSlider.value = 20;
+				SubtreeSpacingSlider.value = 30;
+				_lineageLayout = Orientation.TOP_TO_BOTTOM;
+				
+				// the layout switch
+				_layout = UGraphConfigEvent.RADIAL;
+				RadialLayoutSwitchButton.selected = true;
+				ForceLayoutPropertiesBox.enabled = false;
+				ForceLayoutPropertiesBox.filters = _filters;
+				//RadiusIncrementHBox.enabled = true;
+				//RadiusIncrementHBox.filters = null;
+			}
+			
+			private function centerVisualization():void {
+				CenterVisualizationChangeButton.dispatchEvent(new Event(UStringConstants.CENTER_VISUALIZATION,true));
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:VBox 
+		horizontalAlign="center" 
+		verticalGap="5" 
+		verticalAlign="middle" 
+		left="10" 
+		right="10" 
+		top="10" 
+		bottom="10" 
+		borderStyle="solid" 
+		cornerRadius="20" 
+		borderThickness="4" 
+		borderColor="#FDFEFE">
+	
+		   <mx:VBox 
+		   	  width="95%" 
+		   	  cornerRadius="20" 
+		   	  borderStyle="solid" 
+		   	  borderThickness="4" 
+		   	  horizontalAlign="center" 
+		   	  verticalAlign="middle" 
+		   	  borderColor="#FAFBFC" 
+		   	  backgroundColor="#4C4848" 
+		   	  verticalGap="5" 
+		   	  id="ForceLayoutPropertiesBox"
+		   	  label="Force Layout Parameters" height="237">
+		   	  <mx:Label text="Nodes:" color="#FCFDFD" fontSize="14" fontWeight="bold" textDecoration="underline" id="NodeLabel" width="60"/>
+		   	  <mx:HBox id="NodesConfigBox" width="95%" horizontalAlign="center" verticalAlign="middle" horizontalGap="3"
+		   	  	borderStyle="solid" borderThickness="4" cornerRadius="20" backgroundColor="#4B0101" backgroundAlpha="1.0" borderColor="#FBFBFB">
+		   	  	  <mx:RadioButtonGroup id="NodesBitmapCachingSwitch"/>
+		   	  	  
+		   	  	  <mx:Label id="NodesShadowSwitchLabel" text="Shadows:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" width="79"/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:RadioButtonGroup id="NodesShadowSwitch"/>
+		   	  	  <mx:RadioButton label="yes" groupName="NodesShadowSwitch" color="#FCFDFD" selected="true" enabled="true" id="NodesShadowActivateButton"
+		   	  	      themeColor="#12FF00"/>
+		   	  	  <mx:RadioButton label="no" groupName="NodesShadowSwitch" color="#FEFEFE" selected="false" enabled="true" id="NodesShadowDeactivateButton"
+		   	  	  	  themeColor="#12FF00"/>
+		   	  	  	  
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:Label id="NodesShadowLengthLabel" text="Length:" fontWeight="bold" color="#FFFFFF" textDecoration="underline"/>
+		   	  	  <mx:HSlider 
+		   	  	  	  id="NodesShadowLengthSlider"
+		   	  	  	  value="10" 
+		   	  	  	  minimum="0"
+		   	  	    maximum="50"
+		   	  	    liveDragging="true"
+		   	  	    showDataTip="true"
+		   	  	    showTrackHighlight="true"
+		   	  	    dataTipPlacement="top"
+		   	  	    allowTrackClick="true"
+		   	  	    dataTipPrecision="0"
+		   	  	    thumbCount="1"
+		   	  	    tickInterval="10"
+		   	  	    labels="[0,50]"
+		   	  	    toolTip="The length of the node shadow."
+		   	  	    tickColor="white" 
+		   	  	    trackColors="white" 
+		   	  	    width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true"/>
+		   	  	  <mx:Label id="NodesShadowAlphaLabel" text="Alpha:" fontWeight="bold" color="#FFFFFF" textDecoration="underline"/>
+		   	  	  <mx:HSlider 
+		   	  	  	  id="NodesShadowAlphaSlider"
+		   	  	  	  value="0.7" 
+		   	  	  	  minimum="0"
+		   	  	    maximum="1"
+		   	  	    liveDragging="true"
+		   	  	    showDataTip="true"
+		   	  	    showTrackHighlight="true"
+		   	  	    dataTipPlacement="top"
+		   	  	    allowTrackClick="true"
+		   	  	    dataTipPrecision="1"
+		   	  	    thumbCount="1"
+		   	  	    tickInterval="0.2"
+		   	  	    labels="[0,1]"
+		   	  	    toolTip="The alpha value of the node shadow."
+		   	  	    tickColor="white" 
+		   	  	    trackColors="white" 
+		   	  	    width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true"/>
+		   	  	  
+		   	  </mx:HBox>
+		   	  <mx:HBox id="NodesConfigBox0" width="95%" horizontalAlign="center" verticalAlign="middle" horizontalGap="5"
+		   	  	borderStyle="solid" borderThickness="4" cornerRadius="20" backgroundColor="#4B0101" backgroundAlpha="1.0" borderColor="#FBFBFB">
+		   	  	  <mx:RadioButtonGroup id="NodesBitmapCachingSwitch0"/>
+		   	  	  
+		   	  	  <mx:Label id="NodesShadowSwitchLabel0" text="General Values:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" width="109"/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:Label text="Fill Color:" color="#FEFEFE" id="NodeColorLabel" width="64" textDecoration="underline"/>
+		   	  	  <mx:ColorPicker/>
+		   	  	  <mx:RadioButtonGroup id="NodesShadowSwitch0"/>
+		   	  	  	  
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:Label text="Border Color:" color="#FEFEFE" id="NodeBorderColorLabel" width="76" textDecoration="underline"/>
+		   	  	  <mx:ColorPicker/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:Label text="Alpha:" color="#FEFEFE" id="NodeBorderColorLabel0" width="48" textDecoration="underline"/>
+		   	  	  <mx:ColorPicker/>
+		   	  	  
+		   	  </mx:HBox>
+		   <mx:HBox id="NodesConfigBox1" width="95%" horizontalAlign="center" verticalAlign="middle" horizontalGap="5"
+		   	borderStyle="solid" borderThickness="4" cornerRadius="20" backgroundColor="#4B0101" backgroundAlpha="1.0" borderColor="#FBFBFB">
+		   	  <mx:RadioButtonGroup id="NodesBitmapCachingSwitch1"/>
+		   	  
+		   	  <mx:Label id="NodesShadowSwitchLabel1" text="Compare Values:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" width="109"/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="Old Color:" color="#FEFEFE" id="NodeColorLabel0" width="64" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  <mx:RadioButtonGroup id="NodesShadowSwitch1"/>
+		   	  	  
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="Both Color:" color="#FEFEFE" id="NodeBorderColorLabel1" width="76" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="New Color:" color="#FEFEFE" id="NodeBorderColorLabel2" width="70" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  
+		   </mx:HBox>
+		   <mx:HBox id="NodesConfigBox2" width="95%" horizontalAlign="center" verticalAlign="middle" horizontalGap="5"
+		   	borderStyle="solid" borderThickness="4" cornerRadius="20" backgroundColor="#4B0101" backgroundAlpha="1.0" borderColor="#FBFBFB">
+		   	  <mx:RadioButtonGroup id="NodesBitmapCachingSwitch2"/>
+		   	  
+		   	  <mx:Label id="NodesShadowSwitchLabel2" text="Glow Values:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" width="109"/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="Old Color:" color="#FEFEFE" id="NodeColorLabel1" width="64" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  <mx:RadioButtonGroup id="NodesShadowSwitch2"/>
+		   	  	  
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="Both Color:" color="#FEFEFE" id="NodeBorderColorLabel3" width="76" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="New Color:" color="#FEFEFE" id="NodeBorderColorLabel4" width="70" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  
+		   </mx:HBox>
+		   	
+		   </mx:VBox>
+		   
+		   <mx:VBox 
+		   	  width="95%" 
+		   	  cornerRadius="20" 
+		   	  borderStyle="solid" 
+		   	  borderThickness="4" 
+		   	  horizontalAlign="center" 
+		   	  verticalAlign="middle" 
+		   	  borderColor="#FAFBFC" 
+		   	  backgroundColor="#4C4848" 
+		   	  verticalGap="5" 
+		   	  id="ForceLayoutPropertiesBox0"
+		   	  label="Force Layout Parameters" height="141">
+		   	  <mx:Label text="Edges:" color="#FCFDFD" fontSize="14" fontWeight="bold" textDecoration="underline" id="EdgeLabel" width="56"/>
+		   	  <mx:HBox id="NodesConfigBox3" width="95%" horizontalAlign="center" verticalAlign="middle" horizontalGap="3"
+		   	  	borderStyle="solid" borderThickness="4" cornerRadius="20" backgroundColor="#4B0101" backgroundAlpha="1.0" borderColor="#FBFBFB">
+		   	  	  <mx:RadioButtonGroup id="NodesBitmapCachingSwitch3"/>
+		   	  	  
+		   	  	  <mx:Label id="NodesShadowSwitchLabel3" text="Shadows:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" width="79"/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:RadioButtonGroup id="NodesShadowSwitch3"/>
+		   	  	  <mx:RadioButton label="yes" groupName="NodesShadowSwitch" color="#FCFDFD" selected="true" enabled="true" id="NodesShadowActivateButton0"
+		   	  	      themeColor="#12FF00"/>
+		   	  	  <mx:RadioButton label="no" groupName="NodesShadowSwitch" color="#FEFEFE" selected="false" enabled="true" id="NodesShadowDeactivateButton0"
+		   	  	  	  themeColor="#12FF00"/>
+		   	  	  	  
+		   	  	  <mx:VRule height="35"/>
+		   	  	  <mx:Label id="NodesShadowLengthLabel0" text="Length:" fontWeight="bold" color="#FFFFFF" textDecoration="underline"/>
+		   	  	  <mx:HSlider 
+		   	  	  	  id="NodesShadowLengthSlider0"
+		   	  	  	  value="10" 
+		   	  	  	  minimum="0"
+		   	  	    maximum="50"
+		   	  	    liveDragging="true"
+		   	  	    showDataTip="true"
+		   	  	    showTrackHighlight="true"
+		   	  	    dataTipPlacement="top"
+		   	  	    allowTrackClick="true"
+		   	  	    dataTipPrecision="0"
+		   	  	    thumbCount="1"
+		   	  	    tickInterval="10"
+		   	  	    labels="[0,50]"
+		   	  	    toolTip="The length of the node shadow."
+		   	  	    tickColor="white" 
+		   	  	    trackColors="white" 
+		   	  	    width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true"/>
+		   	  	  <mx:Label id="NodesShadowAlphaLabel0" text="Alpha:" fontWeight="bold" color="#FFFFFF" textDecoration="underline"/>
+		   	  	  <mx:HSlider 
+		   	  	  	  id="NodesShadowAlphaSlider0"
+		   	  	  	  value="0.7" 
+		   	  	  	  minimum="0"
+		   	  	    maximum="1"
+		   	  	    liveDragging="true"
+		   	  	    showDataTip="true"
+		   	  	    showTrackHighlight="true"
+		   	  	    dataTipPlacement="top"
+		   	  	    allowTrackClick="true"
+		   	  	    dataTipPrecision="1"
+		   	  	    thumbCount="1"
+		   	  	    tickInterval="0.2"
+		   	  	    labels="[0,1]"
+		   	  	    toolTip="The alpha value of the node shadow."
+		   	  	    tickColor="white" 
+		   	  	    trackColors="white" 
+		   	  	    width="100" borderColor="#FEFEFE" fillAlphas="[1.0, 1.0]" fillColors="[#030000, #030000]" labelStyleName="MySliderLabel" enabled="true"/>
+		   	  	  
+		   	  </mx:HBox>
+		   <mx:HBox id="NodesConfigBox6" width="95%" horizontalAlign="center" verticalAlign="middle" horizontalGap="5"
+		   	borderStyle="solid" borderThickness="4" cornerRadius="20" backgroundColor="#4B0101" backgroundAlpha="1.0" borderColor="#FBFBFB">
+		   	  <mx:RadioButtonGroup id="NodesBitmapCachingSwitch6"/>
+		   	  
+		   	  <mx:Label id="NodesShadowSwitchLabel6" text="Glow Values:" fontWeight="bold" color="#FFFFFF" fontSize="12" fontStyle="normal" textDecoration="normal" width="109"/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="Old Color:" color="#FEFEFE" id="NodeColorLabel4" width="64" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  <mx:RadioButtonGroup id="NodesShadowSwitch6"/>
+		   	  	  
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="Both Color:" color="#FEFEFE" id="NodeBorderColorLabel9" width="76" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  <mx:VRule height="35"/>
+		   	  <mx:Label text="New Color:" color="#FEFEFE" id="NodeBorderColorLabel10" width="70" textDecoration="underline"/>
+		   	  <mx:ColorPicker/>
+		   	  
+		   </mx:HBox>
+		   	
+		   </mx:VBox>
+		   
+		   <mx:HBox cornerRadius="15" borderStyle="solid" backgroundColor="#AAA9A9" horizontalAlign="center" verticalAlign="middle">
+		     <mx:Button 
+		     	id="GraphConfigResetButton" 
+		     	label="RESET" 
+		     	click="resetGraphConfigValues();" 
+		     	fontWeight="bold" 
+		     	fontSize="12" 
+		     	cornerRadius="15" 
+		     	fillAlphas="[1.0, 1.0]" 
+		     	fillColors="[#5F5751, #5F5751]" 
+		     	borderColor="#FCFDFD" 
+		     	color="#FCFEFE" 
+		     	alpha="0.7" 
+		     	themeColor="#00FFC6"
+		     	toolTip="Reset Graph Values."/>
+		   </mx:HBox>
+	
+	  </mx:VBox>
+	
+</mx:Panel>

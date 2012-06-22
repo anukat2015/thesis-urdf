@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:HBox 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="330" 
+	height="25"
+    horizontalAlign="center"
+    verticalAlign="middle"
+    textAlign="center" 
+    creationComplete="onCreationComplete();" 
+    horizontalGap="0" borderStyle="solid" cornerRadius="5" 
+    color="#FFFFFF" backgroundColor="#515151" 
+    borderThickness="0" borderColor="#BDBEC0" creationPolicy="all">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import uviface.viz.util.UFrameRateCounter;
+			import uviface.viz.UFlareVis;
+			import flash.system.*;
+			import util.UMath;
+			
+			private var _fpsCounter:UFrameRateCounter;
+		    
+			private function onCreationComplete():void {
+				// initialize a frames per second counter
+				_fpsCounter = new UFrameRateCounter();
+			}
+			
+			public function updateFrameRateCounter():void {
+				FrameRateNumber.text = _fpsCounter.showFPS().toString();
+				return;
+			}
+			
+			public function updateDataStatistics(flareVis:UFlareVis):void {
+				UsedNodesNumber.text = flareVis.visualization.data.nodes.length.toString();
+				UsedEdgesNumber.text = flareVis.visualization.data.edges.length.toString();
+			    //MemoryConsumptionNumber.text =  flareVis.calculateMemoryUsage().toString() + " KB";
+				return;
+			}
+			
+			public function updateMemoryConsumption():void {
+				//MemoryConsumptionNumber.text =  Number(System.totalMemory/Math.pow(2,10)).toString() + " KB";
+				MemoryConsumptionNumber.text =  Number(System.totalMemory/1048576).toFixed(2) + " MB";//Number(System.totalMemory/1000000).toFixed(2) + " MB";
+				return;
+			}
+			
+			/* private function changeFrameRate():void {
+				//mx.core.Application.application.frameRate = FPSSlider.value;
+				mx.core.Application.application.stage.frameRate = FPSSlider.value;
+			} */
+			
+		]]>
+	</mx:Script>
+	
+	<mx:HBox width="70" height="23" paddingLeft="2" horizontalGap="0" cornerRadius="10" borderStyle="none" borderThickness="2" backgroundColor="#C7C5C5" borderColor="#8A8989" horizontalAlign="left" verticalAlign="middle" backgroundAlpha="1.0" color="#FDFCFC" fontFamily="Verdana" fontWeight="bold" alpha="0.0">
+		<mx:Label id="UsedNodesLabel" text="Nodes:" fontSize="9"/>
+		<mx:Label id="UsedNodesNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="normal" fontSize="9"/>
+	</mx:HBox>
+	<mx:HBox width="75" height="23" paddingLeft="2" horizontalGap="0" cornerRadius="10" borderStyle="none" borderThickness="2" backgroundColor="#C7C5C5" horizontalAlign="left" verticalAlign="middle" borderColor="#8A8989" backgroundAlpha="1.0" fontWeight="bold" color="#FDFDFD" alpha="0.0">
+		<mx:Label id="UsedEdgesLabel" text=", Edges:" fontSize="9"/>
+		<mx:Label id="UsedEdgesNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="normal" fontSize="9"/>
+	</mx:HBox>
+	<mx:HBox width="120" height="23" paddingLeft="2" horizontalGap="0" horizontalAlign="left" verticalAlign="middle" backgroundColor="#C7C5C5" borderStyle="none" cornerRadius="10" borderThickness="2" borderColor="#8A8989" color="#FEFEFE" fontWeight="bold" backgroundAlpha="0.0">
+		<mx:Label id="MemoryConsumptionLabel" text=", Memory:" fontSize="9"/>
+		<mx:Label id="MemoryConsumptionNumber" text="0 MB" textAlign="right" fontStyle="italic" fontWeight="normal"/>
+	</mx:HBox>
+	<mx:HBox width="55" height="23" paddingLeft="2" verticalAlign="middle" horizontalGap="2" backgroundColor="#C7C5C5" cornerRadius="10" borderStyle="none" borderThickness="2" borderColor="#8A8989" backgroundAlpha="0.0" fontWeight="bold" color="#FEFEFE">
+		<mx:Label id="FrameRateLabel" text=", fps:" fontSize="9"/>
+		<mx:Label id="FrameRateNumber" text="0" textAlign="right" fontStyle="italic" fontWeight="normal"/>
+	</mx:HBox>
+	
+</mx:HBox>

@@ -1,0 +1,545 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ApplicationControlBar 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="100%" 
+	height="70" 
+	fillAlphas="[0.0, 0.0]" 
+	fillColors="[#545353, #010000]" 
+	cornerRadius="0" 
+	xmlns:ns1="uviface.ui.application.*" 
+	dock="false" 
+	paddingBottom="2"
+	paddingTop="2" 
+	horizontalAlign="center" 
+	verticalAlign="middle"
+	dropShadowEnabled="false"
+	hideEffect="{wipeToTopIn}" 
+    showEffect="{wipeToBottomOut}"
+    creationPolicy="all">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ItemClickEvent;
+			import mx.events.ListEvent;
+			
+			import util.UStringUtil;
+			import mx.controls.Alert;
+			
+			import uviface.event.*;
+			import uviface.viz.UFlareVis;
+			import uviface.viz.display.UEdge;
+			
+			import flare.util.Colors;
+			
+			public static var useRulesForDataLoading:Boolean = true;
+			
+			//private var _compareModeActivated:Boolean = false;
+			//private var _glowModeActivated:Boolean = false;
+			
+			//public static var edgeLabelColor:uint = UColors.WHITE;
+			//public static var edgeLabelVisible:Boolean = true;
+			
+			[Bindable]
+			private var _controlPanelLabels:Array = ["General","Nodes","Edges"];
+			
+			private function selectControlPanel(event:ItemClickEvent):void {
+				switch(event.index) {
+					case 0: {
+					         GeneralConfigurationBox.visible = true;
+					         NodeConfigurationBox.visible = false;
+					         EdgeConfigurationBox.visible = false;
+					         break;
+					}
+					case 1: {
+					         GeneralConfigurationBox.visible = false;
+					         NodeConfigurationBox.visible = true;
+					         EdgeConfigurationBox.visible = false;
+					         break;
+					}
+					case 2: {
+					         GeneralConfigurationBox.visible = false;
+					         NodeConfigurationBox.visible = false;
+					         EdgeConfigurationBox.visible = true;
+					         break;
+					}
+					default: {
+					         GeneralConfigurationBox.visible = true;
+					         NodeConfigurationBox.visible = false;
+					         EdgeConfigurationBox.visible = false;
+					         break;
+					}
+				}
+			}
+			
+			private function setQuickAccesOnlyMenu():void {
+				ControlPanelLinkBar.dispatchEvent(new UQuickAccessEvent(UQuickAccessEvent.QUICK_ACCESS_EVENT, UQuickAccessEvent.NOTHING,
+				   !PopUpMenuesAllowedCheckBox.selected, true))
+			}
+			
+			private function setBackgroundColor():void {
+				var backgroundColorEvent:UQuickAccessEvent = new UQuickAccessEvent(UQuickAccessEvent.QUICK_ACCESS_EVENT, UQuickAccessEvent.NOTHING, false, true);
+				backgroundColorEvent.backgroundColorChange = true;
+				backgroundColorEvent.applicationBackgroundColor = BackgroundColorPicker.selectedColor;//.value;
+				ControlPanelLinkBar.dispatchEvent(backgroundColorEvent);
+			}
+			
+			/** Sends an enter compare mode event to the UViz.mxml main class. */
+			/* private function activateCompareMode():void {
+				
+				// we have to make sure that no query was processed before, otherwise we get strange errors
+				if(!mx.core.Application.application.firstQueryProcessed())
+				   return;
+				
+				// check, if the compare mode is active currently
+				if(_compareModeActivated) {
+					_compareModeActivated = false;
+					CompareButton.emphasized = false;
+					CompareButton.setStyle("fillAlphas",["0.0", "0.0", "1.0", "1.0"]); 
+					CompareButton.setStyle("fillColors",["#020202", "#010101", "#02FCE7", "#02FCE7"]);
+					GlowButton.enabled = false;
+					GlowButton.emphasized = false;
+					GlowButton.setStyle("fillAlphas",["0.0", "0.0", "1.0", "1.0"]); 
+					GlowButton.setStyle("fillColors",["#020202", "#010101", "#02FCE7", "#02FCE7"]);
+					CompareButton.dispatchEvent(new UCompareModeEvent(UCompareModeEvent.DEACTIVATE_COMPARE_MODE,true));
+					//return;
+				}
+				else {
+					_compareModeActivated = true;
+					CompareButton.emphasized = true;
+					CompareButton.setStyle("fillAlphas",["1.0", "1.0", "1.0", "1.0"]); 
+					CompareButton.setStyle("fillColors",["#02FCE7", "#02FCE7", "#02FCE7", "#02FCE7"]);
+					GlowButton.enabled = true;
+					GlowButton.emphasized = false;
+					CompareButton.dispatchEvent(new UCompareModeEvent(UCompareModeEvent.ACTIVATE_COMPARE_MODE,true));
+				}
+				
+			}
+			
+			private function activateGlowMode():void {
+				
+				// we do not want glow mode in lineage mode
+				if(UFlareVis.lineageMode)
+				   return;
+				
+				// check, if the compare mode is active currently
+				if(_glowModeActivated) {
+					_glowModeActivated = false;
+					GlowButton.emphasized = false;
+					GlowButton.setStyle("fillAlphas",["0.0", "0.0", "1.0", "1.0"]); 
+					GlowButton.setStyle("fillColors",["#020202", "#010101", "#02FCE7", "#02FCE7"]);
+					CompareButton.dispatchEvent(new UCompareModeEvent(UCompareModeEvent.DEACTIVATE_GLOW_MODE,true));
+					//return;
+				}
+				else {
+					_glowModeActivated = true;
+					GlowButton.emphasized = true;
+					GlowButton.setStyle("fillAlphas",["1.0", "1.0", "1.0", "1.0"]); 
+					GlowButton.setStyle("fillColors",["#02FCE7", "#02FCE7", "#02FCE7", "#02FCE7"]);
+					CompareButton.dispatchEvent(new UCompareModeEvent(UCompareModeEvent.ACTIVATE_GLOW_MODE,true));
+				}
+			} */
+			
+			private function handleNumOfFactsChange():void {
+				var factsEvent:URequestAllFactsEvent = new URequestAllFactsEvent(
+				                 URequestAllFactsEvent.CHANGE_NUM_OF_RESULT_FACTS,true);
+				factsEvent.numOfResultFacts = DataLoadResultNumberStepper.value;
+				DataLoadResultNumberStepper.dispatchEvent(factsEvent);
+			}
+			
+			private function handleDataLoadingChange():void {
+				if(RuleProcessingCheckBox.selected)
+				   useRulesForDataLoading = true;
+				else
+				   useRulesForDataLoading = false;
+			}
+			
+			private function handleNodeOrLabelColorChange(doLabelColorChange:Boolean):void {
+            	
+            	var colorChangeEvent:UNodeAndLabelColorEvent = new UNodeAndLabelColorEvent(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT, 
+            		           doLabelColorChange, true);
+            	// set the node color
+            	colorChangeEvent.nodeColor = computeAlphaRGB(NodeColorPicker.selectedColor);
+            	// set the node alpha
+            	colorChangeEvent.nodeAlpha = NodeAlphaSlider.value;
+            	// set the node label color
+            	colorChangeEvent.labelColor = NodeLabelColorPicker.selectedColor;
+            	// send the event
+            	NodeLabelColorPicker.dispatchEvent(colorChangeEvent);
+                
+            }
+            
+            private function handleEdgeColorChange(setTrueEdgeColor:Boolean):void {
+            	
+            	var colorChangeEvent:UNodeAndLabelColorEvent = new UNodeAndLabelColorEvent(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT, 
+            		           false, true);
+            	// set edge coloring to true
+            	colorChangeEvent.doEdgeColoring = true;
+            	// indicate if to set the color for the true-edges or the false-edges
+            	colorChangeEvent.setTrueEdgeColor = setTrueEdgeColor;
+            	// now set the new color itself
+            	if(setTrueEdgeColor)
+            	    colorChangeEvent.edgeColor = computeAlphaRGB(TrueEdgeColorPicker.selectedColor,1.0);
+            	else
+            	    colorChangeEvent.edgeColor = computeAlphaRGB(FalseEdgeColorPicker.selectedColor,1.0);
+            	// send the event
+            	TrueEdgeColorPicker.dispatchEvent(colorChangeEvent);
+                
+            }
+            
+             private function handleEdgeAlphaChange():void {
+            	
+            	var colorChangeEvent:UNodeAndLabelColorEvent = new UNodeAndLabelColorEvent(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT, 
+            		           false, true);
+            	
+            	// set edge coloring to true
+            	colorChangeEvent.doEdgeColoring = true;
+            	
+            	// set edge alpha changing to true
+            	colorChangeEvent.changeEdgeAlpha = true;
+            	
+            	if(EdgeAlphaCheckBox.selected)
+            	   colorChangeEvent.useEdgeAlpha = true;
+            	else
+            	   colorChangeEvent.useEdgeAlpha = false;
+          
+            	// send the event
+            	EdgeAlphaCheckBox.dispatchEvent(colorChangeEvent);           
+            }
+            
+            private function handleEdgeLabelVisibilityChange():void {
+            	
+            	var colorChangeEvent:UNodeAndLabelColorEvent = new UNodeAndLabelColorEvent(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT, 
+            		           false, true);
+            	
+            	// set edge coloring to true
+            	colorChangeEvent.doEdgeColoring = true;
+            	
+            	// change the visibility change flag
+            	colorChangeEvent.changeLabelVisibility = true;
+            	// change the flag
+               // edgeLabelVisible = !edgeLabelVisible;
+          
+            	// send the event
+            	EdgeAlphaCheckBox.dispatchEvent(colorChangeEvent);           
+            }
+            
+            private function handleEdgeLabelColorChange():void {
+            	
+            	var colorChangeEvent:UNodeAndLabelColorEvent = new UNodeAndLabelColorEvent(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT, 
+            		           true, true);
+            	
+            	// set edge coloring to true
+            	colorChangeEvent.doEdgeColoring = true;
+            	
+            	// change the edge label color
+            	colorChangeEvent.labelColor = EdgeLabelColorPicker.selectedColor;	
+            	
+            	//edgeLabelColor = EdgeLabelColorPicker.selectedColor;
+          
+            	// send the event
+            	EdgeAlphaCheckBox.dispatchEvent(colorChangeEvent);           
+            }
+            
+            /*
+            private function toggleContextSpritesVisibility():void {
+            	
+            	var contextSpritesEvent:UNodeAndLabelColorEvent = new UNodeAndLabelColorEvent(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT, 
+            		           true, true);
+            	
+            	// toggle the visibility of the context sprites
+            	contextSpritesEvent.changeContextNodesVisibility = true;
+          
+            	// send the event
+            	ContextSpritesVisibilityCheckBox.dispatchEvent(contextSpritesEvent);      
+            }
+            */
+            
+            
+            public static function computeAlphaRGB(rgb:uint, newAlpha:uint = 0):uint{
+			  //newAlpha has to be in the 0 to 255 range
+			  var alphaRGB:uint = 0;
+			  alphaRGB += (newAlpha<<24);
+			  alphaRGB += (rgb);
+			  return alphaRGB;
+			}
+			
+			public static function alphaRGB(rgb:uint, newAlpha:uint = 0):uint{
+			  //newAlpha has to be in the 0 to 255 range
+			  
+			  rgb = Colors.setAlpha(rgb, uint(255*newAlpha)%256);
+			  
+			  return rgb;
+			}
+			
+			
+			
+			public function updateDataStatistics(flareVis:UFlareVis):void {
+				//if(flareVis)
+				VisStatisticsBox.updateDataStatistics(flareVis);
+			}
+			
+			public function updateMemoryConsumption():void {
+				VisStatisticsBox.updateMemoryConsumption();
+			}
+			
+			public function updateFrameRate():void {
+				VisStatisticsBox.updateFrameRateCounter();
+			}
+			
+			public function hide():void {
+				this.visible = false;
+				this.includeInLayout = false;
+			}
+			
+			public function show():void {
+				this.visible = true;
+			}
+			
+			public function handleVisibilityButtonClick():void {
+				if(this.visible)
+				   hide();
+				else
+				   show();
+			}
+			
+			private function handleEdgeLineageIndicationChange():void {
+				LineageIndicationBox.dispatchEvent(new ULineageIndicationEvent(
+				           ULineageIndicationEvent.LINEAGE_INDICATION_EVENT,LineageIndicationBox.selected,true));
+			}
+			
+		]]>
+	</mx:Script>
+	
+	<mx:Style>
+
+		.buttons
+		{
+			font-family: "Verdana";
+			font-color: white;
+			color: white;
+			fill-color: #3F3F3F;
+			font-size: 10px;
+			letter-spacing: 1px;
+			selected-color: #00ff12;
+			roll-over-color: #00ff12;
+            padding-left: 2;
+            padding-right: 2
+		}
+		
+	</mx:Style>
+	
+	<mx:Canvas width="775" height="65" borderStyle="solid" cornerRadius="15" borderThickness="2" backgroundColor="#3F3F3F" 
+		backgroundAlpha="1.0" borderColor="#6D6E6F" alpha="1.0" color="#FDFEFE">
+			<mx:HBox width="100%" height="30" horizontalAlign="center" verticalAlign="middle" paddingTop="2" color="#FDFFFF" horizontalGap="20">
+				<mx:Label text="Configuration Menu:" fontFamily="Arial" fontSize="12" fontWeight="bold"/>
+				<!--
+				<mx:HBox horizontalAlign="center" verticalAlign="middle" horizontalGap="2" backgroundColor="#FCFCFC" cornerRadius="20" borderStyle="none" borderThickness="3" backgroundAlpha="0.0" borderColor="#FDFEFF">
+					<mx:Button 
+						id="CompareButton" 
+						label="Comparison Mode" 
+						toolTip="Toggle Comparison Mode" 
+						fontSize="10" 
+						paddingBottom="0" 
+						paddingTop="0" 
+						paddingLeft="0" 
+						paddingRight="0"
+						click="activateCompareMode();" 
+						color="#FEFEFE"  
+						themeColor="#02FCE7"
+						cornerRadius="5" 
+						fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+						fillColors="[#020202, #010101, #02FCE7, #02FCE7]" 
+						borderColor="#FCFDFD" labelPlacement="top"
+					    textAlign="center"/>
+					<mx:Button 
+						id="GlowButton" 
+						label="Glow Mode" 
+						toolTip="Toggle Glow Mode" 
+						fontSize="10" 
+						paddingBottom="0" 
+						paddingTop="0" 
+						paddingLeft="0" 
+						paddingRight="0"
+						click="activateGlowMode();" 
+						color="#FFFEFE" 
+						themeColor="#02FCE7"
+						enabled="false"
+						cornerRadius="5" 
+						fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+						fillColors="[#020202, #000000, #02FCE7, #02FCE7]" 
+						borderColor="#FCFDFD"  labelPlacement="top"
+					    textAlign="center"/>
+				</mx:HBox>
+				-->
+				<mx:ToggleButtonBar id="ControlPanelLinkBar" dataProvider="{_controlPanelLabels}" 
+				    itemClick="selectControlPanel(event);" color="#030303" fontWeight="bold" 
+				    borderStyle="solid" cornerRadius="5" borderThickness="0" backgroundColor="#3f3f3f" 
+				    fontSize="9" toolTip="Select 'General' for general configuration options for UViz. 
+				    'Nodes' provides configuration options for th nodes and 'Edges' for the edges visualized in UViz."
+				    buttonStyleName="buttons"/>
+				<ns1:UMemoryStatisticsBox id="VisStatisticsBox" backgroundAlpha="0.0" borderThickness="0" color="#FEFBFB"/>
+			</mx:HBox>
+			
+			<mx:HRule y="32" left="25" right="25"/>
+			
+			<mx:HBox width="100%" height="25" horizontalAlign="center" verticalAlign="middle" 
+				borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" 
+				backgroundAlpha="0.0" horizontalGap="5" borderColor="#FCFAFA" fontSize="10" 
+				color="#030303" y="35" id="GeneralConfigurationBox" fontWeight="normal" includeInLayout="false"
+			    hideEffect="ZoomOut" showEffect="ZoomIn" visible="true">
+				<mx:CheckBox 
+					id="PopUpMenuesAllowedCheckBox" 
+					label="Pop-Up Menues?" 
+					color="#FCFBFB" 
+					selected="true" 
+					enabled="true" 
+					fontWeight="bold" 
+					fontSize="9" 
+					click="setQuickAccesOnlyMenu();"
+					toolTip="Decide if UViz should pop-up the control panels when moving the mouse to the display borders, or not." fontFamily="Verdana"/>
+				<mx:VRule height="22" strokeColor="#020202"/>
+				<mx:CheckBox 
+					id="CachingUsageCheckBox" 
+					label="Caching on Server?" 
+					color="#FCFBFB" 
+					selected="true" 
+					enabled="true" 
+					fontWeight="bold" 
+					fontSize="9" 
+					toolTip="Decide if UViz should tell the server to use caching of results and rules, or not." fontFamily="Verdana"/>
+				<mx:VRule height="22" strokeColor="#020202"/>
+				<mx:CheckBox 
+					id="RuleProcessingCheckBox" 
+					label="Process Rules?" 
+					color="#FEFCFC" 
+					selected="true" 
+					enabled="true" 
+					fontSize="9" 
+					fontWeight="bold" 
+					fontFamily="Verdana" 
+					click="handleDataLoadingChange();"
+					toolTip="Activate/Deactivate the rule processing for the URDF reasoner."/>
+				<mx:VRule height="22" strokeColor="#010101" strokeWidth="2"/>
+				<mx:Label id="DataLoadResultNumberBoxLabel" text="Max. # Facts/Result  [1,300]:" fontWeight="bold" color="#FEFEFE" fontSize="9" fontStyle="normal" textDecoration="normal" fontFamily="Verdana"/>
+				<mx:NumericStepper id="DataLoadResultNumberStepper" value="100" minimum="0" maximum="300" stepSize="1" enabled="true" 
+					change="handleNumOfFactsChange();" width="47" height="20" toolTip="Determine how many result facts should be returned by the server."/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+				<mx:Label id="BackgroundColorLabel" text="Background Color:" color="#FBFAFA" fontSize="9" fontWeight="bold"/>
+				<mx:ColorPicker 
+					id="BackgroundColorPicker" change="setBackgroundColor();" width="15" height="15" toolTip="Set the background color for UViz."/>
+			</mx:HBox>
+			
+			<mx:HBox width="100%" height="25" horizontalAlign="center" verticalAlign="middle" 
+				borderStyle="solid" cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" 
+				backgroundAlpha="0.0" horizontalGap="10" borderColor="#FCFAFA" fontSize="10" 
+				color="#030303" y="35" id="NodeConfigurationBox" fontWeight="normal" includeInLayout="false"
+			    hideEffect="ZoomOut" showEffect="ZoomIn" visible="false">
+				<mx:Label id="NodeColorLabel" text="Node Color:" color="#FDFAFA" fontSize="9" fontWeight="bold"/>
+				<mx:ColorPicker 
+					id="NodeColorPicker" change="handleNodeOrLabelColorChange(false)" width="15" height="15" toolTip="Set the node color for UViz."/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+				<mx:Label id="NodeAlphaLabel" text="Node Alpha [0,1]:" color="#FDFBFB" fontSize="9" fontWeight="bold"/>
+				<mx:HSlider width="150" minimum="0" maximum="1" enabled="true" 
+					height="20" 
+					value="1"
+				    snapInterval="0.1" 
+					id="NodeAlphaSlider" 
+					change="handleNodeOrLabelColorChange(false)" 
+					borderColor="#FEFEFE"
+					labels="[0,2,4,6,8,1.0]"
+					toolTip="Set the node alpha value for UViz." 
+					labelStyleName="MySliderLabel" 
+					labelOffset="0"/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+				<mx:Label id="NodeLabelColorLabel" text="Node Label Color:" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+				<mx:ColorPicker 
+					id="NodeLabelColorPicker" 
+					change="handleNodeOrLabelColorChange(true)" 
+					width="15" 
+					height="15"
+					toolTip="Set the node label color for UViz."/>	
+			</mx:HBox>
+			
+			<mx:HBox width="100%" height="25" horizontalAlign="center" verticalAlign="middle" borderStyle="solid" 
+				cornerRadius="10" borderThickness="0" backgroundColor="#E0DEDE" backgroundAlpha="0.0" 
+				horizontalGap="4" borderColor="#FCFAFA" fontSize="10" color="#030303" y="35" 
+				id="EdgeConfigurationBox" includeInLayout="false" hideEffect="ZoomOut" showEffect="ZoomIn" visible="false">	
+				<mx:CheckBox 
+					id="EdgeAlphaCheckBox" 
+					label="Use Edge Alpha?" 
+					color="#FEFCFC" 
+					selected="true" 
+					enabled="true" 
+					fontSize="9" 
+					fontWeight="bold" 
+					fontFamily="Verdana" 
+					click="handleEdgeAlphaChange();"
+					toolTip="Specify if fact confidences should influence the alpha value encodings for the edges."/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+				<mx:CheckBox 
+					id="EdgeLabelsUsedCheckBox" 
+					label="Use Edge Labels?" 
+					color="#FCFBFB" 
+					selected="false" 
+					enabled="true" 
+					fontWeight="bold" 
+					fontSize="9" 
+					click="handleEdgeLabelVisibilityChange();"
+					toolTip="Decide if UViz should display edge labels or not." fontFamily="Verdana"/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+				<mx:CheckBox 
+					id="LineageIndicationBox" 
+					label="Indicate Lineage?" 
+					color="#FEFCFC" 
+					selected="false" 
+					enabled="true" 
+					fontSize="9" 
+					fontWeight="bold" 
+					fontFamily="Verdana" 
+					click="handleEdgeLineageIndicationChange();"
+					toolTip="Specify if a cross on the edge should indicate available lineage information."/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+				<mx:Label id="EdgeLabelColorLabel" text="Edge Label Color:" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+				<mx:ColorPicker 
+					id="EdgeLabelColorPicker" 
+					change="handleEdgeLabelColorChange()" 
+					width="15" 
+					height="15"
+					toolTip="Set the edge label color for UViz." selectedColor="0xffffffff"/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+			    <mx:Label id="TrueEdgesColorLabel" text="Edge Color (True):" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+				<mx:ColorPicker 
+					id="TrueEdgeColorPicker" 
+					change="handleEdgeColorChange(true)" 
+					width="15" 
+					height="15"
+					toolTip="Set the color for true-edges (set to true by the URDF reasoner) in UViz." enabled="true"/>
+				<mx:VRule height="22" strokeColor="#010101"/>
+			    <mx:Label id="FalseEdgesColorLabel" text="Edge Color (False):" color="#FFFFFF" fontSize="9" fontWeight="bold"/>
+				<mx:ColorPicker 
+					id="FalseEdgeColorPicker" 
+					change="handleEdgeColorChange(false)" 
+					width="15" 
+					height="15"
+					toolTip="Set the color for false-edges (set to false by the URDF reasoner) in UViz." enabled="true"/>
+			</mx:HBox>
+	</mx:Canvas>
+	
+	<mx:WipeUp id="wipeToTopIn" duration="500"/>
+	<mx:WipeDown id="wipeToBottomOut" duration="500"/> 
+	
+	<mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0"/>
+        
+    <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0"/>
+	
+</mx:ApplicationControlBar>

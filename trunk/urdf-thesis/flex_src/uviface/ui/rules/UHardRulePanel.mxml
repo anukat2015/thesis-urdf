@@ -1,0 +1,598 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="765" 
+	height="265"
+	xmlns:ac="com.hillelcoren.components.*" 
+    borderStyle="none"
+    backgroundColor="#3F3F3F" 
+    fontFamily="Arial"
+    xmlns:rules="uviface.ui.rules.*" 
+    xmlns:query="uviface.ui.query.*" 
+    xmlns:tooltip="uviface.ui.tooltip.*"
+    creationComplete="onCreationComplete();" fontSize="10"
+    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+	
+	<mx:Script>
+		<![CDATA[
+			import urdf.api.ULiteral;
+			import urdf.api.UHardRule;
+			import urdf.api.URelation;
+			import mx.events.ListEvent;
+			import mx.events.ItemClickEvent;
+			import mx.collections.ArrayCollection;
+			import mx.collections.SortField;
+            import mx.collections.Sort;
+            
+            import uviface.event.*;
+	        
+	        import uviface.ui.tooltip.UStringToolTip;
+	        
+	        import mx.controls.Alert;  
+	        
+	        // a flag to determine if the hard rule cache on the server should be cleared
+	        // and a new list of hard rules should be used
+	        private var _hardRulesChanged:Boolean = false;
+	        
+	        [Bindable]
+	        private var _hardRuleLiterals:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _availableHardRules:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _selectedHardRules:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			private var _availableRulesButtonLabels:Array = ["NEW","DELETE","SELECT","SELECT ALL"];
+			[Bindable]
+			private var _selectedRulesButtonLabels:Array = ["DESELECT","DESELECT ALL"];
+			[Bindable]
+			private var _LiteralConfigButtonLabels:Array = ["ADD","CHANGE","DELETE"];
+			
+			private var _currentActiveHardRules:Array = new Array();
+			
+			[Bindable]
+			private var _dropDown:ClassFactory;	
+			[Bindable]
+			private var _dropDownStringOnly:ClassFactory;	
+			
+			private function onCreationComplete():void {
+				// add the event listener for the string change event
+				HardRuleGrid.addEventListener(UStringChangeEvent.STRING_CHANGE_EVENT,handleLiteralChange,false,0,true);
+				_dropDown = new ClassFactory(List);
+				_dropDown.properties = {showDataTips:true, dataTipFunction:dataTipProducer};
+				_dropDownStringOnly = new ClassFactory(List);
+				_dropDownStringOnly.properties = {showDataTips:true, dataTipFunction:dataTipProducerStringOnly}
+				//adjustHardRuleToolTipPosition();
+			}
+			
+			private function dataTipProducer(value:Object):String{
+				return produceRuleString(value);//value.label;
+			}
+			
+			private function dataTipProducerStringOnly(value:Object):String{
+				return value as String;
+			}
+			
+			/*
+			private function adjustHardRuleToolTipPosition(event:MouseEvent):void {
+				HardRuleStringToolTip.x = this.contentMouseX;//event.localX;//this.contentMouseX;
+				HardRuleStringToolTip.y = this.contentMouseY + 20;//event.localY;//this.contentMouseY + 20;
+				HardRuleStringToolTip.visible = true;
+			}
+			
+			private function adjustHardRuleToolTipPosition():void {
+				HardRuleStringToolTip.x = this.parent.x + (0.5 * this.parent.width) - (0.5 * HardRuleStringToolTip.width);// contentMouseX;//event.localX;//this.contentMouseX;
+				HardRuleStringToolTip.y = this.parent.y - 85 - HardRuleStringToolTip.height;// - 50;//this.contentMouseY + 20;//event.localY;//this.contentMouseY + 20;
+				//HardRuleStringToolTip.visible = true;
+			}
+			
+			private function hideHardRuleStringToolTip():void {
+				HardRuleStringToolTip.visible = false;
+			}
+			*/
+			public function set hardRules(hardRules:Array):void {
+
+                // we take the received default hard rules from the server
+                // as our current hard rules to use
+                _currentActiveHardRules = hardRules;
+
+                // remove all available and selected hard rules 
+                // and used literals first
+                _availableHardRules.removeAll();
+                _selectedHardRules.removeAll();
+                _hardRuleLiterals.removeAll();
+                var hardRule:UHardRule;
+                var literal:ULiteral;
+                var hardRuleObject:Object;
+                //var literalObject:Object;
+                //var index:int = 0;
+                var literals:Array;
+                //var literalsObjectArray:Array;//  = new Array();;
+				
+				/*
+				for(var index:int = 0; index<hardRules.length; index++) {
+					trace("hardRule : " + hardRules[index].toString());
+				}
+				*/
+				
+				if(hardRules != null && hardRules.length > 0) {
+					
+					for each (hardRule in hardRules) {
+						//trace("hardRule : " + hardRule.toString());
+						hardRuleObject = new Object();
+						// set the name of the hard rule
+						hardRuleObject.Name = hardRule.getName();
+						// set the label of the hard rule
+						hardRuleObject.label = hardRule.getName() + " - " + hardRule.toString();
+						// an array of literal objects
+						//while(literalsObjectArray.length > 0)
+						   //literalsObjectArray.pop();
+						var literalsObjectArray:Array = new Array();
+						// get the literals from the hard rule
+						literals = hardRule.getLiterals();
+						
+						for each (literal in literals) {
+						   var literalObject:Object = new Object();
+						   literalObject.Subject = literal.getFirstArgumentName();
+						   literalObject.Predicate = literal.getRelationName();
+						   literalObject.Object = literal.getSecondArgumentName();
+						   // add the current literal object to the hard rule literal objects array
+						   literalsObjectArray.push(literalObject);
+						   //trace("literal : " + literalObject.Subject + " , " +  literalObject.Predicate + " , " + literalObject.Object);
+						}
+						// add the literals to the current hard rule object
+						hardRuleObject["Literals"] = literalsObjectArray;
+						// add this hard rule object to the internal list of default hard rules
+						_availableHardRules.addItem(hardRuleObject);
+					}
+				}
+				
+				// indicate that all soft rulesa are used per default
+				handleRuleSelectAllButtonClick();
+			}
+			
+			public function get hardRules():Array {
+				return _currentActiveHardRules;
+			}
+			
+			private function produceRuleString(hardRuleObject:Object):String {
+				var ruleString:String = hardRuleObject.Name + ":  ";
+				var literalObject:Object;
+				for each (literalObject in hardRuleObject.Literals) {
+				   ruleString += literalObject.Predicate + " (" + literalObject.Subject + " , " + literalObject.Object + ") ^";	
+				}
+				ruleString = ruleString.substring(0,ruleString.lastIndexOf("^"));
+				return ruleString;
+				
+			}
+			
+			private function handleAvailableHardRuleListClick():void {
+				//var index:int = HardRuleComboBox;
+			    var hardRuleObject:Object = AvailableRulesList.selectedItem;//HardRuleComboBox.selectedItem;//_hardRules[index];
+			    //trace("index = " + index);
+			    //var literalObject:Object;
+			    //var literalString:String;
+			    // set the hard rule name
+			    HardRuleNameLabel.text = hardRuleObject.Name;
+			    
+			    // set the values of the literals
+			    //HardRuleGrid.dataProvider = hardRuleObject.Literals;
+			    _hardRuleLiterals.source = hardRuleObject.Literals;
+			    //trace("literals are: " + _hardRuleLiterals.toString());
+			    
+			    // update rule text
+				//HardRuleStringToolTip.toolTipText = produceRuleString(hardRuleObject);
+			    //adjustHardRuleToolTipPosition();
+			}
+			
+			private function handleAvailableRulesButtonClick():void {
+				
+				var index:int = AvailableRulesButtonBar.selectedIndex;
+				switch(index) {
+					case 0: handleRuleNewButtonClick();break;
+					case 1: handleRuleDeleteButtonClick();break;
+					case 2: handleRuleSelectButtonClick();break;
+					case 3: handleRuleSelectAllButtonClick();break;
+				}
+			}
+			
+			private function handleRuleNewButtonClick():void {
+				var hardRuleObject:Object = new Object();
+				// set the name of the hard rule
+				hardRuleObject.Name = "H" + (_availableHardRules.length + 1).toString();
+				// add the literals to the current hard rule object
+				hardRuleObject["Literals"] = new Array();
+				
+				// set a default literal
+				var literalObject:Object = new Object();
+				literalObject.Subject = "?X";
+				literalObject.Predicate = "livesIn";
+				literalObject.Object = "??Y";
+				(hardRuleObject["Literals"] as Array).push(literalObject);
+				
+				// set the label of the hard rule
+				hardRuleObject.label = hardRuleObject.Name + " - " + literalObject.Predicate + "(" + literalObject.Subject + ", " + literalObject.Object + ")";
+				
+				_availableHardRules.addItem(hardRuleObject);	
+				
+				// select the new rule
+				AvailableRulesList.selectedItem = hardRuleObject;
+				
+				// select the new rule directly
+				handleAvailableHardRuleListClick();
+				
+				// we potentially changed a hard rule 
+				_hardRulesChanged = true;
+			}
+			
+			private function handleRuleDeleteButtonClick():void {
+				var availableIndex:int = AvailableRulesList.selectedIndex;
+				if(availableIndex < 0)
+				   return;
+				var selectedIndex:int = _selectedHardRules.getItemIndex(AvailableRulesList.selectedItem);
+				if(selectedIndex >= 0)
+				   _selectedHardRules.removeItemAt(selectedIndex);
+				_availableHardRules.removeItemAt(availableIndex);
+				// we potentially changed a hard rule 
+				_hardRulesChanged = true;
+			}
+			
+			private function handleRuleSelectButtonClick():void {
+				var index:int = AvailableRulesList.selectedIndex;
+				//var hardRuleObject:Object = _availableHardRules.getItemAt(index);
+				if(_selectedHardRules.contains(AvailableRulesList.selectedItem))
+				   return;
+				_selectedHardRules.addItem(AvailableRulesList.selectedItem);
+				//_selectedHardRules.refresh();
+				// we potentially changed a hard rule 
+				_hardRulesChanged = true;
+			}
+			
+			private function handleRuleSelectAllButtonClick(hardRulesChanged:Boolean = true):void {
+				// clear the selected hard rules
+				_selectedHardRules.removeAll();
+				var hardRuleObject:Object;
+				for each (hardRuleObject in _availableHardRules) {
+					_selectedHardRules.addItem(hardRuleObject);
+				}
+				// we potentially changed a hard rule 
+				if(hardRulesChanged)
+				   _hardRulesChanged = true;
+			}
+			
+			private function handleSelectedRulesButtonClick():void {
+				
+				var index:int = SelectedRulesButtonBar.selectedIndex;
+				switch(index) {
+					case 0: handleRuleDeselectButtonClick();break;
+					case 1: handleRuleDeselectAllButtonClick();break;
+				}
+			}
+			
+			private function handleRuleDeselectButtonClick():void {
+				var selectedIndex:int = _selectedHardRules.getItemIndex(SelectedRulesList.selectedItem);
+				if(selectedIndex < 0)
+				   return;
+				_selectedHardRules.removeItemAt(selectedIndex);
+				// we potentially changed a hard rule 
+				_hardRulesChanged = true;
+			}
+			
+			private function handleRuleDeselectAllButtonClick():void {
+				_selectedHardRules.removeAll();
+				// we potentially changed a hard rule 
+				_hardRulesChanged = true;
+			}
+			
+			/*
+			private function handleLiteralsRowClicked():void {
+				var index:int = HardRuleGrid.selectedIndex;
+				if(index < 0)
+				   return;
+			    var literalObject:Object = _hardRuleLiterals.getItemAt(index);//HardRuleGrid.selectedItem;//HardRuleComboBox.selectedItem;//_hardRules[index];
+			    
+			    // set the values of the literals
+			    //HardRuleGrid.dataProvider = hardRuleObject.Literals;
+			    LiteralEditor.firstArgument = literalObject.Subject;
+			    //trace("literalObject.Predicate = " + literalObject.Predicate);
+			    LiteralEditor.relation = literalObject.Predicate;
+			    LiteralEditor.secondArgument = literalObject.Object; 	
+			}
+			*/
+			
+			private function handleLiteralChange(event:UStringChangeEvent = null):void {
+				
+				 // first, try to make sure we have a conform literal
+				 /*
+				 if(!LiteralEditor.validateHardRuleLiteral()) {
+				 	Alert.show("Change literal to match the default schema: subject = single '?' + x-chars " + 
+				 			", predicate = item selected from list or single '?' + x-chars and object = single '??' + x-chars."
+				 			, "Literal Schema Mismatch Error", 4, LiteralEditor); 
+				    return;
+				 }
+				 */
+				
+				 var index:int = HardRuleGrid.selectedIndex;
+				 
+				 if(index < 0)
+				    return;
+				 
+				 var literalObject:Object = _hardRuleLiterals.getItemAt(index);
+				 
+				 switch(event.componentToChange) {
+				 	case UStringChangeEvent.SUBJECT: {literalObject.Subject = event.changedString; break;}
+				 	case UStringChangeEvent.PREDICATE: {literalObject.Predicate = event.changedString; break;}
+				 	case UStringChangeEvent.OBJECT: {literalObject.Object = event.changedString; break;}
+				 	default : {literalObject.Predicate = event.changedString; break;}
+				 }
+				 
+				 // signalize that the item was updated
+				 _hardRuleLiterals.itemUpdated(literalObject);
+				 
+				 var hardRuleObject:Object = _availableHardRules.getItemAt(AvailableRulesList.selectedIndex);
+				 
+				 // set the label of the hard rule
+				 hardRuleObject.label = hardRuleObject.Name + " - " + literalObject.Predicate + "(" + literalObject.Subject + ", " + literalObject.Object + ")";
+				 
+				 // change the current selected hard rule
+				 hardRuleObject.Literals = _hardRuleLiterals.source;
+				 
+				 // update the current soft rule
+				 _availableHardRules.itemUpdated(hardRuleObject);
+				 //update the soft ruel if it is selected
+				 _selectedHardRules.itemUpdated(hardRuleObject);
+				 
+				 // update rule text
+				 //HardRuleStringToolTip.toolTipText = produceRuleString(hardRuleObject);
+				 //adjustHardRuleToolTipPosition();
+				 
+				 // we potentially changed a hard rule 
+				_hardRulesChanged = true;
+			}
+			
+			private function buildHardRule(hardRuleObject:Object):Boolean {
+			
+				var literalArray:Array = new Array();
+				
+				for each(var literal:Object in hardRuleObject["Literals"]) {
+					
+					//literal.adjustArguments();
+					
+					var subject:String = literal.Subject;
+					if(subject == null || subject == "")
+					   continue; // we skip this literal, in case there is a undefined value
+					var predicate:String = literal.Predicate;
+					if(predicate == null || predicate == "")
+					   continue; // we skip this literal, in case there is a undefined value
+					var object:String = literal.Object;
+					if(object == null || object == "")
+					   continue; // we skip this literal, in case there is a undefined value
+					   
+					//no empty values -> build the query literal
+					var tempLiteral:ULiteral = new ULiteral();
+					//var tempLiteral:ULiteral = new ULiteral(URelation.valueOfRelation(rel),arg1,arg2);
+					tempLiteral.initLiteralFull(URelation.valueOfRelation(predicate),subject,object);
+					
+					// add this literal to the query
+					literalArray.push(tempLiteral);
+					
+					//trace("arg1 : " + arg1 + " , rel : " + rel + " , arg2 : " + arg2);
+				}
+				
+				if(literalArray.length == 0) {
+				   // we need the number 1 to show the suitable text in the popup window
+				   //createQueryErrorPopUp(VALUE);
+				   mx.core.Application.application.UVizErrorPanel.writeHardRuleLiteralError(hardRuleObject.Name);
+		    	   mx.core.Application.application.UVizErrorPanel.show();
+				   //Alert.show("There is a value missing in one of the literal components of hard rule " + hardRuleObject.Name + "!", 
+				     //         "Literal Value Missing Error", 4, AvailableRulesList);
+				   return false;
+				}
+				
+				//this._query = new UQuery();
+				var hardRule:UHardRule = new UHardRule();
+				// we have only one entry in the hard rule so far
+				// could that change later ??
+				hardRule.initHardRule(hardRuleObject.Name,literalArray[0]);
+				_currentActiveHardRules.push(hardRule); 
+				
+				return true;
+			}
+			
+			public function buildHardRuleList():void {
+				
+				// first, clear the current hard rule list
+				while(_currentActiveHardRules.length > 0) {
+					_currentActiveHardRules.pop();
+				}
+				
+				var hardRuleObject:Object;
+				for each (hardRuleObject in _selectedHardRules) {
+					// if something is not ok -> abort
+					if(!buildHardRule(hardRuleObject))
+					   return;
+				}
+				
+				//var changeRulesEvent:UQueryEvent = new UQueryEvent(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY,null,true);
+				//this.dispatchEvent(new UQueryEvent(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY,null,true));
+				//changeRulesEvent.hardRulesChanged = _hardRulesChanged;
+				//this.dispatchEvent(changeRulesEvent,null,true));
+				
+				// reset the flag
+				//_hardRulesChanged = false;
+			}
+			
+			public function get hardRulesChanged():Boolean {
+				var tempChange:Boolean = _hardRulesChanged;
+				_hardRulesChanged = false;
+				//trace("temp change is : " + tempChange);
+				return tempChange;
+			}
+			
+			public function resetHardRules():void {
+				// we pass a 2 as second parameter, because 2 means update hard rules only
+				this.dispatchEvent(new URuleUpdateEvent(URuleUpdateEvent.UPDATE_RULES, URuleUpdateEvent.HARD_ONLY, true));
+			}
+			/*
+			public function show():void {
+				ZoomIn.play([this]);
+			}
+			
+			public function hide():void {
+				ZoomOut.play([this]);
+			}
+			*/
+		]]>
+	</mx:Script>
+	        	
+        <mx:Panel 
+		  	id="AvailableRulesPanel" 
+		  	width="260" 
+		  	height="210" 
+		  	horizontalAlign="center" 
+		  	backgroundColor="#FEFDFD" 
+		  	borderColor="#B7BABC" 
+		  	cornerRadius="15" 
+	        borderStyle="solid" 
+	        borderThickness="1" 
+		  	verticalAlign="middle"
+		  	roundedBottomCorners="true" headerHeight="0" y="27" x="5">
+		  	  <mx:Label text="Available Hard Rules" fontSize="12" fontWeight="bold"/>
+		  	
+		  	  <mx:List  
+			    	id="AvailableRulesList"  
+			    	cornerRadius="5" 
+			    	borderStyle="solid" 
+			    	borderThickness="1" 
+			    	rowCount="5" 
+			    	dataProvider="{_availableHardRules}" 
+		            selectedIndex="-1" 
+		            enabled="true"  
+			    	backgroundColor="#FEFDFD"
+			        labelField="label"
+			        width="220" 
+			        height="125"
+			        itemClick="handleAvailableHardRuleListClick();"
+			        showDataTips="true"
+			    	dataTipFunction="dataTipProducer"/>
+		  	  
+		  	  <mx:LinkBar 
+		  	  	id="AvailableRulesButtonBar" 	
+		  	  	dataProvider="{_availableRulesButtonLabels}" fontSize="10" fontWeight="bold" 
+		  	  	itemClick="handleAvailableRulesButtonClick();"/>
+		  	
+		  </mx:Panel>  
+			  
+			  <mx:Panel 
+			  	id="SelectedRulesPanel" 
+			  	width="205" 
+			  	height="210"  
+			  	horizontalAlign="center" 
+			  	backgroundColor="#FEFDFD" 
+			  	borderColor="#B7BABC" 
+			  	cornerRadius="15" 
+		        borderStyle="solid" 
+		        borderThickness="1" 
+			  	verticalAlign="middle"
+			  	roundedBottomCorners="true"  headerHeight="0" x="270" y="27">
+			  	<mx:Label text="Selected Hard Rules" fontSize="12" fontWeight="bold"/>
+			  	
+			  	<mx:List  
+			    	id="SelectedRulesList"  
+			    	cornerRadius="5" 
+			    	borderStyle="solid" 
+			    	borderThickness="1" 
+			    	rowCount="5" 
+			    	selectedIndex="-1"
+			    	enabled="true"  
+			    	dataProvider="{_selectedHardRules}" 
+			    	backgroundColor="#FEFEFE"
+			    	labelField="label" width="170" height="125"
+			    	showDataTips="true"
+			    	dataTipFunction="dataTipProducer"/>
+			  	
+			  	<mx:LinkBar 
+			  	  	id="SelectedRulesButtonBar" 	
+			  	  	dataProvider="{_selectedRulesButtonLabels}" fontSize="10" fontWeight="bold"
+			  	  	itemClick="handleSelectedRulesButtonClick();"/>
+			  	
+			  </mx:Panel>   
+		    
+		<mx:VBox id="HardRuleDetailVBox" 
+			cornerRadius="15" 
+			borderStyle="solid" 
+			borderThickness="1" 
+			horizontalAlign="center" 
+			verticalGap="8" 
+			backgroundColor="#FDFBFB" 
+			height="138" 
+			width="280" x="480" y="58">
+		    
+	        <mx:Spacer height="5%"/>
+	    
+	         <mx:Form paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" fontSize="10" fontWeight="bold">
+                <mx:FormItem label="Hard Rule Name:"
+                    direction="horizontal" fontWeight="bold" fontSize="10">
+                    <mx:TextInput id="HardRuleNameLabel" text="Hard Rule Name" fontWeight="bold" color="#000000" fontSize="10" editable="false" textAlign="center"/>
+                </mx:FormItem>
+	        	
+	        </mx:Form>  
+		    
+		    <mx:Label text="Competitor Literal" fontWeight="bold"/>
+		    
+		    <mx:DataGrid  
+		    	id="HardRuleGrid"  
+		    	cornerRadius="0" 
+		    	borderStyle="solid" 
+		    	borderThickness="2" 
+		    	rowCount="1" 
+		    	dataProvider="{_hardRuleLiterals}" 
+		    	width="260" 
+		    	height="45" 
+		    	editable="true" 
+		    	enabled="true" textAlign="center">
+		    	
+				<mx:columns>
+					<mx:DataGridColumn id="SubjectColumn" headerText="Subject" dataField="Subject" editable="false"/>
+					<mx:DataGridColumn 
+						id="PredicateColumn" 
+						headerText="Predicate" 
+						dataField="Predicate"
+						editable="true"
+						itemEditor="uviface.ui.rules.URelationChooserHardRule" 
+						/>
+					<mx:DataGridColumn id="ObjectColumn" headerText="Object" dataField="Object" editable="false"/>
+				</mx:columns> 
+				
+		    </mx:DataGrid>
+			    
+		</mx:VBox> 
+	<!--
+	<tooltip:UStringToolTip 
+		id="HardRuleStringToolTip" 
+		includeInLayout="false" 
+		visible="false" 
+		title="Currently Selected Hard Rule"
+	    creationComplete="{HardRuleStringToolTip.toolTipText='Hard Rule text goes here!';}"/>
+	
+	<mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" 
+        duration="1000"
+        originX="{this.x + this.width/2}"
+        originY="{this.y + this.height/2}" startDelay="250"/>
+        
+    <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" 
+        duration="750"
+        originX="{this.x + this.width/2}"
+        originY="{this.y + this.height/2}"/>	 
+	-->
+</mx:Canvas>

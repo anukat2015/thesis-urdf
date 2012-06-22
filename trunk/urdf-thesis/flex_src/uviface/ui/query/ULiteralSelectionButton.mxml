@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Button xmlns:mx="http://www.adobe.com/2006/mxml"
+	label="" 
+	borderColor="0xff000000"
+	themeColor="0xff00ff00"
+	textAlign="center"  
+    rollOver="rollOverHandler(event);">
+	
+	<mx:Script>
+		<![CDATA[
+			
+			protected override function rollOverHandler(event:MouseEvent):void {
+				this.emphasized = true;
+				this.setStyle("borderColor",0xff00ff00);
+				this.setStyle("color",0xff00ff00)
+			}
+			
+			protected override function rollOutHandler(event:MouseEvent):void {
+				this.emphasized = false;
+				this.setStyle("borderColor",0xff000000);
+				this.setStyle("color",0xff000000);
+				//this.setStyle(color,0xff838B83);
+			}
+			
+			/*protected override function clickHandler(event:MouseEvent):void {
+				this.emphasized = true;
+				//this.setStyle("borderColor",0xff00ff00);
+				this.setStyle("color",0xff00ff00)
+			}*/
+			
+			/*public function indicateStatus(status:String):void {
+				
+				switch (status) {
+			        case "active":
+			           this.emphasized = true;
+				       //this.setStyle("borderColor",0xff00ff00);
+				       this.setStyle("color",0xff00ff00)
+			           break;
+			        case "inactive":
+			           this.emphasized = true;
+				       //this.setStyle("borderColor",0xffff0000);
+				       this.setStyle("color",0xffff0000)
+			           break;
+		       }
+			}*/
+			
+		]]>
+	</mx:Script>
+	
+</mx:Button>
