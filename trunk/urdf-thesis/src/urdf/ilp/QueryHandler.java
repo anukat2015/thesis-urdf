@@ -79,6 +79,171 @@ public class QueryHandler
 		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating overlap between bodies
 	
 
+	public static void main (String args[]) {
+		try {
+			Rule r = new Rule(new Literal(new Relation("livesIn", new Type("people"), new Type("place")), 65, 66));
+			r.bodyLiterals.add(new Literal(new Relation("isMarriedTo", new Type("people"), new Type("people")), 65, 67));
+			r.bodyLiterals.add(new Literal(new Relation("livesIn", new Type("people"), new Type("place")), 67, 66));
+			
+			System.out.println(r.bodySupportQuery());
+			System.out.println(r.examplesCoveredQuery(0)); //change to count ?count
+			System.out.println(r.examplesCoveredQuery(1));
+			System.out.println(r.examplesCoveredQuery(2));
+			System.out.println(r.positivesCoveredQuery());
+			System.out.println(r.possiblePositivesToBeCoveredQuery(0));
+			System.out.println(r.possiblePositivesToBeCoveredQuery(1));
+			System.out.println(r.possiblePositivesToBeCoveredQuery(2));
+			
+			QueryHandler qh = new QueryHandler(null, null);
+			String finalClause, key;	
+			
+			System.out.println("\n\n>>> Input Arg=1");
+			String clauses[] = qh.parseRule(r, 1);
+			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+			
+			
+			
+			System.out.println("\n\n>>> Input Arg=2");
+			clauses = qh.parseRule(r, 2);
+			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+			
+			
+			
+			System.out.println("\n\n>>> Input Arg=3");
+			clauses = qh.parseRule(r, 3);
+			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+			
+			
+			System.out.println("\n\n>>> Input Arg=0");
+			clauses = qh.parseRule(r, 0);
+			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		
+	}
 	
 	 
 	public QueryHandler(Connection conn, String baseTbl, String headTbl) throws Exception
@@ -274,39 +439,35 @@ public class QueryHandler
 		return ps;
 	}
 	
-
+	// @param forWhat 0: for PositivesCovered, 1: for examplesCovered 2: for body 4: for mult1 5: for mult2 6: for possiblePosToBeCovered
 	public float calcRulePropertiesRdf3x(Rule rule, String[] clauses, int forWhat, int inputArg) throws Exception {
 		String sparql;
-		/*switch(forWhat)
+		switch(forWhat)
 		{
 			case 0:	// positivesCovered
+				sparql = "SELECT COUNT ?w WHERE {" + rule.positivesCoveredQuery() + "}";
 				break;
 			case 1: // examplesCovered
-				sparql = "SELECT COUNT ?w WHERE {";
-				sparql += "?" + rule.getHead().getFirstArgument()
+				sparql = "SELECT COUNT ?w WHERE {" + rule.examplesCoveredQuery(inputArg) + "}";
 				
 				break;
 			case 2: // body
-				finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-				key=clauses[1]+clauses[2];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
+				sparql = "SELECT COUNT ?w WHERE {" + rule.bodySupportQuery() + "}";
+				
 				break;
-			case 4:
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			case 4: // mult1
+
 				break;
-			case 5: // case 5
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			case 5: // mult2
+
 				break;
-			default:
-				finalClause=clauses[7];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				//key=clauses[1]+clauses[2];
-				key=finalClause;
-		}*/
+			case 6: // possiblePositivesToBeCovered
+				
+				break;
+				
+			default: throw new IllegalArgumentException("forWhat argument should be:  0=PositivesCovered, 1=examplesCovered 2=body 4=mult1 5=mult2 6=possiblePosToBeCovered");
+
+		}
 		return -1;
 	}
 	
