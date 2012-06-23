@@ -485,14 +485,7 @@ public class Rule implements Cloneable
 		this.numOfFreeVariables=count;
 	}
 	
-	public String positivesCoveredPatterns() {
-		String patterns = head.getSparqlPattern();
-		patterns += head.getSparqlPattern();
-		patterns += examplesCoveredPatterns();
-		return patterns;
-	}
-	
-	public String examplesCoveredPatterns() {
+	public String getBodyPatterns() {
 		String patterns = "";
 		for (Literal literal: bodyLiterals) {
 			patterns += literal.getSparqlPattern();
@@ -500,8 +493,38 @@ public class Rule implements Cloneable
 		return patterns;
 	}
 	
-	public String possiblePositivesToBeCovered() {
-		return "";
+	public String positivesCoveredQuery() {
+		String patterns = head.getSparqlPattern();
+		patterns += getBodyPatterns();
+		return "SELECT COUNT ?count WHERE {"+patterns+"}";
+	}
+	
+	public String examplesCoveredQuery() {
+		return examplesCoveredQuery(0);
+	}
+	
+	public String examplesCoveredQuery(int inputArg) {
+		String patterns = head.geSparqlPattern(inputArg);
+		patterns += getBodyPatterns();
+		return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+	}
+	
+	public String possiblePositivesToBeCoveredQuery() {
+		return possiblePositivesToBeCoveredQuery(0);
+	}
+	
+	public String possiblePositivesToBeCoveredQuery(int inputArg) {
+		String patterns = head.geSparqlPattern(inputArg);
+		patterns += getBodyPatterns();
+		switch (inputArg) {
+			case 1:  return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
+			case 2:  return "SELECT DISTINCT ?free "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+			default: return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+		}
+	}
+
+	public String bodySupportQuery() {
+		return "SELECT COUNT ?count WHERE {"+getBodyPatterns()+"}" ;
 	}
 
 

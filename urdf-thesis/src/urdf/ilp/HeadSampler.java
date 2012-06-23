@@ -97,15 +97,18 @@ public class HeadSampler
         	PrintWriter out[] = new PrintWriter[partitions];
         	
         	for (int i=0; i<partitions; i++) 
-        		out[i] = new PrintWriter(new FileWriter(partitionPaths.replace("$n", Integer.toString(i))));
+        		out[i] = new PrintWriter(new FileWriter(partitionPaths.replace("$n", Integer.toString(i+1))));
 	
             BufferedReader br = new BufferedReader(new FileReader(inFile));
             String line = null;
             
             int relPosInLine = 1;
-            while ((line=br.readLine().trim())!=null) {	
+            while ((line=br.readLine())!=null) {
+            	line = line.trim();
             	while (!(line.endsWith(";") || line.endsWith("."))) {
-            		line += br.readLine().trim();
+            		String cont = br.readLine();
+            		if (cont != null)
+            			line += cont.trim();
             	}
             	if (line.startsWith("@")) 
             		for (int i=0; i<partitions; i++)
