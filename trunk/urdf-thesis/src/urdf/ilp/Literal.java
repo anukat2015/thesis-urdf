@@ -141,10 +141,13 @@ public class Literal implements Cloneable
 	}
 	
 	public String getSparqlPattern() {
-		return geSparqlPattern(0);
+		if (relation.isAuxiliary()) 
+			return "filter( ?"+firstArgument+" "+relation.getName()+" ?"+secondArgument+" ) .";
+		else
+			return getSparqlPattern(0);
 	}
 	
-	public String geSparqlPattern(int inputArg) {
+	public String getSparqlPattern(int inputArg) {
 		switch (inputArg) {
 			case 1:  return "?" + firstArgument + " " + getRelationNameRdf3x() + " ?free . ";
 			case 2:  return "?free " + getRelationNameRdf3x() + " ?" + secondArgument + " . ";

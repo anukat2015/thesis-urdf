@@ -59,12 +59,12 @@ public class ThresholdChecker
 	{
 		this.dangerousRelations=dangerousRelations;
 	}
-	public boolean checkSupportThreshold(Rule rule, int FactsForHead, String[] clauses,int inputArg) throws Exception
+	public boolean checkSupportThreshold(Rule rule, int FactsForHead,int inputArg) throws Exception
 	{
-		int examplesForSupport=(int)queryHandler.calcRuleProperties(rule, clauses, 6, inputArg);
+		int examplesForSupport = (int) queryHandler.calcRuleProperties(rule, 6, inputArg);
 		rule.setPossiblePosToBeCovered(examplesForSupport);
 		
-		int examplesCovered=(int)queryHandler.calcRuleProperties(rule, clauses, 1, inputArg);
+		int examplesCovered=(int)queryHandler.calcRuleProperties(rule, 1, inputArg);
 		rule.setExamplesCovered(examplesCovered);
 		
 		int minExamples=(examplesForSupport<examplesCovered?examplesForSupport:examplesCovered);
@@ -78,13 +78,13 @@ public class ThresholdChecker
 		}
 		return false;
 	}
-	public boolean checkPositivesThreshold(Rule rule,String[] clauses,int inputArg) throws Exception
+	public boolean checkPositivesThreshold(Rule rule,int inputArg) throws Exception
 	{	
 		if (rule.getExamplesForSupport()<positivesCoveredThreshold)
 		{
 			return false;// do not store the rule and don't extend it
 		}
-		int positivesCovered=(int)queryHandler.calcRuleProperties(rule, clauses, 0, inputArg);
+		int positivesCovered=(int)queryHandler.calcRuleProperties(rule, 0, inputArg);
 		rule.setPositivesCovered(positivesCovered);	
 		
 		if (positivesCovered<positivesCoveredThreshold)
@@ -95,7 +95,7 @@ public class ThresholdChecker
 		// the rule will be stored, but check the confidence now	
 		
 		//use conf or accuracy
-		calculateConfidence(rule,clauses, inputArg,positivesCovered);
+		calculateConfidence(rule, inputArg,positivesCovered);
 		//calculateAccuracy(rule,clauses,inputArg,positivesCovered);
 		
 		return true;
@@ -120,8 +120,6 @@ public class ThresholdChecker
 			return false;// do not store the rule and don't extend it
 		}
 		// the rule will be stored, but check the confidence now
-
-		String[] clauses=queryHandler.parseRule(rule, inputArg);
 		
 		switch(smoothingMethod)
 		{
@@ -137,7 +135,7 @@ public class ThresholdChecker
 		
 		if (rule.getConfidence()>this.confidenceThreshold)// check if rule is above confidence threshold without pruning
 		{			
-			calculateSpecialityRatio(rule, clauses, inputArg);
+			calculateSpecialityRatio(rule, inputArg);
 			if (rule.getConfidence()>this.confidenceThreshold)
 			{
 				rule.setIsGood(true);
@@ -154,10 +152,10 @@ public class ThresholdChecker
 		return true;
 	}
 	
-	private void calculateSpecialityRatio(Rule rule, String[] clauses, int inputArg) throws Exception
+	private void calculateSpecialityRatio(Rule rule, int inputArg) throws Exception
 	{
 		//int bodySize=rule.getBodySize();
-		int bodySize=getBodySize(rule,clauses,inputArg);// be careful with the body size: I might have dangerous relations
+		int bodySize=getBodySize(rule,inputArg);// be careful with the body size: I might have dangerous relations
 		rule.setBodySize(bodySize);
 		
 		boolean comesFromGeneral=rule.isTooGeneral();
@@ -190,7 +188,7 @@ public class ThresholdChecker
 	private void calculateSpecialityRatio2(Rule rule, String[] clauses, int inputArg) throws Exception
 	{
 		//int bodySize=rule.getBodySize();
-		int bodySize=getBodySize(rule,clauses,inputArg);// be careful with the body size: I might have dangerous relations
+		int bodySize=getBodySize(rule,inputArg);// be careful with the body size: I might have dangerous relations
 		rule.setBodySize(bodySize);
 		
 		boolean comesFromGeneral=rule.isTooGeneral();
@@ -203,10 +201,10 @@ public class ThresholdChecker
 			
 			//check multiplicity distributions
 			float headAvgMult=rule.getHead().getRelation().getMult(inputArg);
-			float bodyAvgMult=queryHandler.getBodyAvgMult(rule, clauses,inputArg);
+			float bodyAvgMult=queryHandler.getBodyAvgMult(rule,inputArg);
 			System.out.println("headMult="+headAvgMult+" bodyMult="+bodyAvgMult);
 			float headVarMult=rule.getHead().getRelation().getVar(inputArg);			
-			float bodyVarMult=(float)Math.sqrt((double)queryHandler.getBodyMultVar(rule, clauses,inputArg, bodyAvgMult));
+			float bodyVarMult=(float)Math.sqrt((double)queryHandler.getBodyMultVar(rule,inputArg, bodyAvgMult));
 			System.out.println("headVar="+headVarMult+" bodyVar="+bodyVarMult);
 			
 			if(headAvgMult+headVarMult>bodyAvgMult || headAvgMult-headVarMult<bodyAvgMult || bodyAvgMult+bodyVarMult>headAvgMult || bodyAvgMult-bodyVarMult<headAvgMult)
@@ -513,7 +511,7 @@ public class ThresholdChecker
 		}
 	}*/
 	
-	private void calculateConfidence(Rule rule,String[] clauses, int inputArg, int positivesCovered) throws Exception
+	private void calculateConfidence(Rule rule, int inputArg, int positivesCovered) throws Exception
 	{
 		float  conf,nom,denom;
 		int examplesCovered=rule.getExamplesCovered();		
@@ -526,7 +524,7 @@ public class ThresholdChecker
 
 		if (rule.getConfidence()>this.confidenceThreshold)// check if rule is above confidence threshold without pruning
 		{
-			calculateSpecialityRatio(rule, clauses, inputArg);
+			calculateSpecialityRatio(rule, inputArg);
 			if (rule.getConfidence()>this.confidenceThreshold)
 			{
 				rule.setIsGood(true);
@@ -538,14 +536,14 @@ public class ThresholdChecker
 		}
 		else
 		{
-			calculateSpecialityRatio(rule, clauses, inputArg);
+			calculateSpecialityRatio(rule, inputArg);
 			rule.setIsGood(false);
 		}
 	}
-	private void calculateAccuracy(Rule rule,String[] clauses, int inputArg, int positivesCovered) throws Exception
+	private void calculateAccuracy(Rule rule, int inputArg, int positivesCovered) throws Exception
 	{
 		float  conf,nom,denom;
-		int body=getBodySize(rule,clauses,inputArg);		
+		int body=getBodySize(rule,inputArg);		
 		
 		//nom=(float)(positivesCovered +beta*(rule.getExamplesCovered()-positivesCovered));
 		nom=(float)positivesCovered;
@@ -555,7 +553,7 @@ public class ThresholdChecker
 
 		if (rule.getConfidence()>this.confidenceThreshold)// check if rule is above confidence threshold without pruning
 		{
-			calculateSpecialityRatio(rule, clauses, inputArg);
+			calculateSpecialityRatio(rule, inputArg);
 			if (rule.getConfidence()>this.confidenceThreshold)
 			{
 				rule.setIsGood(true);
@@ -603,7 +601,7 @@ public class ThresholdChecker
 		return false;
 	}
 	
-	private int getBodySize(Rule rule,String[] clauses,int inputArg) throws Exception
+	private int getBodySize(Rule rule, int inputArg) throws Exception
 	{
 		String rel;
 		Set<String> set=dangerousRelations.keySet();
@@ -635,7 +633,7 @@ public class ThresholdChecker
 		}
 		else
 		{
-			size=(int)queryHandler.calcRuleProperties(rule, clauses, 2, inputArg);
+			size=(int)queryHandler.calcRuleProperties(rule, 2, inputArg);
 			return size;
 		}
 		

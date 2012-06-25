@@ -32,42 +32,7 @@ public class Relation implements Serializable
 	private int distinctEntitiesArg1=0;
 	private int distinctEntitiesArg2=0;
 	
-	//Query database to get Relation data
- 	public Relation(String name, Connection conn) {
- 		String query;
- 		ResultSet rs;
-		Statement stmt;
-		try {
-			stmt = (Statement) conn.createStatement();
-			
-			query = "SELECT arg2 FROM facts WHERE relation='hasRange' AND arg1='" + name + "'";
-			rs = (ResultSet) stmt.executeQuery(query);
-			if (rs!=null && rs.next()) 
-				this.range = new Type(rs.getString(1), conn);
-				
 
-			query = "SELECT arg2 FROM facts WHERE relation='hasDomain' AND arg1='" + name + "'";
-			rs = (ResultSet) stmt.executeQuery(query);
-			if (rs!=null && rs.next()) 
-				this.domain = new Type(rs.getString(1), conn);
-				
-			
-			query = "SELECT n, mult1, mult2 FROM rel_stats WHERE relation='" + name + "'";
-			rs = (ResultSet) stmt.executeQuery(query);
-			if (rs!=null && rs.next()) {
-				this.size = rs.getInt(1);
-				this.mult1 = rs.getFloat(2);
-				this.mult2 = rs.getFloat(3);
-			}	
-				
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
- 	}
- 	public Relation(String name, String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
- 		this(name,Driver.connect(iniFile));
- 	}
 	
 	public Relation(String name, Type domain, Type range)
 	{
@@ -221,5 +186,44 @@ public class Relation implements Serializable
 	public void setName(String newName) {
 		this.name = newName;
 	}
+	
+	
+	
+	//Query database to get Relation data
+ 	/*public Relation(String name, Connection conn) {
+ 		String query;
+ 		ResultSet rs;
+		Statement stmt;
+		try {
+			stmt = (Statement) conn.createStatement();
+			
+			query = "SELECT arg2 FROM facts WHERE relation='hasRange' AND arg1='" + name + "'";
+			rs = (ResultSet) stmt.executeQuery(query);
+			if (rs!=null && rs.next()) 
+				this.range = new Type(rs.getString(1), conn);
+				
+
+			query = "SELECT arg2 FROM facts WHERE relation='hasDomain' AND arg1='" + name + "'";
+			rs = (ResultSet) stmt.executeQuery(query);
+			if (rs!=null && rs.next()) 
+				this.domain = new Type(rs.getString(1), conn);
+				
+			
+			query = "SELECT n, mult1, mult2 FROM rel_stats WHERE relation='" + name + "'";
+			rs = (ResultSet) stmt.executeQuery(query);
+			if (rs!=null && rs.next()) {
+				this.size = rs.getInt(1);
+				this.mult1 = rs.getFloat(2);
+				this.mult2 = rs.getFloat(3);
+			}	
+				
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+ 	}
+ 	public Relation(String name, String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+ 		this(name,Driver.connect(iniFile));
+ 	}*/
 
 }

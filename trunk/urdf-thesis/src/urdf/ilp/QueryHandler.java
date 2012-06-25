@@ -78,185 +78,20 @@ public class QueryHandler
 	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForOverlap=
 		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating overlap between bodies
 	
-
-	public static void main (String args[]) {
-		try {
-			Rule r = new Rule(new Literal(new Relation("livesIn", new Type("people"), new Type("place")), 65, 66));
-			r.bodyLiterals.add(new Literal(new Relation("isMarriedTo", new Type("people"), new Type("people")), 65, 67));
-			r.bodyLiterals.add(new Literal(new Relation("livesIn", new Type("people"), new Type("place")), 67, 66));
-			
-			System.out.println(r.bodySupportQuery());
-			System.out.println(r.examplesCoveredQuery(0)); //change to count ?count
-			System.out.println(r.examplesCoveredQuery(1));
-			System.out.println(r.examplesCoveredQuery(2));
-			System.out.println(r.positivesCoveredQuery());
-			System.out.println(r.possiblePositivesToBeCoveredQuery(0));
-			System.out.println(r.possiblePositivesToBeCoveredQuery(1));
-			System.out.println(r.possiblePositivesToBeCoveredQuery(2));
-			
-			QueryHandler qh = new QueryHandler(null, null);
-			String finalClause, key;	
-			
-			System.out.println("\n\n>>> Input Arg=1");
-			String clauses[] = qh.parseRule(r, 1);
-			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
-			
-			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
-			key=clauses[4]+clauses[5];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-			key=clauses[1]+clauses[2];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
-			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
-			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[7];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			key=finalClause;
-			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
-			
-			
-			
-			System.out.println("\n\n>>> Input Arg=2");
-			clauses = qh.parseRule(r, 2);
-			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
-			
-			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
-			key=clauses[4]+clauses[5];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-			key=clauses[1]+clauses[2];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
-			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
-			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[7];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			key=finalClause;
-			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
-			
-			
-			
-			System.out.println("\n\n>>> Input Arg=3");
-			clauses = qh.parseRule(r, 3);
-			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
-			
-			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
-			key=clauses[4]+clauses[5];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-			key=clauses[1]+clauses[2];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
-			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
-			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[7];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			key=finalClause;
-			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
-			
-			
-			System.out.println("\n\n>>> Input Arg=0");
-			clauses = qh.parseRule(r, 0);
-			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
-			
-			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
-			key=clauses[4]+clauses[5];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-			key=clauses[1]+clauses[2];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
-			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-			key=clauses[1]+clauses[6];
-			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
-			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
-
-			finalClause=clauses[7];
-			finalClause="SELECT count(*) FROM ("+finalClause+")";
-			key=finalClause;
-			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
-		}
-		catch (Exception e) {
-			// TODO: handle exception
-		}
-
-		
-	}
-	
 	 
 	public QueryHandler(Connection conn, String baseTbl, String headTbl) throws Exception
 	{
 		this.baseTbl = baseTbl;
 		this.headTbl = headTbl;
-		this.conn = conn; 						
+		this.conn = conn; 	
+		this.stmt = (Statement) conn.createStatement();
 	}
 	
 	public QueryHandler(Connection conn, RelationsInfo relationsInfo) throws Exception
 	{
 		this.relationsInfo = relationsInfo;
-		this.conn = conn; 						
+		this.conn = conn; 	
+		this.stmt = (Statement) conn.createStatement();
 	}
 
 
@@ -439,30 +274,55 @@ public class QueryHandler
 		return ps;
 	}
 	
-	// @param forWhat 0: for PositivesCovered, 1: for examplesCovered 2: for body 4: for mult1 5: for mult2 6: for possiblePosToBeCovered
-	public float calcRulePropertiesRdf3x(Rule rule, String[] clauses, int forWhat, int inputArg) throws Exception {
+	/**
+	 * @param forWhat 0: for PositivesCovered, 1: for examplesCovered 2: for body 4: for mult1 5: for mult2 6: for possiblePosToBeCovered
+	 * @param rule
+	 * @param inputArg 0: both, 1: first, 2: second
+	 * @return
+	 * @throws SQLException 
+	 * @throws Exception
+	 */
+	public float calcRuleProperties(Rule rule, int forWhat, int inputArg) throws IllegalArgumentException, SQLException {
 		String sparql;
+		ResultSet rs;
 		switch(forWhat)
 		{
 			case 0:	// positivesCovered
-				sparql = "SELECT COUNT ?w WHERE {" + rule.positivesCoveredQuery() + "}";
+				sparql = rule.positivesCoveredQuery();
+				System.out.println(sparql);
+				rs = (ResultSet) stmt.executeQuery(sparql);
+				if (rs.next()) return rs.getFloat(2);
 				break;
+				
 			case 1: // examplesCovered
-				sparql = "SELECT COUNT ?w WHERE {" + rule.examplesCoveredQuery(inputArg) + "}";
-				
+				sparql = rule.examplesCoveredQuery(inputArg);
+				System.out.println(sparql);
+				rs = (ResultSet) stmt.executeQuery(sparql);
+				if (rs.last()) return (float) rs.getRow();
 				break;
+				
 			case 2: // body
-				sparql = "SELECT COUNT ?w WHERE {" + rule.bodySupportQuery() + "}";
-				
+				sparql = rule.bodySupportQuery();
+				System.out.println(sparql);
+				rs = (ResultSet) stmt.executeQuery(sparql);
+				if (rs.next()) return rs.getFloat(2);
 				break;
+				
 			case 4: // mult1
-
+				sparql = rule.mult1Query();
+				// TODO
 				break;
-			case 5: // mult2
-
-				break;
-			case 6: // possiblePositivesToBeCovered
 				
+			case 5: // mult2
+				sparql = rule.mult2Query();
+				//TODO
+				break;
+				
+			case 6: // possiblePositivesToBeCovered
+				sparql = rule.possiblePositivesToBeCoveredQuery(inputArg);
+				System.out.println(sparql);
+				rs = (ResultSet) stmt.executeQuery(sparql);
+				if (rs.last()) return (float) rs.getRow();
 				break;
 				
 			default: throw new IllegalArgumentException("forWhat argument should be:  0=PositivesCovered, 1=examplesCovered 2=body 4=mult1 5=mult2 6=possiblePosToBeCovered");
@@ -471,107 +331,43 @@ public class QueryHandler
 		return -1;
 	}
 	
-	/**
-	 * @param clauses
-	 * 		0: select clause 
-	 * 		1: from clause only for body -> body and examplesCovered 
-	 * 		2: where clause only for body -> body
-	 * 		3: group by clause
-	 * 		4: from clause for body and head -> positivesCovered
-	 * 		5: where clause for body and head without IN statement -> positivesCovered 
-	 * 		6: where clause for body with IN statement -> examplesCovered
-	 * 		
-	 * 
-	 * @param forWhat 0: for PositivesCovered, 1: for examplesCovered 2: for body 4: for mult1 5: for mult2 6: for possiblePosToBeCovered
-	 * @param rule
-	 * @param inputArg 0: both, 1: first, 2: second
-	 * @return
-	 * @throws Exception
-	 */
-	public float calcRuleProperties(Rule rule, String[] clauses, int forWhat, int inputArg) throws Exception
-	{
-		String finalClause;
-		String key;
-		switch(forWhat)
-		{
-			case 0:	// positivesCovered
-				finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
-				key=clauses[4]+clauses[5];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				break;
-			case 1: // examplesCovered
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				break;
-			case 2: // body
-				finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-				key=clauses[1]+clauses[2];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				break;
-			case 4:
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
-				break;
-			case 5: // case 5
-				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
-				key=clauses[1]+clauses[6];
-				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
-				break;
-			default:
-				finalClause=clauses[7];
-				finalClause="SELECT count(*) FROM ("+finalClause+")";
-				//key=clauses[1]+clauses[2];
-				key=finalClause;
+
+	
+	public float getBodyAvgMult(Rule rule,int inputArg) throws SQLException{
+		int selectArg = (inputArg==1)? rule.getHead().getFirstArgument() : rule.getHead().getSecondArgument();
+		
+		String sparql = "SELECT ?count ?"+selectArg+" WHERE {"+rule.getBodyPatterns()+"}";
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
+		
+		float sum = 0;
+		while (rs.next()) {
+			sum += rs.getInt(2);
 		}
-		
-		
-		rule.printRule(true);
-		String s = "Query For: ";
-		switch(forWhat){case 0: s="PositivesCovered"; case 1: s="examplesCovered"; case 2: s="body"; case 4: s="mult1"; case 5: s="mult2"; case 6: s="possiblePosToBeCovered";}
-		System.out.println(s);
-		System.out.println(finalClause);
-		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,forWhat, rule.getBodyLiterals().size()),rule,1, forWhat, inputArg);
-		return fire(ps,forWhat,rule);
+		return sum/rs.getRow();
 	}
-	public float getBodyAvgMult(Rule rule, String[] clauses,int inputArg) throws SQLException
-	{
-		String groupBy=(inputArg==1?"input":"output");
-		String basic=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-		String finalClause="SELECT avg(mult) average FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+")";
-		String key=clauses[1]+clauses[2];
+	
+
+	
+	public float getBodyMultVar(Rule rule,int inputArg, float avg) throws SQLException {
+		int selectArg = (inputArg==1)? rule.getHead().getFirstArgument() : rule.getHead().getSecondArgument();
+		String sparql = "SELECT ?count ?"+selectArg+" WHERE {"+rule.getBodyPatterns()+"}";
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
 		
-		rule.printRule(true);
-		System.out.println(finalClause);
-		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,12, rule.getBodyLiterals().size()),rule,1, 2, inputArg);
-		
-		float avg=fire(ps,2,rule);		
-		//System.out.println("BodyMult: "+avg);
-		return avg;
-		
+		float var = 0;
+		while (rs.next()) {
+			var += Math.pow(rs.getDouble(2) - avg, 2);
+		}
+		return var/rs.getRow();
 	}
-	public float getBodyMultVar(Rule rule, String[] clauses,int inputArg, float avg) throws SQLException
+
+	
+	public ArrayList<String> findConstants(Rule rule, int possiblePosToBeCoveredThershold, int positivesCoveredThreshold, float supportThreshold, int factsForHead, int inputArg,int depthOfRule) throws SQLException
 	{
-		String groupBy=(inputArg==1?"input":"output");
-		String basic=clauses[0]+clauses[1]+clauses[2]+clauses[3];
-		String finalClause="SELECT sum((mult-"+avg+")*(mult-"+avg+")*numOfObservations)/sum(numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+") GROUP BY mult)";
-		//String finalClause="SELECT Variance(mult) FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+")";
-		
-		
-		String key=clauses[1]+clauses[2];
-		
-		rule.printRule(true);
-		System.out.println(finalClause);
-		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,13, rule.getBodyLiterals().size()),rule,1, 2, inputArg);
-		float var=fire(ps,2,rule);	
-		//System.out.println("BodyVar: "+var);
-		
-		return var;		
+		System.out.println("/TODO findConstants()");
+		return null;
 	}
- 	
-	public ArrayList<String> findConstants(Rule rule, String[] clauses, int possiblePosToBeCoveredThershold, int positivesCoveredThreshold, float supportThreshold, int factsForHead, int inputArg,int depthOfRule) throws SQLException
-	{
+ 	/*public ArrayList<String> findConstants(Rule rule, String[] clauses, int possiblePosToBeCoveredThershold, int positivesCoveredThreshold, float supportThreshold, int factsForHead, int inputArg,int depthOfRule) throws SQLException
+	{ 
 		String arg,put, finalClause, key;
 		ArrayList<String> outConstants=new ArrayList<String>();
 		
@@ -595,7 +391,209 @@ public class QueryHandler
 			outConstants.add(rs.getString(1));
 		}		
 		return outConstants;		
+	}*/
+	
+	
+	public int getAllCombinationsOfPairs(String target, int arg) throws SQLException
+	{
+		int possibleOtherEntities;
+		String finalClause;
+		ResultSet rs;
+		finalClause = "SELECT count(*) FROM (SELECT "+(arg==1?"input":"output")+" FROM (SELECT arg1 input, arg2 output FROM "+baseTbl+" WHERE relation='"+target+"') GROUP BY "+(arg==1?"input":"output")+")";
+		
+		
+		System.out.println(finalClause);
+		rs = (ResultSet) stmt.executeQuery(finalClause);
+		//rsCounter++;
+		//System.out.println(rsCounter);
+		rs.next();
+		possibleOtherEntities=rs.getInt(1);
+		rs.close();
+		return possibleOtherEntities;		
 	}
+	
+	public int calcOverlap(Rule rule1, Rule rule2) throws SQLException {
+		String sparql = "SELECT count ?count WHERE {" + rule1.getBodyPatterns() + rule2.getBodyPatterns() + "}";
+		
+		int depthOfRule1=0;
+		for (int i=0,len=rule1.getBodyLiterals().size();i<len;i++){
+			if (rule1.getBodyLiterals().get(i).getRelation().isAuxiliary())
+				continue;
+			depthOfRule1++;
+		}
+		
+		System.out.println(sparql);
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
+		if (rs.next())
+			return rs.getInt(2);
+		
+		return -1;
+	}
+
+	//***************************** FIRE QUERIES ***************************************
+	public int fireSampleQuery(Relation relation) throws SQLException
+	{
+		String sparql = "SELECT count ?count WHERE {?s "+relation.getName()+" ?o}";
+		
+		System.out.println(sparql);
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
+		if (rs.next())
+			return rs.getInt(2);
+
+		return -1;		
+	}
+	
+	public String[] getTypeConstants(String target, int numOfTries, int arg) throws SQLException {
+		String sparql = "SELECT count ?type WHERE { ?arg1"+target+"?arg2 . ?arg"+arg+" <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type } order by desc(count) limit "+numOfTries;	
+		
+		System.out.println(sparql);
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
+		
+		String[] ans = new String[numOfTries];
+		int i=0;
+		while (rs.next()) {
+			ans[i] = rs.getString(1);
+			i++;
+		}
+		rs.close();
+		return ans;		
+	}
+
+	// TODO Substitute for RelationsInfo.getVar(arg)
+	public float getVarMult(String relationName, int arg) throws SQLException
+	{	
+		if (arg!=1 && arg!=2) 
+			throw new SQLException("Invalid Argument, it should be 1 or 2");
+
+		String sparql = "SELECT count ?arg"+arg+" WHERE {?arg1 "+relationName+" ?arg2 }";
+
+		System.out.println(sparql);
+		ResultSet rs=(ResultSet) stmt.executeQuery(sparql);
+		
+		float avg = 0; 
+		int count = 0;
+		while (rs.next()) {
+			avg  += rs.getFloat(2);
+			count++;
+		}
+		
+		rs.first();		
+		float var = (float) Math.pow(rs.getFloat(2)-avg, 2); 
+		while (rs.next()) {
+			var += (float) Math.pow(rs.getFloat(2)-avg, 2);
+		}
+		
+		return var/((float) count);
+	}
+	
+	public float getParamForGeneralityRatio(String target, int inputArg) throws SQLException {		
+		if (inputArg==1 || inputArg==2) {
+			float nominator = 0;
+			float denominator = relationsInfo.getRelationFromRelations(target).getDistinctEntities(inputArg);
+			
+			String sparql = "SELECT DISTINCT ?arg"+inputArg+" WHERE { ?arg1 "+target+" ?arg2 }";
+			ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
+			if (rs.last()) nominator = (float) rs.getRow();
+			return nominator/denominator;
+		}
+		else {
+			float generalityRatio1 = getAllCombinationsOfPairs(target, 1);
+			float generalityRatio2 = getAllCombinationsOfPairs(target, 2);
+			return Math.max(generalityRatio1, generalityRatio2);
+		}
+	}
+	/*
+	 * 
+	 * 
+	 *  	
+	 private void initializeConnection(String iniFile) throws Exception { 
+	    DatabaseParameters p = DBConfig.databaseParameters(iniFile);
+
+	    if (p.system.toLowerCase().indexOf("postgres") >= 0) 
+	    {
+	    
+	      DriverManager.registerDriver((Driver) Class.forName("org.postgresql.Driver").newInstance());
+
+	      this.conn = DriverManager.getConnection("jdbc:postgresql://" + p.host + ":" + p.port + (p.database == null ? "" : "/" + p.database), p.user,
+	          p.password);
+
+	    } 
+	    else if (p.system.toLowerCase().indexOf("oracle") >= 0) 
+	    {
+	    	
+	      DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance());
+
+	      this.conn = DriverManager.getConnection("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=" + p.host
+	          + ")(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=" + p.inst + ")(server = dedicated)))", p.user, p.password);
+
+	    } 
+	    else
+	      throw new Exception("UNKNOWN DB DRIVER!");
+	    this.stmt = conn.createStatement();
+	}
+	
+	public static Connection getConnection(String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
+		DatabaseParameters p = DBConfig.databaseParameters(iniFile);
+		Connection conn = null;
+	    if (p.system.toLowerCase().indexOf("postgres") >= 0) 
+	    {
+	    
+	      DriverManager.registerDriver((Driver) Class.forName("org.postgresql.Driver").newInstance());
+
+	      conn = DriverManager.getConnection("jdbc:postgresql://" + p.host + ":" + p.port + (p.database == null ? "" : "/" + p.database), p.user,
+	          p.password);
+
+	    } 
+	    else if (p.system.toLowerCase().indexOf("oracle") >= 0) 
+	    {
+	    	
+	      DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance());
+
+	      conn = DriverManager.getConnection("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=" + p.host
+	          + ")(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=" + p.inst + ")(server = dedicated)))", p.user, p.password);
+
+	    } 
+	    return conn;
+	}
+	
+	
+	public float getVarMult(String target,int arg) throws SQLException
+	{
+		String sql="SELECT VARIANCE(mult) FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation='"+target+"' GROUP BY f0.arg"+arg+")";
+		
+		System.out.println(sql);
+		ResultSet rs = (ResultSet) stmt.executeQuery(sql);
+		//rsCounter++;
+		//System.out.println(rsCounter);
+		rs.next();
+		float ans = rs.getFloat(1);
+		rs.close();
+		return ans;
+	}
+	
+		public String[] getTypeConstants(String target, int numOfTries, int arg) throws SQLException {
+		String sparql = "SELECT count ?type WHERE { ?arg1 $rel ?arg2 . ?arg$n <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type } order by desc(cont) limit $tries";
+		//String sparql = "SELECT count ?type WHERE { ?arg1 <http://yago-knowledge.org/resource/livesIn> ?arg2 . ?arg1 <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> ?type } order by desc(count) limit 100";
+			
+		System.out.println(sparql);
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);
+		//rsCounter++;
+		//System.out.println(rsCounter);
+		String[] ans = new String[numOfTries];
+		int i=0;
+		while (rs.next()){
+			ans[i] = rs.getString(1);
+			i++;
+		}
+		rs.close();
+		return ans;		
+	}
+	 * 
+	 */
+
+	
+	
+	
 	/**
 	 * @param rule
 	 * @param inputArg 0: both, 1: first, 2: second
@@ -612,10 +610,10 @@ public class QueryHandler
 	 *		8: from clause for body for evaluation with recursion
 	 *		9: where clause body but not preparedStatement
 	 */
-	public String[] parseRule(Rule rule, int inputArg)
+	/*public String[] parseRule(Rule rule, int inputArg)
 	{
-		String parallelHintBaseTbl=" /*+ PARALLEL(facts,8) */ ";
-		String parallelHintSampleTbl=" /*+ PARALLEL(train11,8) */ ";
+		String parallelHintBaseTbl=" PARALLEL(facts,8)";
+		String parallelHintSampleTbl=" PARALLEL(train11,8)";
 		String[] sqlClauses=new String[10];
 		ArrayList<Literal> bodyLiterals=rule.getBodyLiterals();
 		Literal head=rule.getHead();
@@ -877,9 +875,14 @@ public class QueryHandler
 		sqlClauses[5]=sqlClauses[5].substring(0, sqlClauses[5].length()-4);
 		sqlClauses[7]+=" GROUP BY f0.arg1,f0.arg2";
 		
+		rule.printRule(false);
+		for (int i=0; i<sqlClauses.length; i++) System.out.println("Clause["+i+"] = "+sqlClauses[i]);
+		
 		return sqlClauses;
-	}
-	public int distinctEntitiesInExamplesCovered(Rule rule,String[] clauses, int arg, int inputArg) throws SQLException
+	}*/
+
+
+	/*public int distinctEntitiesInExamplesCovered(Rule rule,String[] clauses, int arg, int inputArg) throws SQLException
 	{
 		String finalClause,key;
 		PreparedStatement ps;
@@ -900,60 +903,9 @@ public class QueryHandler
 		ps=fillInPreparedStatement(ps, rule, 1, 1, inputArg);
 		return (int)fire(ps, 1,rule);
 		
-	}
+	}*/
 	
-	public int getAllCombinationsOfPairs(String target, int arg) throws SQLException
-	{
-		int possibleOtherEntities;
-		String finalClause;
-		ResultSet rs;
-		finalClause = "SELECT count(*) FROM (SELECT "+(arg==1?"input":"output")+" FROM (SELECT arg1 input, arg2 output FROM "+baseTbl+" WHERE relation='"+target+"') GROUP BY "+(arg==1?"input":"output")+")";
-		
-		
-		System.out.println(finalClause);
-		rs = (ResultSet) stmt.executeQuery(finalClause);
-		//rsCounter++;
-		//System.out.println(rsCounter);
-		rs.next();
-		possibleOtherEntities=rs.getInt(1);
-		rs.close();
-		return possibleOtherEntities;		
-	}
-	
- 	public int calcOverlap(Rule rule1, String[] clauses1, Rule rule2, String[] clauses2) throws SQLException
-	{
-		String finalClause="(("+clauses1[0]+clauses1[1]+clauses1[2]+clauses1[3]+") INTERSECT ("+clauses2[0]+clauses2[1]+clauses2[2]+clauses2[3]+"))";
-		finalClause="SELECT count(*) FROM "+finalClause;
-		PreparedStatement ps=checkForQueryExistance(finalClause, finalClause, 3, rule1.getBodyLiterals().size()+rule2.getBodyLiterals().size());
-		
-		int depthOfRule1=0;
-		for (int i=0,len=rule1.getBodyLiterals().size();i<len;i++)
-		{
-			if (rule1.getBodyLiterals().get(i).getRelation().isAuxiliary())
-			{
-				continue;
-			}
-			depthOfRule1++;
-		}
-		
-		ps=fillInPreparedStatement(ps, rule1,1, 2, 1);
-		ps=fillInPreparedStatement(ps, rule2,depthOfRule1+1, 2, 1);
-		return (int)fire(ps,-1,null);
-	}
-
-	//***************************** FIRE QUERIES ***************************************
-	public int fireSampleQuery(Relation relation) throws SQLException
-	{
-		ResultSet rs = (ResultSet) stmt.executeQuery("SELECT count(*) FROM "+headTbl+" WHERE relation ='"+relation.getName()+"'");
-		//rsCounter++;
-		//System.out.println(rsCounter);
-		rs.next();	
-		int ans=rs.getInt(1);
-		rs.close();
-		return  ans;		
-	}
-
-	private float fire(PreparedStatement ps, int forWhat,Rule rule)throws SQLException
+	/*private float fire(PreparedStatement ps, int forWhat,Rule rule)throws SQLException
 	{
 		ResultSet rs = (ResultSet) ps.executeQuery();
 		//rsCounter++;
@@ -966,195 +918,91 @@ public class QueryHandler
 		}
 		rs.close();
 		return ans;
-	}
+	}*/
 	
-	/**
-	 * @param ps
-	 * @param rule
-	 * @param forWhat 0: for Positives, 1: for examples 2: for body 4: for mult1 5: for mult2
-	 * @param inputArg 0: both, 1: first, 2: second
-	 * @return
-	 * @throws SQLException
-	 */
-	private PreparedStatement fillInPreparedStatement(PreparedStatement ps, Rule rule, int col, int forWhat, int inputArg) throws SQLException
-	{
-		int column=(col<1?1:col);
-		
-		if (forWhat==0 || forWhat==6)
-		{
-			ps.setString(column, rule.getHead().getRelationName());
-			column++;
-		}		
-		
-		for (int i=0,len=rule.getBodyLiterals().size();i<len;i++)
-		{
-			if (!rule.getBodyLiterals().get(i).getRelation().isAuxiliary())
-			{
-				ps.setString(column, rule.getBodyLiterals().get(i).getRelationName());
-				column++;
-			}
-		}
-		
-		if (forWhat==6 && rule.bindsHeadVariables() && inputArg==0)
-		{
-			for (int i=0,len=rule.getBodyLiterals().size();i<len;i++)
-			{
-				if (!rule.getBodyLiterals().get(i).getRelation().isAuxiliary())
-				{
-					ps.setString(column, rule.getBodyLiterals().get(i).getRelationName());
-					column++;
-				}
-			}
-			
-		}
-		
-		if (forWhat==1 ||forWhat==4 ||forWhat==5)
-		{
-			ps.setString(column, rule.getHead().getRelationName());
-			if (inputArg==0 && rule.bindsHeadVariables())
-			{
-				column++;
-				ps.setString(column, rule.getHead().getRelationName());
-				
-			}
-		}
-		return ps;
-
-	}
 	
 
-	public String[] getTypeConstants(String target, int numOfTries, int arg) throws SQLException
+	/*public float calcRulePropertiesOld(Rule rule, String[] clauses, int forWhat, int inputArg) throws Exception
 	{
-		String sql="SELECT arg2 FROM (SELECT f1.arg2, count(*) c FROM "+headTbl+" f0, "+baseTbl+" f1 WHERE f0.relation='"+target+
-						"' AND f1.relation='type' AND f0.arg"+arg+"=f1.arg1 GROUP BY f1.arg2 ORDER BY c DESC) WHERE rownum<="+numOfTries;
-			
-		System.out.println(sql);
-		ResultSet rs = (ResultSet) stmt.executeQuery(sql);
-		//rsCounter++;
-		//System.out.println(rsCounter);
-		String[] ans = new String[numOfTries];
-		int i=0;
-		while (rs.next())
+		String finalClause;
+		String key;
+		switch(forWhat)
 		{
-			ans[i] = rs.getString(1);
-			i++;
-		}
-		rs.close();
-		
-		return ans;		
-	}
-
-	public float getVarMult(String target,int arg) throws SQLException
-	{
-		String sql="SELECT VARIANCE(mult) FROM (SELECT count(*) mult FROM "+baseTbl+" f0 WHERE f0.relation='"+target+"' GROUP BY f0.arg"+arg+")";
-		
-		System.out.println(sql);
-		ResultSet rs = (ResultSet) stmt.executeQuery(sql);
-		//rsCounter++;
-		//System.out.println(rsCounter);
-		rs.next();
-		float ans = rs.getFloat(1);
-		rs.close();
-		return ans;
-	}
-	public float getParamForGeneralityRatio(String target, int inputArg) throws SQLException
-	{
-		String tbl1, tbl2, sql;
-		float param1=0,param2=0;
-		ResultSet rs;
-		//rsCounter++;
-		//System.out.println(rsCounter);
-		if (inputArg!=2)
-		{
-			tbl1="(SELECT count(*) denom FROM (SELECT arg1 FROM "+headTbl+" WHERE relation='"+target+"' GROUP BY arg1))";
-			tbl2="(SELECT count(*) nom FROM (SELECT arg1 FROM "+baseTbl+" WHERE relation='"+target+"' GROUP BY arg1))";			
-			sql="SELECT nom/denom FROM"+tbl1+", "+tbl2;
-			
-			System.out.println(sql);
-			rs = (ResultSet) stmt.executeQuery(sql);
-			rs.next();
-			param1 = rs.getFloat(1);
-			rs.close();
-		}
-		if (inputArg!=1)
-		{
-			tbl1="(SELECT count(*) denom FROM (SELECT arg2 FROM "+headTbl+" WHERE relation='"+target+"' GROUP BY arg2))";
-			tbl2="(SELECT count(*) nom FROM (SELECT arg2 FROM "+baseTbl+" WHERE relation='"+target+"' GROUP BY arg2))";			
-			sql="SELECT nom/denom FROM"+tbl1+", "+tbl2;
-			
-			System.out.println(sql);
-			rs = (ResultSet) stmt.executeQuery(sql);
-			rs.next();
-			param2=rs.getFloat(1);
-			rs.close();
-		}
-		switch(inputArg)
-		{
-		case 1:
-			return param1;
-		case 2:
-			return param2;
-		default://0
-			return (param1>param2?param1:param2);
+			case 0:	// positivesCovered
+				finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+				key=clauses[4]+clauses[5];
+				finalClause="SELECT count(*) FROM ("+finalClause+")";
+				break;
+			case 1: // examplesCovered
+				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+				key=clauses[1]+clauses[6];
+				finalClause="SELECT count(*) FROM ("+finalClause+")";
+				break;
+			case 2: // body
+				finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+				key=clauses[1]+clauses[2];
+				finalClause="SELECT count(*) FROM ("+finalClause+")";
+				break;
+			case 4:
+				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+				key=clauses[1]+clauses[6];
+				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+				break;
+			case 5: // case 5
+				finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+				key=clauses[1]+clauses[6];
+				finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+				break;
+			default:
+				finalClause=clauses[7];
+				finalClause="SELECT count(*) FROM ("+finalClause+")";
+				//key=clauses[1]+clauses[2];
+				key=finalClause;
 		}
 		
-
-	}
-	/*
-	 * 
-	 * 
-	 *  	
-	 private void initializeConnection(String iniFile) throws Exception { 
-	    DatabaseParameters p = DBConfig.databaseParameters(iniFile);
-
-	    if (p.system.toLowerCase().indexOf("postgres") >= 0) 
-	    {
-	    
-	      DriverManager.registerDriver((Driver) Class.forName("org.postgresql.Driver").newInstance());
-
-	      this.conn = DriverManager.getConnection("jdbc:postgresql://" + p.host + ":" + p.port + (p.database == null ? "" : "/" + p.database), p.user,
-	          p.password);
-
-	    } 
-	    else if (p.system.toLowerCase().indexOf("oracle") >= 0) 
-	    {
-	    	
-	      DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance());
-
-	      this.conn = DriverManager.getConnection("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=" + p.host
-	          + ")(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=" + p.inst + ")(server = dedicated)))", p.user, p.password);
-
-	    } 
-	    else
-	      throw new Exception("UNKNOWN DB DRIVER!");
-	    this.stmt = conn.createStatement();
-	}
+		
+		rule.printRule(true);
+		String s = "Query For: ";
+		switch(forWhat){case 0: s="PositivesCovered"; case 1: s="examplesCovered"; case 2: s="body"; case 4: s="mult1"; case 5: s="mult2"; case 6: s="possiblePosToBeCovered";}
+		System.out.println(s);
+		System.out.println(finalClause);
+		PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,forWhat, rule.getBodyLiterals().size()),rule,1, forWhat, inputArg);
+		return fire(ps,forWhat,rule);
+	}*/
 	
-	public static Connection getConnection(String iniFile) throws SQLException, InstantiationException, IllegalAccessException, ClassNotFoundException, IOException {
-		DatabaseParameters p = DBConfig.databaseParameters(iniFile);
-		Connection conn = null;
-	    if (p.system.toLowerCase().indexOf("postgres") >= 0) 
-	    {
-	    
-	      DriverManager.registerDriver((Driver) Class.forName("org.postgresql.Driver").newInstance());
-
-	      conn = DriverManager.getConnection("jdbc:postgresql://" + p.host + ":" + p.port + (p.database == null ? "" : "/" + p.database), p.user,
-	          p.password);
-
-	    } 
-	    else if (p.system.toLowerCase().indexOf("oracle") >= 0) 
-	    {
-	    	
-	      DriverManager.registerDriver((Driver) Class.forName("oracle.jdbc.driver.OracleDriver").newInstance());
-
-	      conn = DriverManager.getConnection("jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(ADDRESS=(PROTOCOL=TCP)(HOST=" + p.host
-	          + ")(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=" + p.inst + ")(server = dedicated)))", p.user, p.password);
-
-	    } 
-	    return conn;
-	}
-	 * 
-	 */
-
+	/*public float getBodyAvgMult(Rule rule,int inputArg, String clauses[]) throws SQLException{
+	String groupBy=(inputArg==1?"input":"output");
+	String basic=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+	String finalClause="SELECT avg(mult) average FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+")";
+	String key=clauses[1]+clauses[2];
+	
+	rule.printRule(true);
+	System.out.println(finalClause);
+	
+	PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,12, rule.getBodyLiterals().size()),rule,1, 2, inputArg);
+	float avg=fire(ps,2,rule);		
+	
+	return avg;	
+}*/
+	
+	/*public float getBodyMultVar(Rule rule,int inputArg, float avg, String clauses[]) throws SQLException {
+	String groupBy=(inputArg==1?"input":"output");
+	String basic=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+	String finalClause="SELECT sum((mult-"+avg+")*(mult-"+avg+")*numOfObservations)/sum(numOfObservations) FROM (SELECT mult, count(*) numOfObservations FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+") GROUP BY mult)";
+	//String finalClause="SELECT Variance(mult) FROM (SELECT count(*) mult FROM("+basic+") GROUP BY "+groupBy+")";
+	
+	
+	String key=clauses[1]+clauses[2];
+	
+	rule.printRule(true);
+	System.out.println(finalClause);
+	
+	PreparedStatement ps=fillInPreparedStatement(checkForQueryExistance(finalClause,key,13, rule.getBodyLiterals().size()),rule,1, 2, inputArg);
+	float var=fire(ps,2,rule);	
+	
+	
+	return var;		
+}*/
+	
 }
 

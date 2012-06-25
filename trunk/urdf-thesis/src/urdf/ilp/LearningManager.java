@@ -32,6 +32,7 @@ public class LearningManager
 	HashMap<String, RuleTreeNode> ruleNodes;
 	ArrayList<Rule> goodRulesForPartition;
 	
+	int partitionNumber;
 	
 	int inputArg;// for sampling
 	String  expDesc;
@@ -42,40 +43,51 @@ public class LearningManager
 			ArrayList<Relation> relations,ArrayList<Type> types, HashMap<Integer,String>relationsForConstants, int noise,int inputArg,String baseTbl, String headTbl) throws Exception
 	{
 		System.out.println(iniFile);
+		
 		Connection conn = Driver.connect(iniFile);
+		Connection connPartition = Driver.connect("src/rdf3x-part0.properties");
 		
-		queryHandler = new QueryHandler(conn, baseTbl, headTbl);
+		
 		this.iniFile=iniFile;
-		
-		setThresholds(supportThreshold, confidenceThreshold, specialityRatioThreshold, possiblePosToBeCoveredThreshold,
-				positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);		
 		
 		
 		//preprocessor=new RelationPreProcessor(conn,tChecker,relations,types,relationsForConstants);		
 		
 		preprocessor = new RelationPreProcessor();	
-		info = preprocessor.getRelationsInfo();	
+		info = preprocessor.getRelationsInfo();
+		RelationsInfo.printRelations(info);
+				
+		queryHandler = new QueryHandler(connPartition, info);
+		
+		tChecker=new ThresholdChecker(queryHandler, supportThreshold, confidenceThreshold, specialityRatioThreshold, possiblePosToBeCoveredThreshold,
+									  positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);
 		
 		tChecker.setDangerousRelations(info.dangerousRelations);
-		expDesc	="supp"	+supportThreshold+"_conf"+confidenceThreshold+"_spec"+specialityRatioThreshold+"_possPos"+possiblePosToBeCoveredThreshold;
+		
+		expDesc	= " supp"	+supportThreshold + 
+				  " conf" + confidenceThreshold + 
+				  " spec" + specialityRatioThreshold + 
+				  " possPos" + possiblePosToBeCoveredThreshold;
 		System.out.println(expDesc);
 		
 		this.inputArg = inputArg;
-		sampler = new HeadSampler(conn);
-		sample(partitionNumber,false, noise);
+		this.partitionNumber = partitionNumber;
+		
+		//sampler = new HeadSampler(conn);
+		//sample(partitionNumber,false, noise);
 		
 		System.out.println("Learning Manager Constructed Successfully");
 
 	}
 	
- 	public void createHeadPredicates(String[] rel,int[] inputArg, int depth)
-	{
+ 	public void createHeadPredicates(String[] rel,int[] inputArg, int depth) {
  		headPredicates=new ArrayList<HeadPredicate>();
- 		
-		for (int i=0,len=rel.length;i<len;i++)
-		{	
+
+		for (int i=0; i<rel.length; i++){	
 			Relation headRelation = info.getRelationFromRelations(rel[i]);
 			//System.out.println(i + ": " + headRelation.getName());
+			//System.out.println(i + ": " + headRelation.getDomain().getName());
+			//System.out.println(i + ": " + headRelation.getRange().getName());
 			HeadPredicate hp = new HeadPredicate(headRelation,depth, info, inputArg[i]);
 			headPredicates.add(hp);				
 		}
@@ -106,7 +118,10 @@ public class LearningManager
 	{
 		int gainMeasure=0;
 		int beamWidth=0;
-		int numOfPartitions=sampler.getNumOfPartitions();
+		
+		//int numOfPartitions=sampler.getNumOfPartitions();
+		int numOfPartitions = partitionNumber;
+		
 		long time;
 		
 		// create the head predicates

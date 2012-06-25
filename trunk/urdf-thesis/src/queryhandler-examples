@@ -1,0 +1,280 @@
+SELECT COUNT ?count WHERE {?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT DISTINCT?A ?B WHERE {?A <http://yago-knowledge.org/resource/livesIn> ?B . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT DISTINCT?A ?B WHERE {?A <http://yago-knowledge.org/resource/livesIn> ?free . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT DISTINCT?A ?B WHERE {?free <http://yago-knowledge.org/resource/livesIn> ?B . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT COUNT ?count WHERE {?A <http://yago-knowledge.org/resource/livesIn> ?B . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT DISTINCT?A ?B WHERE {?A <http://yago-knowledge.org/resource/livesIn> ?B . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT DISTINCT?A ?free WHERE {?A <http://yago-knowledge.org/resource/livesIn> ?free . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+SELECT DISTINCT ?free ?B WHERE {?free <http://yago-knowledge.org/resource/livesIn> ?B . ?A <http://yago-knowledge.org/resource/isMarriedTo> ?C . ?C <http://yago-knowledge.org/resource/livesIn> ?B . filter( ?A != ?C ) .}
+
+
+>>> Input Arg=1
+livesIn(65,66)<-isMarriedTo(65,67)livesIn(67,66)!=(65,67)
+confidence: 0.0 support: 0.0 specialityRatio: 0.0
+N+(c): -1 E+(c): -1 N(c): -1 B(c): -1 E+: 0
+
+Clause[0] =  SELECT  f1.arg1 input, f2.arg2 output
+Clause[1] =  FROM base f1, base f2
+Clause[2] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[3] =  GROUP BY  f1.arg1, f2.arg2
+Clause[4] =  FROM head f0, base f1, base f2
+Clause[5] =  WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[6] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? )
+Clause[7] =  SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2
+Clause[8] =  FROM base f1, insertTable f2
+Clause[9] =  WHERE f1.relation='isMarriedTo' AND f2.relation='livesIn' AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=0: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2  GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=1: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? )
+
+ForWhat=2: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2  GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=4: 
+Clause = SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) GROUP BY  f1.arg1, f2.arg2) GROUP BY input)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? )
+
+ForWhat=5: 
+Clause = SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) GROUP BY  f1.arg1, f2.arg2) GROUP BY output)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? )
+
+ForWhat=6: 
+Clause = SELECT count(*) FROM ( SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2)
+Key = SELECT count(*) FROM ( SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2)
+
+
+>>> Input Arg=2
+livesIn(65,66)<-isMarriedTo(65,67)livesIn(67,66)!=(65,67)
+confidence: 0.0 support: 0.0 specialityRatio: 0.0
+N+(c): -1 E+(c): -1 N(c): -1 B(c): -1 E+: 0
+
+Clause[0] =  SELECT  f1.arg1 input, f2.arg2 output
+Clause[1] =  FROM base f1, base f2
+Clause[2] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[3] =  GROUP BY  f1.arg1, f2.arg2
+Clause[4] =  FROM head f0, base f1, base f2
+Clause[5] =  WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[6] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )
+Clause[7] =  SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2
+Clause[8] =  FROM base f1, insertTable f2
+Clause[9] =  WHERE f1.relation='isMarriedTo' AND f2.relation='livesIn' AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=0: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2  GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=1: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ) GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )
+
+ForWhat=2: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2  GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=4: 
+Clause = SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ) GROUP BY  f1.arg1, f2.arg2) GROUP BY input)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )
+
+ForWhat=5: 
+Clause = SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ) GROUP BY  f1.arg1, f2.arg2) GROUP BY output)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )
+
+ForWhat=6: 
+Clause = SELECT count(*) FROM ( SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2)
+Key = SELECT count(*) FROM ( SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2)
+
+
+>>> Input Arg=0
+livesIn(65,66)<-isMarriedTo(65,67)livesIn(67,66)!=(65,67)
+confidence: 0.0 support: 0.0 specialityRatio: 0.0
+N+(c): -1 E+(c): -1 N(c): -1 B(c): -1 E+: 0
+
+Clause[0] =  SELECT  f1.arg1 input, f2.arg2 output
+Clause[1] =  FROM base f1, base f2
+Clause[2] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[3] =  GROUP BY  f1.arg1, f2.arg2
+Clause[4] =  FROM head f0, base f1, base f2
+Clause[5] =  WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[6] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ))
+Clause[7] =  SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND (f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 )) GROUP BY f0.arg1,f0.arg2
+Clause[8] =  FROM base f1, insertTable f2
+Clause[9] =  WHERE f1.relation='isMarriedTo' AND f2.relation='livesIn' AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[0] =  SELECT  f1.arg1 input, f2.arg2 output
+Clause[1] =  FROM base f1, base f2
+Clause[2] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[3] =  GROUP BY  f1.arg1, f2.arg2
+Clause[4] =  FROM head f0, base f1, base f2
+Clause[5] =  WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+Clause[6] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ))
+Clause[7] =  SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND (f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 )) GROUP BY f0.arg1,f0.arg2
+Clause[8] =  FROM base f1, insertTable f2
+Clause[9] =  WHERE f1.relation='isMarriedTo' AND f2.relation='livesIn' AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=0: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2  GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=1: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )) GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ))
+
+ForWhat=2: 
+Clause = SELECT count(*) FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2  GROUP BY  f1.arg1, f2.arg2)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 
+
+ForWhat=4: 
+Clause = SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )) GROUP BY  f1.arg1, f2.arg2) GROUP BY input)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ))
+
+ForWhat=5: 
+Clause = SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ( SELECT  f1.arg1 input, f2.arg2 output FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? )) GROUP BY  f1.arg1, f2.arg2) GROUP BY output)
+Key =  FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 AND  (f1.arg1 IN (SELECT f0.arg1 FROM head f0 WHERE f0.relation=? ) AND f2.arg2 IN (SELECT f0.arg2 FROM head f0 WHERE f0.relation=? ))
+
+ForWhat=6: 
+Clause = SELECT count(*) FROM ( SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND (f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 )) GROUP BY f0.arg1,f0.arg2)
+Key = SELECT count(*) FROM ( SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND (f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) AND f0.arg2 IN (SELECT f2.arg2 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 )) GROUP BY f0.arg1,f0.arg2)
+
+
+
+
+
+
+
+
+
+
+	public static void main (String args[]) {
+		try {
+			Rule r = new Rule(new Literal(new Relation("livesIn", new Type("people"), new Type("place")), 65, 66));
+			r.bodyLiterals.add(new Literal(new Relation("isMarriedTo", new Type("people"), new Type("people")), 65, 67));
+			r.bodyLiterals.add(new Literal(new Relation("livesIn", new Type("people"), new Type("place")), 67, 66));
+			r.bodyLiterals.add(new Literal(RelationsInfo.NEQ, 65, 67));
+			
+			System.out.println(r.bodySupportQuery());
+			System.out.println(r.examplesCoveredQuery(0)); //change to count ?count
+			System.out.println(r.examplesCoveredQuery(1));
+			System.out.println(r.examplesCoveredQuery(2));
+			System.out.println(r.positivesCoveredQuery());
+			System.out.println(r.possiblePositivesToBeCoveredQuery(0));
+			System.out.println(r.possiblePositivesToBeCoveredQuery(1));
+			System.out.println(r.possiblePositivesToBeCoveredQuery(2));
+			
+			QueryHandler qh = new QueryHandler(null, "base", "head");
+			String finalClause, key;	
+			
+			System.out.println("\n\n>>> Input Arg=1");
+			//String clauses[] = qh.parseRule(r, 1);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+			
+			
+			
+			System.out.println("\n\n>>> Input Arg=2");
+			//clauses = qh.parseRule(r, 2);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+			
+			
+		
+			System.out.println("\n\n>>> Input Arg=0");
+			//lauses = qh.parseRule(r, 0);
+			for (int i=0; i<clauses.length; i++) System.out.println("Clause["+i+"] = "+clauses[i]);
+			
+			finalClause=clauses[0]+clauses[4]+clauses[5]+clauses[3];			
+			key=clauses[4]+clauses[5];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=0: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=1: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[2]+clauses[3];
+			key=clauses[1]+clauses[2];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			System.out.println("\nForWhat=2: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY input)";
+			System.out.println("\nForWhat=4: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[0]+clauses[1]+clauses[6]+clauses[3];
+			key=clauses[1]+clauses[6];
+			finalClause="SELECT avg(n1), sum(n1) FROM (SELECT count(*) n1 FROM ("+finalClause+") GROUP BY output)";
+			System.out.println("\nForWhat=5: \nClause = "+finalClause+"\nKey = "+key);
+
+			finalClause=clauses[7];
+			finalClause="SELECT count(*) FROM ("+finalClause+")";
+			key=finalClause;
+			System.out.println("\nForWhat=6: \nClause = "+finalClause+"\nKey = "+key);
+		}
+		catch (Exception e) {
+			// TODO: handle exception
+		}
+
+		
+	}

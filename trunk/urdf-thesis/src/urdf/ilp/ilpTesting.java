@@ -62,7 +62,7 @@ public class ilpTesting {
 			// int[] inputArg={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 
 			// relations for yago2
-			String[] relationsToBeLearned={"isPoliticianOf"};
+			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
 			int[] inputArg={1};
 
 			//String[] relationsToBeLearned = { "isPoliticianOf",

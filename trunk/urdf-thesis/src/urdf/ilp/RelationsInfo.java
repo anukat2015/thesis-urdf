@@ -101,5 +101,28 @@ public class RelationsInfo implements Serializable
 	{
 		return this.types;
 	}
+	
+	
+	public static void printTypesAndRelations(RelationsInfo relationsInfo)
+	{
+		printTypes(relationsInfo);
+		printRelations(relationsInfo);
+	}
+	
+	public static void printTypes(RelationsInfo relationsInfo) {
+		System.out.println("Type Hierachy:");	
+		for (String k: relationsInfo.getAllTypes().keySet()) 
+			System.out.println("Type: " + relationsInfo.getAllTypes().get(k).getName() + 
+							   " SuperType: " + (relationsInfo.getAllTypes().get(k).getSuperType()==null ? "null" : relationsInfo.getAllTypes().get(k).getSuperType().getName()));
+	}
+	
+	public static void printRelations(RelationsInfo relationsInfo) {
+		System.out.println("Relations:");
+		for (String k: relationsInfo.getAllRelations().keySet()) {
+			System.out.println(relationsInfo.getAllRelations().get(k).getName() + "("+  
+							   relationsInfo.getAllRelations().get(k).getDomain().getName() + ", " + 
+							   relationsInfo.getAllRelations().get(k).getRange().getName()+")");
+		}
+	}
 
 }

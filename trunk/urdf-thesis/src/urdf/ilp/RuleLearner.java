@@ -531,8 +531,7 @@ public class RuleLearner
 		Literal lit;
 		int var=(head.getHeadRelation().getConstantInArg()==1?65:66);
 		// first get the constants if any
-		String[] clauses=queryHandler.parseRule(rule,inputArg);
-		ArrayList<String> consts=queryHandler.findConstants(rule, clauses, tChecker.getPossiblePosToBeCoveredThreshold(), tChecker.getPositivesCoveredThreshold(), tChecker.getSupportThreshold(), FactsForHead, inputArg, d);
+		ArrayList<String> consts=queryHandler.findConstants(rule, tChecker.getPossiblePosToBeCoveredThreshold(), tChecker.getPositivesCoveredThreshold(), tChecker.getSupportThreshold(), FactsForHead, inputArg, d);
 		
 		for (int i=0, len=consts.size();i<len;i++)
 		{
@@ -728,16 +727,14 @@ public class RuleLearner
 	}
 	// *************************** METHODS FOR CHECKING **********************************
 	private boolean checkForSupportAndExactExamples(Rule rule) throws Exception
-	{
-		String[] clauses=queryHandler.parseRule(rule, inputArg);
-		
-		if (tChecker.checkSupportThreshold(rule,FactsForHead,clauses,inputArg))
+	{		
+		if (tChecker.checkSupportThreshold(rule,FactsForHead,inputArg))
 		{			
 			if (rule.bindsHeadVariables())
 			{
 				if (!rule.hasFreeVariables()||allowFreeVars)
 				{
-					if(checkForPositives(rule,clauses))
+					if(checkForPositives(rule))
 					{
 						return true;
 					}
@@ -838,13 +835,9 @@ public class RuleLearner
  		
  	}
  	
-	private boolean checkForPositives(Rule rule,String[] clauses) throws Exception
+	private boolean checkForPositives(Rule rule) throws Exception
 	{
-		if (clauses==null)
-		{
-			clauses=queryHandler.parseRule(rule,inputArg);
-		}
-		if (tChecker.checkPositivesThreshold(rule,clauses,inputArg))
+		if (tChecker.checkPositivesThreshold(rule,inputArg))
 		{					
 			return true;
 		}			
@@ -1018,16 +1011,13 @@ public class RuleLearner
 	{	
 		Rule rule2=node2.getRule();
 		Rule rule1=node1.getRule();	
-		boolean goodRule=false;
-		String[] clauses2;
-		String[] clauses1=queryHandler.parseRule(rule1,inputArg);		
+		boolean goodRule=false;	
 		int overlap=0;
 		ArrayList<Rule> array=new ArrayList<Rule>();
 
 		if (rule2.isGood() && !rule2.isTooGeneral())
 		{
-			clauses2=queryHandler.parseRule(rule2,  inputArg);
-			overlap=queryHandler.calcOverlap(rule1,clauses1,rule2, clauses2);
+			overlap=queryHandler.calcOverlap(rule1,rule2);
 			goodRule=true;
 		}
 		
@@ -1195,11 +1185,11 @@ public class RuleLearner
 	{
 		if (inputArg!=2)
 		{
-			typeConstantsForArg1=queryHandler.getTypeConstants(head.getHeadRelation().getName(), numOfTries, 1);
+			typeConstantsForArg1 = queryHandler.getTypeConstants(head.getHeadRelation().getName(), numOfTries, 1);
 		}
 		if (inputArg!=1)
 		{
-			typeConstantsForArg2=queryHandler.getTypeConstants(head.getHeadRelation().getName(), numOfTries, 2);
+			typeConstantsForArg2 = queryHandler.getTypeConstants(head.getHeadRelation().getName(), numOfTries, 2);
 		}		
 	}
 
