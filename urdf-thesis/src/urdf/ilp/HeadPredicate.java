@@ -25,8 +25,8 @@ public class HeadPredicate
 		this.relationsInfo=relationsInfo;
 		this.inputArg=(inputArg==-1?headRelation.getInputArg():inputArg);
 
-		this.domain=headRelation.getDomain();//.getFirstParent();
-		this.range=headRelation.getRange();//.getFirstParent();
+		this.domain=headRelation.getDomain(); 	//.getFirstParent();
+		this.range=headRelation.getRange(); 	//.getFirstParent();
 
 		if (inputArg==2)
 		{

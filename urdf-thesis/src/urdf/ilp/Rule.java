@@ -450,8 +450,12 @@ public class Rule implements Cloneable
 		freeVariables.add(65);
 		freeVariables.add(66);
 
+		System.out.println(bodyLiterals.size());
 		for (int i=0,len=bodyLiterals.size();i<len;i++)
 		{
+			System.out.println(bodyLiterals.get(i).getRelation().getName());
+			System.out.println(bodyLiterals.get(i).getRelation().getRange().getName());
+			System.out.println(bodyLiterals.get(i).getRelation().getDomain().getName());
 			if (bodyLiterals.get(i).getRelation().isAuxiliary())
 			{
 				continue;
@@ -504,7 +508,7 @@ public class Rule implements Cloneable
 	}
 	
 	public String examplesCoveredQuery(int inputArg) {
-		String patterns = head.geSparqlPattern(inputArg);
+		String patterns = head.getSparqlPattern(inputArg);
 		patterns += getBodyPatterns();
 		return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
 	}
@@ -514,7 +518,7 @@ public class Rule implements Cloneable
 	}
 	
 	public String possiblePositivesToBeCoveredQuery(int inputArg) {
-		String patterns = head.geSparqlPattern(inputArg);
+		String patterns = head.getSparqlPattern(inputArg);
 		patterns += getBodyPatterns();
 		switch (inputArg) {
 			case 1:  return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
@@ -525,6 +529,18 @@ public class Rule implements Cloneable
 
 	public String bodySupportQuery() {
 		return "SELECT COUNT ?count WHERE {"+getBodyPatterns()+"}" ;
+	}
+
+
+	public String mult1Query() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
+	public String mult2Query() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 
