@@ -44,142 +44,134 @@ public class Rule implements Cloneable
 	private int numOfFreeVariables=2;
 	
 	ArrayList<Literal> bodyLiterals=new ArrayList<Literal>();
-	String[] sqlClauses=null;
 	
-	public Rule (Literal head)
-	{
+	public Rule (Literal head) {
 		this.head=head;
 	}
 	
 	
 	//***************** GET METHODS ****************
- 	public Literal getHead()
-	{
+ 	public Literal getHead() {
 		return this.head;
 	}
- 	public int getExamplesForSupport()
- 	{
+ 	
+ 	public int getExamplesForSupport() {
  		return this.possiblePosToBeCovered;
  	}
-	public boolean hasFreeVariables()
-	{
+	
+ 	public boolean hasFreeVariables() {
 		return this.hasFreeVariables;
 	}
-	public boolean bindsHeadVariables()
-	{
+ 	
+	public boolean bindsHeadVariables() {
 		return this.bindsHeadVariables;
 	}
-	public boolean isGood()
-	{
+	
+	public boolean isGood() {
 		return this.isGood;
 	}
-	public int getPositivesCovered()
-	{
+	
+	public int getPositivesCovered() {
 		return this.positivesCovered;
 	}
-	public int getExamplesCovered()
-	{
+	
+	public int getExamplesCovered() {
 		return this.examplesCovered;
 	}
-	public ArrayList<Literal> getBodyLiterals()
-	{
+	
+	public ArrayList<Literal> getBodyLiterals() {
 		return this.bodyLiterals;
 	}
-	public float getSupport()
-	{
+	
+	public float getSupport() {
 		return this.support;
 	}
-	public float getConfidence()
-	{
+	
+	public float getConfidence() {
 		return this.confidence;
 	}
-	public boolean isInBeam()
-	{
+	
+	public boolean isInBeam() {
 		return this.isInBeam;
 	}
-	public double getGain()
-	{
+	
+	public double getGain() {
 		return this.gain;
 	}
-	public int getBodySize()
-	{
+	
+	public int getBodySize() {
 		return this.bodySize;
 	}
-	public boolean isTooGeneral()
-	{
+	
+	public boolean isTooGeneral() {
 		return this.isTooGeneral;
 	}
-	public float getGeneralityRatio()
-	{
+	
+	public float getGeneralityRatio() {
 		return this.specialityRatio;
-	}
-	public String[] getSQLClauses()
-	{
-		return this.sqlClauses;
 	}
 
 	//***************** SET METHODS ****************
-	public void setOrigConf(float val)
-	{
+	public void setOrigConf(float val) {
 		this.origConf=val;
 	}
-	public void setHeadConf(float val)
-	{
+	
+	public void setHeadConf(float val) {
 		this.headConf=val;
 	}
- 	public void setExamplesCovered(int groundings)
-	{
+	
+ 	public void setExamplesCovered(int groundings) {
 		this.examplesCovered=groundings;
-	}	
- 	public void setPossiblePosToBeCovered(int groundings)
- 	{
+	}
+ 	
+ 	public void setPossiblePosToBeCovered(int groundings) {
  		this.possiblePosToBeCovered=groundings;
  	}
-	public void setPositivesCovered(int groundings)
-	{
+ 	
+	public void setPositivesCovered(int groundings) {
 		this.positivesCovered=groundings;
 	}
-	public void setSupport(float supp)
-	{
+	
+	public void setSupport(float supp) {
 		this.support=supp;
 	}
-	public void setConfidence(float conf, int partition)
-	{
+	
+	public void setConfidence(float conf, int partition) {
 		this.confidence=conf;		
 		this.weight=confidence;
 	}	
-	public void setIsGood(boolean flag)
-	{
+	
+	public void setIsGood(boolean flag) {
 		this.isGood=flag;
 	}
-	public void setIsInBeam(boolean flag)
-	{
+	
+	public void setIsInBeam(boolean flag) {
 		this.isInBeam=flag;
 	}
-	public void setGain(double gain)
-	{
+	
+	public void setGain(double gain) {
 		this.gain=gain;
 	}
-	public void setSpecialityRatio(float ratio)
-	{
+	
+	public void setSpecialityRatio(float ratio) {
 		this.specialityRatio=ratio;
 	}
-	public void setBodySize(int size)
-	{
+	
+	public void setBodySize(int size) {
 		this.bodySize=size;
 	}
-	public void setIsTooGeneral(boolean flag)
-	{
+	
+	public void setIsTooGeneral(boolean flag) {
 		this.isTooGeneral=flag;
 	}
-	public void setHasFreeVariables(boolean flag)
-	{
+	
+	public void setHasFreeVariables(boolean flag) {
 		this.hasFreeVariables=flag;
 	}
 	
 	// *************** OTHER METHODS *****************
-  	public boolean equals(Rule rule)
-	{
+  	
+	public boolean equals(Rule rule) {
 		boolean flag=false;
 		if (!this.head.equals(rule.head))
 			return false;
@@ -187,22 +179,17 @@ public class Rule implements Cloneable
 		if (this.bodyLiterals.size()!=rule.bodyLiterals.size())
 			return false;
 		
-		for (int i=0,len=this.bodyLiterals.size();i<len;i++)
-		{
+		for (int i=0,len=this.bodyLiterals.size();i<len;i++) {
 			
 			flag=false;
-			for (int j=0;j<rule.bodyLiterals.size();j++)
-			{
-				if(this.bodyLiterals.get(i).equals(rule.bodyLiterals.get(j)))
-				{
+			for (int j=0;j<rule.bodyLiterals.size();j++) {
+				if(this.bodyLiterals.get(i).equals(rule.bodyLiterals.get(j))) {
 					flag=true;
 					break;
 				}
 			}
 			if (!flag)
-			{
 				return false;
-			}
 			
 		}	
 		return true;
@@ -212,8 +199,7 @@ public class Rule implements Cloneable
 	 * @param literal: the literal to be add to the rule
 	 * @param position: the index in bodyLiterals of the literal on which the new Literal is connected
 	 */
-	public void addLiteral(Literal literal,int position)
-	{
+	public void addLiteral(Literal literal,int position) {
 		this.bodyLiterals.add(literal);
 		
 		// set the flags bindsHeadVariables and hasFreeVariables
@@ -228,8 +214,7 @@ public class Rule implements Cloneable
 	 *  
 	 *  CHECK AGAIN FOR EQ and constants
 	 */
-	public void addLiteral(Literal literal)
-	{
+	public void addLiteral(Literal literal) {
 		this.bodyLiterals.add(literal);
 		
 		// set the flags bindsHeadVariables and hasFreeVariables
@@ -237,64 +222,67 @@ public class Rule implements Cloneable
 		
 			
 	}
+	
+	public String getRuleString() {
+		String s=head.getRelation().getSimpleName()+"("+(char)head.getFirstArgument()+","+(char)head.getSecondArgument()+")<-";		
+		for (int i=0,len=this.bodyLiterals.size();i<len;i++) {
+			s += this.bodyLiterals.get(i).getRelation().getSimpleName()+
+				 "("+
+					(char)this.bodyLiterals.get(i).getFirstArgument()+ ","+
+					(this.bodyLiterals.get(i).getSecondArgument()>0?(char)this.bodyLiterals.get(i).getSecondArgument():this.bodyLiterals.get(i).getConstant())
+				 +")";
+		}
+		return s;
+	}
+	
+	public String getConfSuppSpec() {
+		String s =  "confidence: "+confidence+
+					" support: "+support+
+					" specialityRatio: "+specialityRatio;
+		return s;
+	}
+	
+	public String getExamplesStats() {
+		String s = "N+(c): "+positivesCovered+
+				  " E+(c): "+possiblePosToBeCovered+
+				  " N(c): "+examplesCovered+
+				  " B(c): "+bodySize+
+				  " E+: "+head.getRelation().getSize();
+		return s;
+	}
+	
 	/**
 	 * Prints the rule
 	 * @param ruleOnly: if false, print also confidence and support, otherwise only the rule itself
 	 */
-	public String printRule(boolean ruleOnly)
-	{		
-		String s=head.getRelation().getName()+"("+head.getFirstArgument()+","+head.getSecondArgument()+")<-";
-		
-		for (int i=0,len=this.bodyLiterals.size();i<len;i++)
-		{
-			s+=this.bodyLiterals.get(i).getRelation().getName()+"("+this.bodyLiterals.get(i).getFirstArgument()+","+(this.bodyLiterals.get(i).getSecondArgument()>0?this.bodyLiterals.get(i).getSecondArgument():this.bodyLiterals.get(i).getConstant())+")";
-			
+	public String printRule(boolean ruleOnly) {				
+		String s = getRuleString(); 
+		if (!ruleOnly) { // printing for the simple case of confidence
+			s += "\n" + getConfSuppSpec();
+			s += "\n" + getExamplesStats();
 		}
-		
-		s+="\n";
-		
-		
-		if (!ruleOnly)
-		{
-			// printing for the simple case of confidence
-			s+="confidence: "+confidence+" support: "+support+" specialityRatio: "+specialityRatio+"\n";
-			s+="N+(c): "+positivesCovered+" E+(c): "+possiblePosToBeCovered+" N(c): "+examplesCovered+" B(c): "+bodySize+" E+: "+head.getRelation().getSize()+"\n";
-			
-			
-			// printing for the improved Formula of confidence
-			//s+="confidence: "+confidence+" origConf: "+origConf+" headConf: "+headConf+"\n";
-			//s+="ratio: "+ratio+" missingHeadFactsOnlyHead: "+missingHeadFactsOnlyHead+" missingHeadFactsHeadBody: "+missingHeadFactsHeadBody+" missingBodyFacts: "+missingBodyFacts+" multBody: "+multBody+" multBodyIdeal: "+multBodyIdeal+"\n";
-			//s+="support: "+support+" generalityRatio: "+specialityRatio+"\n";
-			//s+="PositivesCovered: "+positivesCovered+" ExamplesForSupport: "+possiblePosToBeCovered+" ExamplesCovered: "+examplesCovered+" BodySize: "+bodySize+" Head Size: "+head.getRelation().getSize();
-			
-		}
-		System.out.println(s);
 		return s;
 	}
 	public String printForParser()
 	{
 		String s=head.getRelation().getName()+"(?"+new Character((char)head.getFirstArgument()).toString()+",?"+new Character((char)head.getSecondArgument()).toString()+",1)<=";
 		String relation;
-		for (int i=0,len=this.bodyLiterals.size();i<len;i++)
-		{
+		for (int i=0,len=this.bodyLiterals.size();i<len;i++) {
+			
 			relation=this.bodyLiterals.get(i).getRelation().getName();
 			if (relation.equals("!="))
-			{
 				relation="notEquals";
-			}
 			else if (relation.equals("="))
-			{
 				relation="equals";
-			}
-			s+=relation+"(?"+new Character((char)this.bodyLiterals.get(i).getFirstArgument()).toString()+","+(this.bodyLiterals.get(i).getSecondArgument()>0?"?"+new Character((char)this.bodyLiterals.get(i).getSecondArgument()).toString():this.bodyLiterals.get(i).getConstant())+",1);";
 			
+			s+=relation+"(?"+new Character((char)this.bodyLiterals.get(i).getFirstArgument()).toString()+","+(this.bodyLiterals.get(i).getSecondArgument()>0?"?"+new Character((char)this.bodyLiterals.get(i).getSecondArgument()).toString():this.bodyLiterals.get(i).getConstant())+",1);";
 		}
 		s+="["+this.confidence+"]";		
 		
 		return s;
 	}
-	public Rule clone()
-	{
+	
+	public Rule clone() {
 	     Rule cloned;
 		try {
 			cloned = (Rule)super.clone();
@@ -306,9 +294,7 @@ public class Rule implements Cloneable
 		    cloned.isTooGeneral=isTooGeneral;
 		    
 		    for (int i=0, len=bodyLiterals.size();i<len;i++)
-		    {
 		    	cloned.bodyLiterals.add(bodyLiterals.get(i).clone());
-		    }
 		    
 		    return cloned;
 		} catch (CloneNotSupportedException e) {
@@ -316,27 +302,20 @@ public class Rule implements Cloneable
 		}
 	    return null;
 	}
-	public int getNextVariableNumber()
-	{
+	
+	public int getNextVariableNumber() {
 		int max=66;
-		if (bodyLiterals.size()>0)
-		{
-			for (int i=0,len=bodyLiterals.size();i<len;i++)
-			{
+		if (bodyLiterals.size()>0) {
+			for (int i=0,len=bodyLiterals.size();i<len;i++) {
 				if (bodyLiterals.get(i).getFirstArgument()>max)
-				{
 					max=bodyLiterals.get(i).getFirstArgument();
-				}
 				if (bodyLiterals.get(i).getSecondArgument()>max)
-				{
 					max=bodyLiterals.get(i).getSecondArgument();
-				}
 			}
 			max++;
 			return max;
 		}
-		return 67;// head(65,66)
-		
+		return 67;// head(65,66)		
 	}
 	
 	/**
@@ -345,37 +324,30 @@ public class Rule implements Cloneable
 	 *  	hasFreeVariables
 	 *  accordingly
 	 */
-	private void setFlags()
-	{	
+	private void setFlags() {	
 		boolean exist1st=false,exist2nd=false;
 		// first check for binding the head variables
-		if (!bindsHeadVariables)
-		{
+		if (!bindsHeadVariables) {
+			
 			this.isInBeam=true; // to be change for relational info gain
 			
-			for (int i=0,len=bodyLiterals.size();i<len;i++)
-			{
+			for (int i=0,len=bodyLiterals.size();i<len;i++) {
 				if (bodyLiterals.get(i).getRelation().isAuxiliary())
-				{
 					continue;
-				}
+
 				if(bodyLiterals.get(i).getFirstArgument()==66
-						||bodyLiterals.get(i).getSecondArgument()==66)
-				{
+						||bodyLiterals.get(i).getSecondArgument()==66) {
 					exist2nd=true;
-					if (exist1st)
-					{
+					if (exist1st) {
 						bindsHeadVariables=true;
 						break;
 					}
 					
 				}
 				if(bodyLiterals.get(i).getFirstArgument()==65
-						||bodyLiterals.get(i).getSecondArgument()==65)
-				{
+						||bodyLiterals.get(i).getSecondArgument()==65) {
 					exist1st=true;
-					if (exist2nd)
-					{
+					if (exist2nd) {
 						bindsHeadVariables=true;
 						break;
 					}
@@ -383,19 +355,17 @@ public class Rule implements Cloneable
 				}
 			}
 		}
-		if (!bindsHeadVariables)
-		{
+		if (!bindsHeadVariables) {
 			isGood=false;
 		}
+
 		// then check for free variables
 		countNumberOfFreeVariables();
-		if(numOfFreeVariables>0)
-		{
+		if(numOfFreeVariables>0) {
 			hasFreeVariables=true;
 			this.isInBeam=true; // to be change for relational info gain
 		}
-		else
-		{
+		else{
 			hasFreeVariables=false;
 		}
 	}
@@ -416,21 +386,14 @@ public class Rule implements Cloneable
 		Literal previousLiteral=(position==-1?head:bodyLiterals.get(position));
 		
 		// if the previous literal had a free variable check if it is now connected
-		switch (previousLiteral.getFreeVariable())
-		{
+		switch (previousLiteral.getFreeVariable()) {
 			case 1:
-				if (previousLiteral.getFirstArgument()==newLiteral.getFirstArgument()
-						||previousLiteral.getFirstArgument()==newLiteral.getSecondArgument())
-				{
+				if (previousLiteral.getFirstArgument()==newLiteral.getFirstArgument() ||previousLiteral.getFirstArgument()==newLiteral.getSecondArgument())
 					previousLiteral.setFreeVariable(0);
-				}
 				break;
 			case 2:
-				if (previousLiteral.getSecondArgument()==newLiteral.getFirstArgument()
-						||previousLiteral.getSecondArgument()==newLiteral.getSecondArgument())
-				{
+				if (previousLiteral.getSecondArgument()==newLiteral.getFirstArgument() ||previousLiteral.getSecondArgument()==newLiteral.getSecondArgument())
 					previousLiteral.setFreeVariable(0);
-				}
 				break;
 			default: // 0
 				// do nothing
@@ -442,64 +405,85 @@ public class Rule implements Cloneable
 	 * counts the number of free variables in the rule and stores the result in
 	 * this.numOfFreeVariables
 	 */
-	private void countNumberOfFreeVariables()
-	{		
+	private void countNumberOfFreeVariables() {		
+		
 		ArrayList<Integer> freeVariables=new ArrayList<Integer>();
 		ArrayList<Integer> bindedVariables=new ArrayList<Integer>();
 		int count=0;
 		freeVariables.add(65);
 		freeVariables.add(66);
 
-		System.out.println(bodyLiterals.size());
-		for (int i=0,len=bodyLiterals.size();i<len;i++)
-		{
-			System.out.println(bodyLiterals.get(i).getRelation().getName());
-			System.out.println(bodyLiterals.get(i).getRelation().getRange().getName());
-			System.out.println(bodyLiterals.get(i).getRelation().getDomain().getName());
+		for (int i=0,len=bodyLiterals.size();i<len;i++) {
+			
 			if (bodyLiterals.get(i).getRelation().isAuxiliary())
-			{
 				continue;
-			}
+	
 			if (freeVariables.contains(bodyLiterals.get(i).getFirstArgument()))
-			{
 				bindedVariables.add(bodyLiterals.get(i).getFirstArgument());
-			}
 			else
-			{
 				freeVariables.add(bodyLiterals.get(i).getFirstArgument());
-			}
+			
 			if (freeVariables.contains(bodyLiterals.get(i).getSecondArgument()))
-			{
 				bindedVariables.add(bodyLiterals.get(i).getSecondArgument());
-			}
 			else
-			{
 				freeVariables.add(bodyLiterals.get(i).getSecondArgument());
-			}
 		}
 		
 		for (int i=0, len=freeVariables.size();i<len;i++)
-		{
 			if (!bindedVariables.contains(freeVariables.get(i)))
-			{
 				count++;
-			}
-		}
 		
 		this.numOfFreeVariables=count;
 	}
 	
 	public String getBodyPatterns() {
 		String patterns = "";
-		for (Literal literal: bodyLiterals) {
-			patterns += literal.getSparqlPattern();
+		// RDF3x requires filter patterns to be at the end
+		int firstAuxIndex = -1;
+		int countNEQ = 0;
+		for (int i=0; i<bodyLiterals.size(); i++) {
+			Literal literal = bodyLiterals.get(i);
+			if (literal.getRelation().isAuxiliary()) {
+				if (firstAuxIndex < 0) 
+					firstAuxIndex = i;
+				if (literal.getRelation().equals(RelationsInfo.NEQ))
+					countNEQ++;
+			} 
+			else
+				patterns += literal.getSparqlPattern();
 		}
+		boolean existNEQ = false;
+		if (firstAuxIndex >= 0) {
+			for (int i=firstAuxIndex; i<bodyLiterals.size(); i++) {
+				Literal literal = bodyLiterals.get(i);
+				if (literal.getRelation().isAuxiliary())
+					// If relation is EQ with a constant in second argument, substitute argument by variable instead of add filter clause
+					if (literal.getRelation().equals(RelationsInfo.EQ) && (literal.getSecondArgument() < 0)) {
+						patterns = patterns.replaceAll("\\"+literal.getFirstArgumentVariable(), literal.getConstant());
+					}
+					else
+						if (literal.getRelation().equals(RelationsInfo.NEQ)) {
+							if (existNEQ == true && literal.getConstant()==null) {
+								patterns = patterns.replaceAll("\\"+literal.getFirstArgumentVariable(), literal.getSecondArgumentVariable());
+							}
+							else {
+								patterns += literal.getSparqlPattern();							
+								existNEQ = true;
+							}
+						}
+						else
+							patterns += literal.getSparqlPattern();
+			}
+		}
+
+
 		return patterns;
 	}
 	
 	public String positivesCoveredQuery() {
 		String patterns = head.getSparqlPattern();
 		patterns += getBodyPatterns();
+		patterns = patterns.substring(0,patterns.length()-2);
 		return "SELECT COUNT ?count WHERE {"+patterns+"}";
 	}
 	
@@ -510,7 +494,8 @@ public class Rule implements Cloneable
 	public String examplesCoveredQuery(int inputArg) {
 		String patterns = head.getSparqlPattern(inputArg);
 		patterns += getBodyPatterns();
-		return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+		patterns = patterns.substring(0,patterns.length()-2);
+		return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
 	}
 	
 	public String possiblePositivesToBeCoveredQuery() {
@@ -519,16 +504,18 @@ public class Rule implements Cloneable
 	
 	public String possiblePositivesToBeCoveredQuery(int inputArg) {
 		String patterns = head.getSparqlPattern(inputArg);
-		patterns += getBodyPatterns();
+		patterns = patterns.substring(0,patterns.length()-2);
 		switch (inputArg) {
-			case 1:  return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
+			case 1:  return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
 			case 2:  return "SELECT DISTINCT ?free "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
-			default: return "SELECT DISTINCT"+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+			default: return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
 		}
 	}
 
 	public String bodySupportQuery() {
-		return "SELECT COUNT ?count WHERE {"+getBodyPatterns()+"}" ;
+		String patterns = getBodyPatterns();
+		patterns = patterns.substring(0,patterns.length()-2);
+		return "SELECT COUNT ?count WHERE {"+patterns+"}" ;
 	}
 
 

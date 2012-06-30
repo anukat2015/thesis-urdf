@@ -41,7 +41,7 @@ public class HeadSampler
  		//  @prefix x: <http://www.w3.org/2001/XMLSchema#> .
  		//  @base <http://yago-knowledge.org/resource/> .
  
- 		dumpRelations.add("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>");
+ 		//dumpRelations.add("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>");
  		dumpRelations.add("<http://www.w3.org/2000/01/rdf-schema#label>");
  		dumpRelations.add("<http://www.w3.org/2000/01/rdf-schema#domain>");
  		dumpRelations.add("<http://www.w3.org/2000/01/rdf-schema#range>");
@@ -56,7 +56,7 @@ public class HeadSampler
  		dumpRelations.add("<http://yago-knowledge.org/resource/hasWikipediaUrl>");
  		
  		
- 		dumpRelations.add("<type>");
+ 		//dumpRelations.add("<type>");
  		dumpRelations.add("<label>");
  		dumpRelations.add("<domain>");
  		dumpRelations.add("<range>");
@@ -70,7 +70,7 @@ public class HeadSampler
  		dumpRelations.add("<numberOfFacts>");
  		dumpRelations.add("<hasWikipediaUrl>");
  		
- 		dumpRelations.add("rdf:type");
+ 		//dumpRelations.add("rdf:type");
  		dumpRelations.add("rdfs:label");
  		dumpRelations.add("rdfs:domain");
  		dumpRelations.add("rdfs:range");
@@ -96,14 +96,21 @@ public class HeadSampler
         if (inFile.exists()) {
         	PrintWriter out[] = new PrintWriter[partitions];
         	
-        	for (int i=0; i<partitions; i++) 
+        	for (int i=0; i<partitions; i++) {
         		out[i] = new PrintWriter(new FileWriter(partitionPaths.replace("$n", Integer.toString(i+1))));
+        	}
 	
             BufferedReader br = new BufferedReader(new FileReader(inFile));
             String line = null;
             
+            System.out.println("Partitioning " + n3FilePath + " in " + partitions);
+            
             int relPosInLine = 1;
+            int count = 0;
             while ((line=br.readLine())!=null) {
+            	if (count++ % 100000 == 0) System.out.print(".");
+            	if (count % 10000000 == 0) System.out.println();
+            	
             	line = line.trim();
             	while (!(line.endsWith(";") || line.endsWith("."))) {
             		String cont = br.readLine();
@@ -126,6 +133,8 @@ public class HeadSampler
             br.close();
             for (int i=0; i<partitions; i++) 
             	out[i].close();
+            
+            System.out.println("Partitioning successful! =)");
             
         }
 	}

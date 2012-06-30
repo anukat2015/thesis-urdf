@@ -2,21 +2,26 @@ package urdf.ilp;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.apache.log4j.Level;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.Logger;
 
 import urdf.rdf3x.Connection;
 import urdf.rdf3x.Driver;
-import urdf.rdf3x.ResultSet;
-import urdf.rdf3x.Statement;
-
-import urdf.rdf3x.Driver;
+import urdf.ilp.ThresholdChecker;
 
 public class LearningManager 
 {
+	public static String loggerName = "logger1";
+	public static String queriesLoggerName = "queries";
+	public static String tcheckerLoggerName = "tchecker";
+	
+	public static String log4jConfig = "src/log4j.properties";
+	
 	RelationPreProcessor preprocessor;
 	RelationsInfo info;
 	HeadSampler sampler;
@@ -32,6 +37,8 @@ public class LearningManager
 	HashMap<String, RuleTreeNode> ruleNodes;
 	ArrayList<Rule> goodRulesForPartition;
 	
+	private static Logger logger = Logger.getLogger(loggerName);
+	
 	int partitionNumber;
 	
 	int inputArg;// for sampling
@@ -42,10 +49,12 @@ public class LearningManager
 			int positivesCoveredThreshold, float functionThreshold, float symmetryThreshold, int smoothingMethod, float stoppingThreshold,
 			ArrayList<Relation> relations,ArrayList<Type> types, HashMap<Integer,String>relationsForConstants, int noise,int inputArg,String baseTbl, String headTbl) throws Exception
 	{
-		System.out.println(iniFile);
+		PropertyConfigurator.configure(log4jConfig);
+		
+		logger.log(Level.INFO, iniFile);
 		
 		Connection conn = Driver.connect(iniFile);
-		Connection connPartition = Driver.connect("src/rdf3x-part0.properties");
+		Connection connPartition = Driver.connect("src/rdf3x.properties");
 		
 		
 		this.iniFile=iniFile;
@@ -55,7 +64,7 @@ public class LearningManager
 		
 		preprocessor = new RelationPreProcessor();	
 		info = preprocessor.getRelationsInfo();
-		RelationsInfo.printRelations(info);
+		
 				
 		queryHandler = new QueryHandler(connPartition, info);
 		
@@ -68,7 +77,7 @@ public class LearningManager
 				  " conf" + confidenceThreshold + 
 				  " spec" + specialityRatioThreshold + 
 				  " possPos" + possiblePosToBeCoveredThreshold;
-		System.out.println(expDesc);
+		logger.log(Level.INFO, expDesc);
 		
 		this.inputArg = inputArg;
 		this.partitionNumber = partitionNumber;
@@ -76,7 +85,16 @@ public class LearningManager
 		//sampler = new HeadSampler(conn);
 		//sample(partitionNumber,false, noise);
 		
-		System.out.println("Learning Manager Constructed Successfully");
+		// Rdf3x doesn't have RANGE and DOMAIN of TYPE relation, gotta add manually
+		String typeName = "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>";
+		Type typeRange = info.getTypeFromTypes("<http://yago-knowledge.org/resource/yagoClass>");
+		Type typeDomain = info.getTypeFromTypes("<http://yago-knowledge.org/resource/wordnet_entity_100001740>");
+		Relation typeRelation = new Relation(typeName, typeDomain, typeRange, 8419005, (float)3.1789155, (float)28.74744415283203, 0);
+		info.getAllRelations().put(typeName, typeRelation);
+		
+		//RelationsInfo.printRelations(info);
+		
+		logger.log(Level.INFO, "Learning Manager Constructed Successfully");
 
 	}
 	
@@ -85,13 +103,10 @@ public class LearningManager
 
 		for (int i=0; i<rel.length; i++){	
 			Relation headRelation = info.getRelationFromRelations(rel[i]);
-			//System.out.println(i + ": " + headRelation.getName());
-			//System.out.println(i + ": " + headRelation.getDomain().getName());
-			//System.out.println(i + ": " + headRelation.getRange().getName());
 			HeadPredicate hp = new HeadPredicate(headRelation,depth, info, inputArg[i]);
 			headPredicates.add(hp);				
 		}
-		System.out.println("HeadPredicates created...");
+		logger.log(Level.INFO, "HeadPredicates created successfully");
 	}
 	
  	public void setThresholds(float supportThreshold, float confidenceThreshold,float specialityRatioThreshold, int possiblePosToBeCoveredThreshold,
@@ -116,34 +131,27 @@ public class LearningManager
 	 */
 	public void learnOnCrossValidation(String[] relationsToBeLearned, int[] inputArg,int depth, boolean allowFreeVars, boolean tryConstants, boolean learnOnlyConstants) throws Exception
 	{
-		int gainMeasure=0;
+		int gainMeasure=3;
 		int beamWidth=0;
 		
-		//int numOfPartitions=sampler.getNumOfPartitions();
 		int numOfPartitions = partitionNumber;
 		
 		long time;
 		
-		// create the head predicates
-		System.out.println("Create Head Predicates");
+		logger.log(Level.INFO, "Creating Head Predicates");
 		createHeadPredicates(relationsToBeLearned,inputArg, depth);		
+
+		logger.log(Level.INFO, "Constructing Rule Learner");
+		learner = new RuleLearner(queryHandler,tChecker,info,allowFreeVars,gainMeasure,beamWidth,tryConstants);
 		
-		// initialize the learner
-		System.out.println("Construct Rule Learner");
-		learner=new RuleLearner(queryHandler,tChecker,info,allowFreeVars,gainMeasure,beamWidth,tryConstants);
-		
-		
-		// learn for each training and testing partition
-		System.out.println("Lear for each training and testing partition");
-		for (int i=1;i<=numOfPartitions;i++)
-		{	
+		logger.log(Level.INFO, "Learn for each training and testing partition");
+		for (int i=1;i<=numOfPartitions;i++) {	
 			time= System.currentTimeMillis();
 			goodRulesForPartition=new ArrayList<Rule>();
 			learnForPartition(i,depth);	
 			time = System.currentTimeMillis() - time;
-			System.out.println(i + ") Time elapsed for the whole partition: "+time);
+			logger.log(Level.INFO, i + ") Time elapsed for the whole partition: "+time);
 			
-			//runUrdfExp(i);		
 			break;
 			
 		}		
@@ -152,10 +160,10 @@ public class LearningManager
  	public void learnForPartition(int partitionNumber,int depth) throws Exception
 	{
  		long time;
- 		int count=0;
+ 		int count = 0;
  		ArrayList<Rule> usefullRules;
- 		rules=new HashMap<String,ArrayList<Rule>>();
- 		ruleNodes=new HashMap<String, RuleTreeNode>();
+ 		rules = new HashMap<String,ArrayList<Rule>>();
+ 		ruleNodes = new HashMap<String, RuleTreeNode>();
  		
  		
  		
@@ -167,31 +175,30 @@ public class LearningManager
   		FileWriter fstream, fstreamForURDF;
   		BufferedWriter out,outForURDF;
 				
-		for (int i=0,len=headPredicates.size();i<len;i++)
-		{	
-			System.out.println("RELATION TO BE LEARNED: "+ headPredicates.get(i).getHeadRelation().getName());
+		for (int i=0,len=headPredicates.size(); i<len; i++) {	
+			
+			logger.log(Level.INFO,"RELATION TO BE LEARNED: "+ headPredicates.get(i).getHeadRelation().getName() + " INPUT ARG:" + headPredicates.get(i).getInputArg());
+			
 			time= System.currentTimeMillis();
 			
-			// comment this
-			//trainTbl="facts";
 			learner.learnRule(headPredicates.get(i), depth);
 			time = System.currentTimeMillis() - time; // time for one full round of training and testing
-			
-			//learner.printRules();
-			//System.out.println("Time elapsed: "+time);
+		
 						
 			rules.put(headPredicates.get(i).getHeadRelation().getName(), learner.getLearnedRules());
 			ruleNodes.put(headPredicates.get(i).getHeadRelation().getName(), learner.getRuleNode());
 			
 			usefullRules=learner.getLearnedRules();
 			
-			for (int j=0;j<usefullRules.size();j++)
-			{
+			String toLog = "Useful Rules: ";
+			for (int j=0;j<usefullRules.size();j++) {
 				goodRulesForPartition.add(usefullRules.get(j));
+				toLog += "\n" + usefullRules.get(j).printRule(false);
 			}
+			logger.log(Level.INFO, toLog);
 			
-			fstream = new FileWriter(headPredicates.get(i).getHeadRelation().getName()+expDesc+".txt");	
-			fstreamForURDF= new FileWriter(headPredicates.get(i).getHeadRelation().getName()+expDesc+"ForURDF.txt");	
+			fstream = new FileWriter("rules/"+headPredicates.get(i).getHeadRelation().getSimpleName()+expDesc+".txt");	
+			fstreamForURDF= new FileWriter("rules/"+headPredicates.get(i).getHeadRelation().getSimpleName()+expDesc+"ForURDF.txt");	
 			outForURDF= new BufferedWriter(fstreamForURDF);
 			out = new BufferedWriter(fstream);
 			
@@ -211,26 +218,6 @@ public class LearningManager
 			out.close();
 			outForURDF.close();
 		}		
-	}
-	
-
-	private void runUrdfExp(int partition) throws Exception
-	{
-		String s="";
-		String path="conf050";
-  		//FileWriter fstream=new FileWriter(path+"/"+"Rules_"+partition+".out");
-  		FileWriter fstream=new FileWriter("Rules_"+partition+".out");
-  		BufferedWriter out= new BufferedWriter(fstream);
-  		
-  		for (int i=0,len=goodRulesForPartition.size();i<len;i++)
-  		{
-  			s=goodRulesForPartition.get(i).printRule(false);
-  			out.write(s+"\n");
-  		}
-  		
-  		out.close();
-  		
-		//Urdf_exp exp=new Urdf_exp(goodRulesForPartition, iniFile, partition,info,inputArg,path);
 	}
 	
 	

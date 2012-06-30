@@ -1,7 +1,5 @@
 package urdf.rdf3x;
 
-
-
 import java.sql.*;
 import java.util.Map;
 import java.util.Properties;
@@ -51,7 +49,10 @@ public final class ResultSet implements java.sql.ResultSet
    // Move after the last entry
    public void afterLast() { row=data.length; }
    // Move before the first entry
-   public void beforeFirst() throws SQLException { throw new SQLFeatureNotSupportedException(); }
+   public void beforeFirst() throws SQLException { 
+	   //throw new SQLFeatureNotSupportedException();
+	   row=-1;
+   }
    // Cancel all updates
    public void cancelRowUpdates() throws SQLException { throw new SQLFeatureNotSupportedException(); }
    // Clear all warnings

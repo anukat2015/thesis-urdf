@@ -55,15 +55,28 @@ public class ilpTesting {
 			// "isAffiliatedTo", "originatesFrom", "worksAt","diedIn"};
 			// int[] inputArg={1,1,1,1,1,1};
 
-			// String[]
-			// relationsToBeLearned={"livesIn","politicianOf","bornIn","graduatedFrom","hasPredecessor",
-			// "hasSuccessor","locatedIn","isMarriedTo","influences","hasCapital","hasChild",
-			// "isAffiliatedTo", "originatesFrom", "worksAt","diedIn"};
-			// int[] inputArg={1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
-
+			/* String[]
+			 relationsToBeLearned = { "<http://yago-knowledge.org/resource/isPoliticianOf>",
+					 				  "<http://yago-knowledge.org/resource/livesIn>",
+					 				  "<http://yago-knowledge.org/resource/wasBornIn>",
+					 				  "<http://yago-knowledge.org/resource/isLocatedIn>",
+					 				  "<http://yago-knowledge.org/resource/isMarriedTo>",
+					 				  "<http://yago-knowledge.org/resource/hasCapital>",
+					 				  "<http://yago-knowledge.org/resource/hasChild>",
+					 				  "<http://yago-knowledge.org/resource/worksAt>",
+					 				  "<http://yago-knowledge.org/resource/hasPoverty>",
+					 				  "<http://yago-knowledge.org/resource/hasOfficialLanguage>",
+					 				  "<http://yago-knowledge.org/resource/produced>",
+					 				  "<http://yago-knowledge.org/resource/created>",
+					 				  "<http://yago-knowledge.org/resource/actedIn>",
+					 				  "<http://yago-knowledge.org/resource/directed>",
+					 				  "<http://yago-knowledge.org/resource/diedIn>"};
+			 int[] inputArg = {2,0,1,2,0,2,2,0,1,2,0,1,2,0,1};
+			*/
+			
 			// relations for yago2
-			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
-			int[] inputArg={1};
+			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
+			int[] inputArg={0};
 
 			//String[] relationsToBeLearned = { "isPoliticianOf",
 			//		"graduatedFrom", "directed", "hasAcademicAdvisor",

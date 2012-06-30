@@ -34,14 +34,12 @@ public class Relation implements Serializable
 	
 
 	
-	public Relation(String name, Type domain, Type range)
-	{
+	public Relation(String name, Type domain, Type range) {
 		this.name=name;
 		this.domain=domain;
 		this.range=range;
 	}
- 	public Relation(String name, Type domain, Type range,int size,float mult1, float mult2, int constantInArg)
-	{
+ 	public Relation(String name, Type domain, Type range,int size,float mult1, float mult2, int constantInArg) {
 		this.name	= name;
 		this.domain	= domain;
 		this.range	= range;
@@ -53,25 +51,20 @@ public class Relation implements Serializable
 		
 		this.constantInArg=constantInArg;
 		
-		if (mult1==1)
-		{
+		if (mult1==1) {
 			isFunction=true;
 			inputArg=1;
 		}
-		else if (mult2==1)
-		{
+		else if (mult2==1) {
 			inputArg=2;
 		}
-		else if (mult1<2)
-		{
+		else if (mult1<2) {
 			inputArg=1;
 		}
-		else if (mult1<2)
-		{
+		else if (mult1<2) {
 			inputArg=2;
 		}
-		else
-		{
+		else {
 			inputArg=0;
 		}
 		
@@ -85,21 +78,47 @@ public class Relation implements Serializable
  		else
  			return var2; 		
  	}
- 	public int getDistinctEntities(int arg)
- 	{
+ 	
+ 	public int getDistinctEntities(int arg) {
  		if (arg==1)
  			return distinctEntitiesArg1;
  		else
  			return distinctEntitiesArg2;
  	}
-	public int getSize(){return this.size;	}
-	public int getConstantInArg(){return this.constantInArg;}
-	public int getInputArg(){return this.inputArg;}
- 	public String getName(){return this.name;}
-	public Type getDomain(){return this.domain;}
-	public Type getRange(){	return this.range;}
-	public boolean isFunction(){return this.isFunction;}
-	public boolean isSymmetric(){return this.isSymmetric;}
+	
+ 	public int getSize(){	
+		return this.size;	
+	}
+	
+	public int getConstantInArg(){
+		return this.constantInArg;
+	}
+	
+	public int getInputArg(){
+		return this.inputArg;
+	}
+ 	
+	public String getName(){
+ 		return this.name;
+ 	}
+ 	
+	public String getSimpleName() {
+ 		return this.name.substring(Math.max(name.lastIndexOf('/'), name.lastIndexOf('#'))+1, name.length()-1);
+ 	}
+	
+ 	public Type getDomain(){
+ 		return this.domain;
+ 	}
+	
+ 	public Type getRange(){	
+ 		return this.range;
+ 	}
+	
+ 	public boolean isFunction(){
+ 		return this.isFunction;
+ 	}
+	
+ 	public boolean isSymmetric(){return this.isSymmetric;}
 	
 	public int getRelationsForm(){
 		if (domain.isChildOf(range)||range.isChildOf(domain)|| domain.equals(range))
@@ -108,18 +127,23 @@ public class Relation implements Serializable
 			return 2;
 	}
 	
-	public float getMult1(){return this.mult1;}
-	public float getMult2(){return this.mult2;}
-	public float getMult(int arg){
-		
+	public float getMult1(){
+		return this.mult1;
+	}
+	
+	public float getMult2(){
+		return this.mult2;
+	}
+	
+	public float getMult(int arg){	
 		if (arg==1)
 			return this.mult1;
 		else
 			return this.mult2;
 		
 	}
-	public float getIdealMult(int arg)
-	{
+	
+	public float getIdealMult(int arg) {
 		if (arg==1)
 		{
 			return idealMult1;
@@ -155,6 +179,7 @@ public class Relation implements Serializable
 	public void setIsSymmetric(boolean isSymmetric){this.isSymmetric=isSymmetric;}
 	public void setSize(int size){this.size=size;}
 	public void setInputArg(int arg){this.inputArg=arg;}
+	
 	public boolean equals(Relation rel)
 	{
 		if (rel==null || rel.name==null) return false;

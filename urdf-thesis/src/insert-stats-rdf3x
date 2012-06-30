@@ -1,3 +1,5 @@
+insert data { <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#range> <http://yago-knowledge.org/resource/yagoClass> . }
+insert data { <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2000/01/rdf-schema#domain> <http://yago-knowledge.org/resource/wordnet_entity_100001740> . }
 insert data { <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://yago-knowledge.org/resource/hasArg1Mult> "3.1789155" . }
 insert data { <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://yago-knowledge.org/resource/hasArg2Mult> "28.74744415283203" . }
 insert data { <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://yago-knowledge.org/resource/numberOfFacts> "8419005" . }
