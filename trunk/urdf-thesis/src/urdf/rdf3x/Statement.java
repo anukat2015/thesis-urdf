@@ -2,8 +2,13 @@ package urdf.rdf3x;
 
 
 import java.sql.*;
-import java.util.Map;
-import java.util.Properties;
+
+import org.apache.log4j.Level;
+import org.apache.log4j.PropertyConfigurator;
+import org.apache.log4j.Logger;
+
+import urdf.ilp.LearningManager;
+import urdf.rdf3x.ResultSet;
 
 // RDF-3X
 // (c) 2009 Thomas Neumann. Web site: http://www.mpi-inf.mpg.de/~neumann/rdf3x
@@ -18,10 +23,13 @@ public final class Statement implements java.sql.Statement
 {
    // The connection
    private Connection connection;
+   
+   private static Logger logger = Logger.getLogger(LearningManager.queriesLoggerName);
 
    // Constructor
    Statement(Connection connection) {
       this.connection=connection;
+      PropertyConfigurator.configure(LearningManager.log4jConfig);
    }
 
    // Add to batch
@@ -48,6 +56,11 @@ public final class Statement implements java.sql.Statement
    private java.sql.ResultSet executeQueryInternal(String query,FunctionCallback callback) throws SQLException{
       synchronized (connection) {
          // Send the query
+    	  
+    	 long t = System.currentTimeMillis(); 
+    	 
+    	 logger.log(Level.INFO, query);
+    	 
          connection.assertOpen();
          connection.writeLine(query);
 
@@ -86,6 +99,12 @@ public final class Statement implements java.sql.Statement
             }
             result.add(row);
          }
+         
+         t = System.currentTimeMillis() - t;
+         
+         Level level = (t<1000)?Level.INFO:Level.WARN;
+         String numberOfRows = ((header[1].equals("count") && !result.isEmpty())?result.get(0)[1]:Integer.toString(result.size()));         
+         logger.log(level, "["+(t)+"ms,"+numberOfRows+"rows] "+query);
 
          return new ResultSet(header,result.toArray(new String[0][]));
       }
@@ -97,6 +116,43 @@ public final class Statement implements java.sql.Statement
    // Execute a query
    public java.sql.ResultSet executeQueryWithFunctions(String query,FunctionCallback functions) throws SQLException{
       return executeQueryInternal(query,functions);
+   }
+   // Execute and return only number of rows
+   public java.sql.ResultSet executeQueryCountRows(String query) throws SQLException{
+      synchronized (connection) {
+          // Send the query
+     	  
+     	  long t = System.currentTimeMillis(); 
+     	 
+     	  logger.log(Level.INFO, query);
+     	 
+          connection.assertOpen();
+          connection.writeLine(query);
+
+          // Check the answer
+          String response=connection.readLine();
+          if (!("ok".equals(response)))
+             throw new SQLException(response);
+
+          // Header
+          String[] header=connection.readResultLine();
+          header = new String[1];
+          header[0] = "count";
+
+          // Collect entries
+          int numberOfRows = 0;
+          while (connection.readResultLine() != null) {
+             numberOfRows++;
+          }
+          String result[][] = new String[1][1];
+          result[0][0] = Integer.toString(numberOfRows);
+          
+          t = System.currentTimeMillis() - t;
+          Level level = (t<1000)?Level.INFO:Level.WARN;
+          logger.log(level,"["+(t)+"ms,"+numberOfRows+"rows]");
+
+          return new ResultSet(header,result);
+       }
    }
    // Execute a statement
    public int executeUpdate(String sql) throws SQLException { executeQuery(sql); return 0; }

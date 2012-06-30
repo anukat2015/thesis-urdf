@@ -12,8 +12,8 @@ public class Literal implements Cloneable
 	private static final String suffix = ">";
 	
 	private Relation relation;
-	private char firstArgument;
-	private char secondArgument;
+	private int firstArgument;
+	private int secondArgument;
 	// modes for first and second arg. 0:new variable 1: old variable
 	private int firstMode=0;
 	private int secondMode=0;
@@ -23,11 +23,11 @@ public class Literal implements Cloneable
 	
 	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, int freeVariable) throws Exception {
 		if (firstArgument>0 && secondArgument>0 && (firstArgument<65 || firstArgument>90 ||secondArgument<65 || secondArgument>90))
-			throw new Exception("argument numbers should be between 65 and 90");
+			throw new Exception("Argument numbers should be between 65 and 90 (arg1="+firstArgument+",arg2="+secondArgument+")");
 		this.relation=relation;
-		this.firstArgument = (char) firstArgument;
+		this.firstArgument = firstArgument;
 		this.firstMode=firstMode;
-		this.secondArgument = (char) secondArgument;
+		this.secondArgument = secondArgument;
 		this.secondMode=secondMode;
 		this.freeVariable=freeVariable;
 		
@@ -37,7 +37,7 @@ public class Literal implements Cloneable
 		this(relation, firstArgument, 1, secondArgument, 1, 0);
 	}
 	
-	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode,String constant) throws Exception {
+	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, String constant) throws Exception {
 		this(relation, firstArgument, firstMode, secondArgument, secondMode, 0);
 		if (!(relation.equals(RelationsInfo.EQ)||relation.equals(RelationsInfo.GT)||relation.equals(RelationsInfo.LT)))
 			throw new Exception("constant does not make sense for relation other than EQ,GT,LT");
@@ -82,11 +82,11 @@ public class Literal implements Cloneable
 	}
 	
 	public String getFirstArgumentVariable(){
-		return "?" + this.firstArgument;
+		return "?" + (char)firstArgument;
 	}
 	
 	public String getSecondArgumentVariable(){
-		return "?" + this.secondArgument;
+		return "?" + (char)secondArgument;
 	}
 	
 	public String getRelationName(){
@@ -135,23 +135,26 @@ public class Literal implements Cloneable
 	
 	public String getRelationNameRdf3x() {
 		String name = relation.getName();
-		if (!name.contains(prefix)) 
-			name = prefix + name + suffix;
+		//if (!name.contains(prefix)) 
+		//	name = prefix + name + suffix;
 		return name; 
 	}
 	
 	public String getSparqlPattern() {
 		if (relation.isAuxiliary()) 
-			return "filter( ?"+firstArgument+" "+relation.getName()+" ?"+secondArgument+" ) .";
+			if (constant == null)
+				return "filter( ?" + (char)firstArgument + " "+relation.getName()+" ?"+ (char)secondArgument +" ) . ";
+			else
+				return "filter( ?" + (char)firstArgument + " "+relation.getName()+" "+ constant +" ) . ";
 		else
 			return getSparqlPattern(0);
 	}
 	
 	public String getSparqlPattern(int inputArg) {
 		switch (inputArg) {
-			case 1:  return "?" + firstArgument + " " + getRelationNameRdf3x() + " ?free . ";
-			case 2:  return "?free " + getRelationNameRdf3x() + " ?" + secondArgument + " . ";
-			default: return "?" + firstArgument + " " + getRelationNameRdf3x() + " ?" + secondArgument + " . ";
+			case 1:  return "?" + (char)firstArgument + " " + getRelationName() + " ?free . ";
+			case 2:  return "?free " + getRelationNameRdf3x() + " ?" + (char)secondArgument + " . ";
+			default: return "?" + (char)firstArgument + " " + getRelationName() + " ?" + (char)secondArgument + " . ";
 		}
 	}
 	

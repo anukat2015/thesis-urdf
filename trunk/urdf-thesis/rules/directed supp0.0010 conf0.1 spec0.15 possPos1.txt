@@ -1,0 +1,18 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/directed>
+ 
+directed(A,B)<-edited(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_Black-and-white_films>)
+confidence: 0.89259243 support: 0.0016237168 specialityRatio: 0.46268657
+N+(c): 62 E+(c): 38184 N(c): 62 B(c): 134 E+: 38184
+directed(A,B)<-edited(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_Black-and-white_films>)
+confidence: 0.89259243 support: 0.0016237168 specialityRatio: 0.46268657
+N+(c): 62 E+(c): 38184 N(c): 62 B(c): 134 E+: 38184
+directed(A,B)<-edited(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_Black-and-white_films>)
+confidence: 0.89259243 support: 0.0016237168 specialityRatio: 0.46268657
+N+(c): 62 E+(c): 38184 N(c): 62 B(c): 134 E+: 38184
+directed(A,B)<-edited(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_Black-and-white_films>)
+confidence: 0.89259243 support: 0.0016237168 specialityRatio: 0.46268657
+N+(c): 62 E+(c): 38184 N(c): 62 B(c): 134 E+: 38184
+directed(A,B)<-edited(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_Black-and-white_films>)
+confidence: 0.89259243 support: 0.0016237168 specialityRatio: 0.46268657
+N+(c): 62 E+(c): 38184 N(c): 62 B(c): 134 E+: 38184
+time elapsed for whole partition: 119555

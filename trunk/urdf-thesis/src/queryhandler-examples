@@ -13,6 +13,12 @@ livesIn(65,66)<-isMarriedTo(65,67)livesIn(67,66)!=(65,67)
 confidence: 0.0 support: 0.0 specialityRatio: 0.0
 N+(c): -1 E+(c): -1 N(c): -1 B(c): -1 E+: 0
 
+select count ?arg2 where {positivescovered} 
+
+SELECT input FROM (SELECT  f1.arg1 input, f2.arg2 output FROM head f0, base f1, base f2 WHERE f0.relation=? AND f1.relation=? AND  f0.arg1=f1.arg1 AND f2.relation=? AND  f0.arg2=f2.arg2 AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 GROUP BY  f1.arg1, f2.arg2)
+INTERSECT
+SELECT arg2 FROM (SELECT f0.arg1,f0.arg2 FROM head f0 WHERE f0.relation=? AND f0.arg1 IN (SELECT f1.arg1 FROM base f1, base f2 WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 ) GROUP BY f0.arg1,f0.arg2) GROUP BY arg2 HAVING count(*)+possiblePosToBeCoveredThershold OR count(*)>supportThreshold*factsForHead
+
 Clause[0] =  SELECT  f1.arg1 input, f2.arg2 output
 Clause[1] =  FROM base f1, base f2
 Clause[2] =  WHERE f1.relation=? AND f2.relation=? AND f2.arg1=f1.arg2 AND f1.arg1!=f1.arg2 

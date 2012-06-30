@@ -1,0 +1,24 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/diedIn>
+ 
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_sovereign_110628644>)
+confidence: 0.25065964 support: 0.012970124 specialityRatio: 0.36724806
+N+(c): 95 E+(c): 29221 N(c): 379 B(c): 1032 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.1553398 support: 0.010574587 specialityRatio: 0.30234835
+N+(c): 48 E+(c): 29221 N(c): 309 B(c): 1022 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_writer_110794014>)
+confidence: 0.19277108 support: 0.008521269 specialityRatio: 0.20064464
+N+(c): 48 E+(c): 29221 N(c): 249 B(c): 1241 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_People_from_New_York_City>)
+confidence: 0.18118466 support: 0.009821704 specialityRatio: 0.23314379
+N+(c): 52 E+(c): 29221 N(c): 287 B(c): 1231 E+: 29221
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(C,B)
+confidence: 0.1301845 support: 0.026590466 specialityRatio: 0.15857142
+N+(c): 120 E+(c): 29221 N(c): 777 B(c): 4900 E+: 29221
+diedIn(A,B)<-hasChild(C,A)wasBornIn(C,B)
+confidence: 0.11630828 support: 0.022346942 specialityRatio: 0.20869288
+N+(c): 100 E+(c): 29221 N(c): 653 B(c): 3129 E+: 29221
+diedIn(A,B)<-isMarriedTo(C,A)wasBornIn(C,B)
+confidence: 0.1301845 support: 0.026590466 specialityRatio: 0.15857142
+N+(c): 120 E+(c): 29221 N(c): 777 B(c): 4900 E+: 29221
+time elapsed for whole partition: 15198

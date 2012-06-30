@@ -1,0 +1,33 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/produced>
+ 
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)type(B,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_films>)
+confidence: 0.7820007 support: 0.008539099 specialityRatio: 0.19061033
+N+(c): 203 E+(c): 23773 N(c): 203 B(c): 1065 E+: 23773
+time elapsed for whole partition: 30549

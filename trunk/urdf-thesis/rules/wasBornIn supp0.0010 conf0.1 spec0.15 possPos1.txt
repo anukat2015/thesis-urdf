@@ -1,0 +1,21 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/wasBornIn>
+ 
+wasBornIn(A,B)<-diedIn(A,B)
+confidence: 0.1972065 support: 0.14521433 specialityRatio: 0.4532699
+N+(c): 2612 E+(c): 91210 N(c): 13245 B(c): 29221 E+: 91210
+wasBornIn(A,B)<-hasAcademicAdvisor(A,C)diedIn(C,B)
+confidence: 0.11624157 support: 0.0036399518 specialityRatio: 0.36008677
+N+(c): 45 E+(c): 91210 N(c): 332 B(c): 922 E+: 91210
+wasBornIn(A,B)<-hasChild(A,C)diedIn(C,B)
+confidence: 0.10381787 support: 0.006709791 specialityRatio: 0.27906978
+N+(c): 100 E+(c): 91210 N(c): 612 B(c): 2193 E+: 91210
+wasBornIn(A,B)<-livesIn(A,B)
+confidence: 0.119524814 support: 0.088520996 specialityRatio: 0.38664877
+N+(c): 1408 E+(c): 91210 N(c): 8074 B(c): 20882 E+: 91210
+wasBornIn(A,B)<-isMarriedTo(A,C)diedIn(C,B)
+confidence: 0.12945583 support: 0.008485911 specialityRatio: 0.27962428
+N+(c): 120 E+(c): 91210 N(c): 774 B(c): 2768 E+: 91210
+wasBornIn(A,B)<-isMarriedTo(C,A)diedIn(C,B)
+confidence: 0.12945583 support: 0.008485911 specialityRatio: 0.27962428
+N+(c): 120 E+(c): 91210 N(c): 774 B(c): 2768 E+: 91210
+time elapsed for whole partition: 120995

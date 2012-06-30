@@ -142,30 +142,21 @@ public class RuleTreeNode
 	 */
 	public void getRulesOfTree(ArrayList<Rule> rulesArray,boolean onlyGoodRules, boolean onlyGeneralRules, boolean allowFreeVars)
 	{
-		if (rulesArray==null)
-		{
+		if (rulesArray==null) {
 			rulesArray=new ArrayList<Rule>();
 		}		
 
-		if (this.parent!=null)
-		{
-			if (allowFreeVars || !rule.hasFreeVariables())
-			{
-				
-				
-				if (!onlyGoodRules || rule.isGood())
-				{
-					if (onlyGeneralRules)
-					{
-						if (rule.isTooGeneral())
-						{
+		if (this.parent!=null) {
+			if (allowFreeVars || !rule.hasFreeVariables()) {
+
+				if (!onlyGoodRules || rule.isGood()) {
+					if (onlyGeneralRules) {
+						if (rule.isTooGeneral()) {
 							rulesArray.add(rule);
 						}
 					}
-					else
-					{
-						if (!rule.isTooGeneral())
-						{
+					else {
+						if (!rule.isTooGeneral()) {
 							rulesArray.add(rule);
 						}
 					}
@@ -173,10 +164,8 @@ public class RuleTreeNode
 				}			
 			}
 		}
-		if(children!=null && children.size()>0)
-		{
-			for (int i=0,len=children.size();i<len;i++)
-			{
+		if(children!=null && children.size()>0) {
+			for (int i=0,len=children.size();i<len;i++) {
 				children.get(i).getRulesOfTree(rulesArray,onlyGoodRules, onlyGeneralRules,allowFreeVars);
 			}
 		}
