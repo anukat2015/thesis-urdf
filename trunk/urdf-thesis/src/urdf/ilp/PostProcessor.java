@@ -278,8 +278,9 @@ public class PostProcessor
 	{
 		try
 		{
-			RelationPreProcessor preprocessor=new RelationPreProcessor(args[0]);			
-			RelationsInfo info=preprocessor.getRelationsInfo();
+			//RelationPreProcessor preprocessor=new RelationPreProcessor(args[0]);			
+			//RelationsInfo info=preprocessor.getRelationsInfo();
+			RelationsInfo info = RelationsInfo.readFromDisk();
 			
 			Rule orRule= new Rule(new Literal(info.getRelationFromRelations("bornIn"),65,66));
 			Literal lit=new Literal(info.getRelationFromRelations("hasSuccessor"),65,67);			

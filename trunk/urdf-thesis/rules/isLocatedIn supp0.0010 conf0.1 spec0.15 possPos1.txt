@@ -1,3 +1,3 @@
 TARGET PREDICATE: <http://yago-knowledge.org/resource/isLocatedIn>
  
-time elapsed for whole partition: 2265
+time elapsed for whole partition: 2469

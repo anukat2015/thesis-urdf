@@ -1,0 +1,117 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/produced>
+ 
+produced(A,B)<-created(A,C)produced(D,C)created(D,B)
+confidence: 0.11883856 support: 0.30530435 specialityRatio: 0.18705153
+N+(c): 19599 E+(c): 7258 N(c): 24191 B(c): 129328 E+: 23773
+produced(A,B)<-created(A,C)wroteMusicFor(D,C)actedIn(D,B)
+confidence: 0.14561534 support: 0.03466117 specialityRatio: 0.2828746
+N+(c): 254 E+(c): 824 N(c): 1110 B(c): 3924 E+: 23773
+produced(A,B)<-created(A,C)wroteMusicFor(D,C)edited(D,B)
+confidence: 0.14654805 support: 0.008244648 specialityRatio: 0.30107528
+N+(c): 74 E+(c): 374 N(c): 196 B(c): 651 E+: 23773
+produced(A,B)<-created(A,C)wroteMusicFor(D,C)directed(D,B)
+confidence: 0.2453941 support: 0.01560594 specialityRatio: 0.27285612
+N+(c): 237 E+(c): 371 N(c): 770 B(c): 2822 E+: 23773
+produced(A,B)<-created(A,C)actedIn(D,C)wroteMusicFor(D,B)
+confidence: 0.12107656 support: 0.050771885 specialityRatio: 0.2948937
+N+(c): 322 E+(c): 1481 N(c): 1207 B(c): 4093 E+: 23773
+produced(A,B)<-created(A,C)actedIn(D,C)edited(D,B)
+confidence: 0.11793244 support: 0.0130820675 specialityRatio: 0.16838115
+N+(c): 160 E+(c): 647 N(c): 311 B(c): 1847 E+: 23773
+produced(A,B)<-created(A,C)edited(D,C)wroteMusicFor(D,B)
+confidence: 0.24929693 support: 0.0055945823 specialityRatio: 0.20182094
+N+(c): 95 E+(c): 176 N(c): 133 B(c): 659 E+: 23773
+produced(A,B)<-created(A,C)edited(D,C)actedIn(D,B)
+confidence: 0.18104635 support: 0.010179616 specialityRatio: 0.20763423
+N+(c): 189 E+(c): 242 N(c): 495 B(c): 2384 E+: 23773
+produced(A,B)<-created(A,C)directed(D,C)wroteMusicFor(D,B)
+confidence: 0.26382306 support: 0.018466327 specialityRatio: 0.18437631
+N+(c): 311 E+(c): 528 N(c): 439 B(c): 2381 E+: 23773
+produced(A,B)<-created(A,B)wroteMusicFor(C,B)actedIn(C,B)
+confidence: 0.37306193 support: 0.003112775 specialityRatio: 0.5323741
+N+(c): 46 E+(c): 240 N(c): 74 B(c): 139 E+: 23773
+produced(A,B)<-created(A,B)wroteMusicFor(C,B)directed(C,B)
+confidence: 0.39698872 support: 0.0033230977 specialityRatio: 0.45142856
+N+(c): 45 E+(c): 136 N(c): 79 B(c): 175 E+: 23773
+produced(A,B)<-created(A,B)actedIn(C,B)edited(C,B)
+confidence: 0.31825316 support: 0.0025238716 specialityRatio: 0.7894737
+N+(c): 31 E+(c): 98 N(c): 60 B(c): 76 E+: 23773
+produced(A,B)<-created(A,B)actedIn(C,B)directed(C,B)
+confidence: 0.21199904 support: 0.01821394 specialityRatio: 0.37982455
+N+(c): 169 E+(c): 1076 N(c): 433 B(c): 1140 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.1013273 support: 0.11862197 specialityRatio: 0.783551
+N+(c): 486 E+(c): 3787 N(c): 2820 B(c): 3599 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.10797198 support: 0.17805915 specialityRatio: 0.29175267
+N+(c): 943 E+(c): 4233 N(c): 5936 B(c): 20346 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.1112893 support: 0.0938039 specialityRatio: 0.55912864
+N+(c): 495 E+(c): 2230 N(c): 3234 B(c): 5784 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.12964831 support: 0.09220544 specialityRatio: 0.31309628
+N+(c): 501 E+(c): 2192 N(c): 4332 B(c): 13836 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.110454656 support: 0.044840787 specialityRatio: 0.4295673
+N+(c): 237 E+(c): 1066 N(c): 1787 B(c): 4160 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_film_studio_executives>)
+confidence: 0.20661156 support: 0.00530013 specialityRatio: 0.9692308
+N+(c): 71 E+(c): 773 N(c): 126 B(c): 130 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.12401004 support: 0.03352543 specialityRatio: 0.6181319
+N+(c): 131 E+(c): 797 N(c): 900 B(c): 1456 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Indian_film_producers>)
+confidence: 0.18948464 support: 0.0086652925 specialityRatio: 0.7773585
+N+(c): 70 E+(c): 355 N(c): 206 B(c): 265 E+: 23773
+produced(A,B)<-created(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_People_from_Los_Angeles,_California>)
+confidence: 0.10239942 support: 0.015437681 specialityRatio: 0.15710616
+N+(c): 63 E+(c): 425 N(c): 367 B(c): 2336 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_studio_executives>)
+confidence: 0.23279402 support: 0.0049215495 specialityRatio: 0.96694213
+N+(c): 71 E+(c): 755 N(c): 117 B(c): 121 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Indian_film_producers>)
+confidence: 0.20265523 support: 0.007445421 specialityRatio: 0.8082192
+N+(c): 57 E+(c): 269 N(c): 177 B(c): 219 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_Irish_descent>)
+confidence: 0.11596216 support: 0.016615488 specialityRatio: 0.20877379
+N+(c): 93 E+(c): 749 N(c): 395 B(c): 1892 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)
+confidence: 0.12926751 support: 0.021789424 specialityRatio: 0.16591929
+N+(c): 111 E+(c): 724 N(c): 518 B(c): 3122 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.19033018 support: 0.004122324 specialityRatio: 0.69014084
+N+(c): 35 E+(c): 263 N(c): 98 B(c): 142 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.13838655 support: 0.0074874857 specialityRatio: 0.34099618
+N+(c): 40 E+(c): 239 N(c): 178 B(c): 522 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.16171162 support: 0.0063096792 specialityRatio: 0.5084746
+N+(c): 42 E+(c): 337 N(c): 150 B(c): 295 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.17087802 support: 0.0035334202 specialityRatio: 0.8659794
+N+(c): 30 E+(c): 254 N(c): 84 B(c): 97 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_actors>)
+confidence: 0.15750597 support: 0.0026921297 specialityRatio: 0.48854962
+N+(c): 24 E+(c): 176 N(c): 64 B(c): 131 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.14866744 support: 0.0020190973 specialityRatio: 0.7058824
+N+(c): 13 E+(c): 199 N(c): 48 B(c): 68 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.22460656 support: 0.0013460648 specialityRatio: 0.7804878
+N+(c): 19 E+(c): 96 N(c): 32 B(c): 41 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.21461008 support: 0.0012619358 specialityRatio: 0.902439
+N+(c): 8 E+(c): 30 N(c): 37 B(c): 41 E+: 23773
+produced(A,B)<-hasPreferredName(A,C)isCalled(D,C)directed(D,B)
+confidence: 0.141966 support: 0.2893619 specialityRatio: 0.36385104
+N+(c): 2041 E+(c): 6879 N(c): 14021 B(c): 38535 E+: 23773
+produced(A,B)<-isCalled(A,C)hasPreferredName(D,C)wroteMusicFor(D,B)
+confidence: 0.1059685 support: 0.027804652 specialityRatio: 0.17669469
+N+(c): 278 E+(c): 661 N(c): 2922 B(c): 16537 E+: 23773
+produced(A,B)<-isCalled(A,C)hasPreferredName(D,C)edited(D,B)
+confidence: 0.13762532 support: 0.023850586 specialityRatio: 0.16720732
+N+(c): 118 E+(c): 735 N(c): 567 B(c): 3391 E+: 23773
+produced(A,B)<-isCalled(A,C)hasPreferredName(D,C)directed(D,B)
+confidence: 0.14626423 support: 0.28948808 specialityRatio: 0.44886854
+N+(c): 2040 E+(c): 6882 N(c): 14024 B(c): 31243 E+: 23773
+time elapsed for whole partition: 377372

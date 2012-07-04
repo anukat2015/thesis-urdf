@@ -1,0 +1,3 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/hasChild>
+ 
+time elapsed for whole partition: 1161

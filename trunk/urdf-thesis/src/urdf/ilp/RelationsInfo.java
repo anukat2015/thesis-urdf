@@ -2,6 +2,11 @@ package urdf.ilp;
 
 
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -116,13 +121,93 @@ public class RelationsInfo implements Serializable
 							   " SuperType: " + (relationsInfo.getAllTypes().get(k).getSuperType()==null ? "null" : relationsInfo.getAllTypes().get(k).getSuperType().getName()));
 	}
 	
-	public static void printRelations(RelationsInfo relationsInfo) {
+	public static void printRelations(Hashtable<String,Relation> relations) {
 		System.out.println("Relations:");
+		for (String k: relations.keySet()) {
+			System.out.println(relations.get(k).getName() + "("+  
+							   relations.get(k).getDomain().getName() + ", " + 
+							   relations.get(k).getRange().getName()+") " +
+							   "("+relations.get(k).getVar(1)+","+relations.get(k).getVar(2)+") " +
+							   "("+relations.get(k).getDistinctEntities(1)+","+relations.get(k).getDistinctEntities(2)+") " +
+							   "("+relations.get(k).getIdealMult(1)+","+relations.get(k).getIdealMult(2)+")");
+		}
+	}
+	
+	public void printJoinableRelations(String relationName) {
+		printJoinableRelations(relations.get(relationName));
+	}
+	
+	public void printJoinableRelations(Relation relation) {
+		System.out.println("Arg1 join Arg1");
+		for (Relation r: this.arg1JoinOnArg1.get(relation)) {
+			System.out.println("\t" + r.getName());
+		}
+		
+		System.out.println("Arg1 join Arg2");
+		for (Relation r: this.arg1JoinOnArg2.get(relation)) {
+			System.out.println("\t" + r.getName());
+		}
+		
+		System.out.println("Arg2 join Arg1");
+		for (Relation r: this.arg2JoinOnArg1.get(relation)) {
+			System.out.println("\t" + r.getName());
+		}
+		
+		System.out.println("Arg2 join Arg2");
+		for (Relation r: this.arg2JoinOnArg2.get(relation)) {
+			System.out.println("\t" + r.getName());
+		}
+	}
+	
+	public static void printRelations(RelationsInfo relationsInfo) {
+		printRelations(relationsInfo.getAllRelations());
+		/*System.out.println("Relations:");
 		for (String k: relationsInfo.getAllRelations().keySet()) {
 			System.out.println(relationsInfo.getAllRelations().get(k).getName() + "("+  
 							   relationsInfo.getAllRelations().get(k).getDomain().getName() + ", " + 
-							   relationsInfo.getAllRelations().get(k).getRange().getName()+")");
-		}
+							   relationsInfo.getAllRelations().get(k).getRange().getName()+") " +
+							   "("+relationsInfo.getAllRelations().get(k).getVar(1)+","+relationsInfo.getAllRelations().get(k).getVar(2)+") " +
+							   "("+relationsInfo.getAllRelations().get(k).getDistinctEntities(1)+","+relationsInfo.getAllRelations().get(k).getDistinctEntities(2)+") " +
+							   "("+relationsInfo.getAllRelations().get(k).getIdealMult(1)+","+relationsInfo.getAllRelations().get(k).getIdealMult(2)+")");
+		}*/
+	}
+	
+	public void persist() {
+      try  {
+    	  FileOutputStream fileOut;
+		  fileOut = new FileOutputStream("relationsInfoForRdf3x.ser");  	  
+	      ObjectOutputStream out = new ObjectOutputStream(fileOut);
+	      out.writeObject(this);
+	      out.close();
+          fileOut.close();
+      }
+      catch(IOException i){
+          i.printStackTrace();
+      }
+	}
+	
+	public static RelationsInfo readFromDisk() {	 
+        try{
+        	FileInputStream fileIn;
+        	ObjectInputStream in;
+        	fileIn =new FileInputStream("relationsInfoForRdf3x.ser");
+        	in = new ObjectInputStream(fileIn);
+        	RelationsInfo relationsInfo = (RelationsInfo) in.readObject();    
+        	in.close();
+        	fileIn.close();
+        	return relationsInfo;
+
+       }
+       catch(IOException i){
+           i.printStackTrace();
+           return null;
+       }
+       catch(ClassNotFoundException c){
+           System.out.println("RelationPreProcessor class not found");
+           c.printStackTrace();
+           return null;
+       }
+
 	}
 
 }
