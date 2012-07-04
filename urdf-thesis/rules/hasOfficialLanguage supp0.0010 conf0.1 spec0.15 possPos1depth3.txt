@@ -1,0 +1,3 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/hasOfficialLanguage>
+ 
+time elapsed for whole partition: 4463

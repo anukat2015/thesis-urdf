@@ -1,3 +1,3 @@
 TARGET PREDICATE: <http://yago-knowledge.org/resource/actedIn>
  
-time elapsed for whole partition: 202501
+time elapsed for whole partition: 126950

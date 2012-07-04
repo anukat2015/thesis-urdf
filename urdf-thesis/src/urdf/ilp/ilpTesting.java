@@ -71,12 +71,16 @@ public class ilpTesting {
 					 				  "<http://yago-knowledge.org/resource/actedIn>",
 					 				  "<http://yago-knowledge.org/resource/directed>",
 					 				  "<http://yago-knowledge.org/resource/diedIn>"};
-			 int[] inputArg = {2,0,1,2,0,2,2,0,1,2,0,1,2,0,1};
+			// int[] inputArg = {2,0,1,2,0,2,2,0,1,2,0,1,2,0,1};
+			 int[] inputArg =   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 			*/
 			
 			// relations for yago2
-			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
-			int[] inputArg={0};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
+			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/diedIn>"};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/directed>"};
+			int[] inputArg={1};
 
 			//String[] relationsToBeLearned = { "isPoliticianOf",
 			//		"graduatedFrom", "directed", "hasAcademicAdvisor",

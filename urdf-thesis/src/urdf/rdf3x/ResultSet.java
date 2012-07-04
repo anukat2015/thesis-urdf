@@ -2,7 +2,6 @@ package urdf.rdf3x;
 
 import java.sql.*;
 import java.util.Map;
-import java.util.Properties;
 import java.io.*;
 
 // RDF-3X

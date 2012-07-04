@@ -1,0 +1,3 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/hasPoverty>
+ 
+time elapsed for whole partition: 780

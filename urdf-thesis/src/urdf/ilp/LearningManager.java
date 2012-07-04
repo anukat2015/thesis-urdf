@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 import urdf.rdf3x.Connection;
 import urdf.rdf3x.Driver;
 import urdf.ilp.ThresholdChecker;
+import urdf.ilp.RelationPreProcessor;
 
 public class LearningManager 
 {
@@ -53,25 +54,30 @@ public class LearningManager
 		
 		logger.log(Level.INFO, iniFile);
 		
+		
 		Connection conn = Driver.connect(iniFile);
 		Connection connPartition = Driver.connect("src/rdf3x.properties");
 		
 		
+		queryHandler = new QueryHandler(connPartition, info);
+		
 		this.iniFile=iniFile;
+		
+		tChecker=new ThresholdChecker(queryHandler, supportThreshold, confidenceThreshold, specialityRatioThreshold, possiblePosToBeCoveredThreshold,
+				  positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);
+
 		
 		
 		//preprocessor=new RelationPreProcessor(conn,tChecker,relations,types,relationsForConstants);		
+		//info = preprocessor.getRelationsInfo();
 		
-		preprocessor = new RelationPreProcessor();	
-		info = preprocessor.getRelationsInfo();
-		
+		info = RelationsInfo.readFromDisk();
+
+		RelationsInfo.printRelations(info);
 				
-		queryHandler = new QueryHandler(connPartition, info);
-		
-		tChecker=new ThresholdChecker(queryHandler, supportThreshold, confidenceThreshold, specialityRatioThreshold, possiblePosToBeCoveredThreshold,
-									  positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);
-		
 		tChecker.setDangerousRelations(info.dangerousRelations);
+		
+		
 		
 		expDesc	= " supp"	+supportThreshold + 
 				  " conf" + confidenceThreshold + 
@@ -92,7 +98,7 @@ public class LearningManager
 		Relation typeRelation = new Relation(typeName, typeDomain, typeRange, 8419005, (float)3.1789155, (float)28.74744415283203, 0);
 		info.getAllRelations().put(typeName, typeRelation);
 		
-		//RelationsInfo.printRelations(info);
+		
 		
 		logger.log(Level.INFO, "Learning Manager Constructed Successfully");
 
@@ -175,9 +181,10 @@ public class LearningManager
   		FileWriter fstream, fstreamForURDF;
   		BufferedWriter out,outForURDF;
 				
-		for (int i=0,len=headPredicates.size(); i<len; i++) {	
-			
+		for (int i=0,len=headPredicates.size(); i<len; i++) {
+			 
 			logger.log(Level.INFO,"RELATION TO BE LEARNED: "+ headPredicates.get(i).getHeadRelation().getName() + " INPUT ARG:" + headPredicates.get(i).getInputArg());
+			info.printJoinableRelations(headPredicates.get(i).getHeadRelation());
 			
 			time= System.currentTimeMillis();
 			
@@ -197,8 +204,8 @@ public class LearningManager
 			}
 			logger.log(Level.INFO, toLog);
 			
-			fstream = new FileWriter("rules/"+headPredicates.get(i).getHeadRelation().getSimpleName()+expDesc+".txt");	
-			fstreamForURDF= new FileWriter("rules/"+headPredicates.get(i).getHeadRelation().getSimpleName()+expDesc+"ForURDF.txt");	
+			fstream = new FileWriter("rules/"+headPredicates.get(i).getHeadRelation().getSimpleName()+expDesc+"depth"+depth+".txt");	
+			fstreamForURDF= new FileWriter("rules/"+headPredicates.get(i).getHeadRelation().getSimpleName()+expDesc+"depth"+depth+"ForURDF.txt");	
 			outForURDF= new BufferedWriter(fstreamForURDF);
 			out = new BufferedWriter(fstream);
 			

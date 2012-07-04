@@ -1,0 +1,69 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/livesIn>
+ 
+livesIn(A,B)<-diedIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.24524543 support: 0.004262044 specialityRatio: 0.15033785
+N+(c): 15 E+(c): 133 N(c): 89 B(c): 592 E+: 20882
+livesIn(A,B)<-diedIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_lawyer_110249950>)
+confidence: 0.74385566 support: 0.0029690643 specialityRatio: 0.22878228
+N+(c): 39 E+(c): 126 N(c): 62 B(c): 271 E+: 20882
+livesIn(A,B)<-diedIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.158935 support: 0.0026338473 specialityRatio: 0.1923077
+N+(c): 6 E+(c): 73 N(c): 55 B(c): 286 E+: 20882
+livesIn(A,B)<-isPoliticianOf(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Living_people>)
+confidence: 0.18374313 support: 0.005698688 specialityRatio: 0.3707165
+N+(c): 15 E+(c): 139 N(c): 119 B(c): 321 E+: 20882
+livesIn(A,B)<-isPoliticianOf(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_lawyer_110249950>)
+confidence: 0.83916086 support: 0.001053539 specialityRatio: 0.28947368
+N+(c): 16 E+(c): 39 N(c): 22 B(c): 76 E+: 20882
+livesIn(A,B)<-isPoliticianOf(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)
+confidence: 0.1608676 support: 0.0017239728 specialityRatio: 0.42857143
+N+(c): 4 E+(c): 40 N(c): 36 B(c): 84 E+: 20882
+livesIn(A,B)<-isCitizenOf(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.7814471 support: 0.009386074 specialityRatio: 0.24408469
+N+(c): 120 E+(c): 275 N(c): 196 B(c): 803 E+: 20882
+livesIn(A,B)<-isCitizenOf(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.7512755 support: 0.005363471 specialityRatio: 0.21917808
+N+(c): 62 E+(c): 140 N(c): 112 B(c): 511 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_European_Tour_golfers>)
+confidence: 0.38821858 support: 0.0098170675 specialityRatio: 0.88744587
+N+(c): 58 E+(c): 395 N(c): 205 B(c): 231 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.16122375 support: 0.0099607315 specialityRatio: 0.2035225
+N+(c): 23 E+(c): 325 N(c): 208 B(c): 1022 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_PGA_Tour_golfers>)
+confidence: 0.2402103 support: 0.011924145 specialityRatio: 0.43455496
+N+(c): 41 E+(c): 350 N(c): 249 B(c): 573 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_lawyer_110249950>)
+confidence: 0.49631578 support: 0.008859305 specialityRatio: 0.4214123
+N+(c): 63 E+(c): 239 N(c): 185 B(c): 439 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_golfers>)
+confidence: 0.21274868 support: 0.013121349 specialityRatio: 0.3942446
+N+(c): 40 E+(c): 339 N(c): 274 B(c): 695 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Indian_politicians>)
+confidence: 0.8203776 support: 0.011588928 specialityRatio: 0.6722222
+N+(c): 147 E+(c): 271 N(c): 242 B(c): 360 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_golfer_110136959>)
+confidence: 0.30872288 support: 0.007231108 specialityRatio: 0.49185666
+N+(c): 32 E+(c): 215 N(c): 151 B(c): 307 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)
+confidence: 0.40122393 support: 0.009386074 specialityRatio: 0.5568182
+N+(c): 54 E+(c): 222 N(c): 196 B(c): 352 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_officeholder_110371450>)
+confidence: 0.29653674 support: 0.0058902404 specialityRatio: 0.25
+N+(c): 25 E+(c): 144 N(c): 123 B(c): 492 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.16194789 support: 0.0034479457 specialityRatio: 0.2005571
+N+(c): 8 E+(c): 108 N(c): 72 B(c): 359 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_legislator_110253995>)
+confidence: 0.2542042 support: 0.006033905 specialityRatio: 0.8181818
+N+(c): 22 E+(c): 126 N(c): 126 B(c): 154 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_African_American_politicians>)
+confidence: 0.4790196 support: 0.0040704915 specialityRatio: 0.36796537
+N+(c): 28 E+(c): 102 N(c): 85 B(c): 231 E+: 20882
+livesIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_LPGA_Tour_golfers>)
+confidence: 0.21485214 support: 0.0045493725 specialityRatio: 0.46568626
+N+(c): 14 E+(c): 116 N(c): 95 B(c): 204 E+: 20882
+livesIn(A,B)<-influences(A,C)isCitizenOf(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.2701157 support: 0.001436644 specialityRatio: 0.2112676
+N+(c): 10 E+(c): 39 N(c): 30 B(c): 142 E+: 20882
+time elapsed for whole partition: 40247

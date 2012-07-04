@@ -26,7 +26,8 @@ public class Relation implements Serializable
 	private boolean isSymmetric=false;
 	private int size=0; 								// number of facts in the relation
 	private int inputArg;								// 0: both, 1: first, 2: second	
-	private float mult1,mult2,idealMult1,idealMult2;
+	private float mult1,mult2;
+	private float idealMult1,idealMult2;
 	private float var1, var2; // variances of multiplicities
 	private int constantInArg=0;						// 0: no constants allowed, 1: constants in arg1 allowed, 2: constants in arg2 allowed
 	private int distinctEntitiesArg1=0;
@@ -39,6 +40,14 @@ public class Relation implements Serializable
 		this.domain=domain;
 		this.range=range;
 	}
+	public Relation(String name, Type domain, Type range,int size,float mult1, float mult2, float var1, float var2, int constantInArg) {
+		this(name, domain, range, size, mult1, mult2, constantInArg);
+		this.var1 = var1;
+		this.var2 = var2;		
+		idealMult1 = (float) (this.mult1 + Math.sqrt(this.var1));
+		idealMult2 = (float) (this.mult2 + Math.sqrt(this.var2));
+	}
+	
  	public Relation(String name, Type domain, Type range,int size,float mult1, float mult2, int constantInArg) {
 		this.name	= name;
 		this.domain	= domain;
@@ -157,6 +166,9 @@ public class Relation implements Serializable
 	// ************ SETTERS ***********
 	public void setVar1(float var1){this.var1=var1;}
 	public void setVar2(float var2){this.var2=var2;}
+	public void setMult1(float mult1){this.mult1=mult1;}
+	public void setMult2(float mult2){this.mult2=mult2;}
+	
 	public void setDistinctEntities(int arg, int num)
  	{
  		if (arg==1)
@@ -167,13 +179,9 @@ public class Relation implements Serializable
 	public void setConstantInArg(int arg){this.constantInArg=arg;}
 	public void setIdealMult(float mult, int arg){
 		if (arg==1)
-		{
 			idealMult1=mult;
-		}
 		else
-		{
 			idealMult2=mult;
-		}
 	}
  	public void setIsFunction(boolean isFuction){	this.isFunction=isFuction;}
 	public void setIsSymmetric(boolean isSymmetric){this.isSymmetric=isSymmetric;}

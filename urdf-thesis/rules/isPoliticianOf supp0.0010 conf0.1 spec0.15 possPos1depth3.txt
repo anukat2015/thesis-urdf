@@ -1,0 +1,27 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/isPoliticianOf>
+ 
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 1.66547 support: 0.015946286 specialityRatio: 0.19094767
+N+(c): 657 E+(c): 38 N(c): 270 B(c): 1414 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)
+confidence: 0.39272818 support: 0.0012589174 specialityRatio: 0.21019109
+N+(c): 32 E+(c): 3 N(c): 33 B(c): 157 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 3.0617416 support: 0.028955098 specialityRatio: 0.15670246
+N+(c): 4899 E+(c): 69 N(c): 1591 B(c): 10153 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 0.38226694 support: 0.015946286 specialityRatio: 0.41402215
+N+(c): 427 E+(c): 38 N(c): 561 B(c): 1355 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)
+confidence: 0.15435833 support: 0.007133865 specialityRatio: 0.28037384
+N+(c): 7 E+(c): 17 N(c): 30 B(c): 107 E+: 2383
+isPoliticianOf(A,B)<-wasBornIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 1.6420869 support: 0.0058749476 specialityRatio: 0.20242915
+N+(c): 232 E+(c): 14 N(c): 100 B(c): 494 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)
+confidence: 0.12017141 support: 0.00461603 specialityRatio: 0.31707317
+N+(c): 2 E+(c): 11 N(c): 13 B(c): 41 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)
+confidence: 0.12283248 support: 0.00461603 specialityRatio: 0.325
+N+(c): 2 E+(c): 11 N(c): 13 B(c): 40 E+: 2383
+time elapsed for whole partition: 21460

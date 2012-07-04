@@ -4,30 +4,31 @@ package urdf.ilp;
 
 import java.util.ArrayList;
 
+
 /**
  * @author Christina Teflioudi
  *
  */
-public class Rule implements Cloneable
-{
+public class Rule implements Cloneable{
+	
 	private Literal head;
-	private float weight=0;
+	//private float weight=0;
 	
-	private int examplesCovered=-1;			// N(c)=N+(c)+N-(c)
-	private int positivesCovered=-1;		// N+(c)
-	private int possiblePosToBeCovered=-1;	// E+(c)
-	private int bodySize=-1;
+	private int examplesCovered = -1;			// N(c)=N+(c)+N-(c)
+	private int positivesCovered = -1;	  		// N+(c)
+	private int possiblePosToBeCovered = -1;	// E+(c)
+	private int bodySize = -1;
 	
 	
-	private float confidence=0;				
-	private float support=0;				// (N+(c) or N(c))/Size(head)
+	private float confidence = 0;				
+	private float support = 0;				// (N+(c) or N(c))/Size(head)
 	private float specialityRatio;			// (N+(c)/Size(body))
 	public float origConf,headConf,ratio,missingHeadFactsOnlyHead,missingHeadFactsHeadBody,missingBodyFacts,multBody,multBodyIdeal;
 	
 	
-	private float testConfidence=0;
-	private int testExamplesCovered=0;	
-	private double gain=-1;// if -1 this is the first rule, so do not prune it
+	//private float testConfidence=0;
+	//private int testExamplesCovered=0;	
+	private double gain = -1;// if -1 this is the first rule, so do not prune it
 	
 	
 	/**
@@ -35,15 +36,15 @@ public class Rule implements Cloneable
 	 *  if a rule binds the head variables, it makes sense to calculate confidence, otherwise it doesn't 
 	 *  if a rule binds the head variables, all its children do also.
 	 */
-	private boolean hasFreeVariables=true;
-	private boolean bindsHeadVariables=false;
-	private boolean isGood=true;	// if the rule passes the confidence threshold and is better in accuracy than its parents, isGood=true
-	private boolean isInBeam=false;
-	private boolean isTooGeneral=false;
+	private boolean hasFreeVariables = true;
+	private boolean bindsHeadVariables = false;
+	private boolean isGood = true;	// if the rule passes the confidence threshold and is better in accuracy than its parents, isGood=true
+	private boolean isInBeam = false;
+	private boolean isTooGeneral = false;
 	
-	private int numOfFreeVariables=2;
+	private int numOfFreeVariables = 2;
 	
-	ArrayList<Literal> bodyLiterals=new ArrayList<Literal>();
+	ArrayList<Literal> bodyLiterals = new ArrayList<Literal>();
 	
 	public Rule (Literal head) {
 		this.head=head;
@@ -107,7 +108,7 @@ public class Rule implements Cloneable
 		return this.isTooGeneral;
 	}
 	
-	public float getGeneralityRatio() {
+	public float getSpecialityRatio() {
 		return this.specialityRatio;
 	}
 
@@ -138,7 +139,7 @@ public class Rule implements Cloneable
 	
 	public void setConfidence(float conf, int partition) {
 		this.confidence=conf;		
-		this.weight=confidence;
+		//this.weight=confidence;
 	}	
 	
 	public void setIsGood(boolean flag) {
@@ -171,6 +172,12 @@ public class Rule implements Cloneable
 	
 	// *************** OTHER METHODS *****************
   	
+	@Override
+	public boolean equals(Object obj) {
+		Rule r = (Rule) obj;
+		return this.equals(r);
+	}
+	
 	public boolean equals(Rule rule) {
 		boolean flag=false;
 		if (!this.head.equals(rule.head))
@@ -200,13 +207,16 @@ public class Rule implements Cloneable
 	 * @param position: the index in bodyLiterals of the literal on which the new Literal is connected
 	 */
 	public void addLiteral(Literal literal,int position) {
+		//reset body size as body changed
+		this.bodySize = -1;
+		
 		this.bodyLiterals.add(literal);
 		
 		// set the flags bindsHeadVariables and hasFreeVariables
 		setFlags();
+		
 		// repair the literal on which the new literal is connected. Check if it had a free variable and now it is connected
 		updatePreviousLiteralForFreeVars(position,literal);
-			
 	}
 	/**
 	 * @param literal: the literal to be add to the rule
@@ -215,12 +225,13 @@ public class Rule implements Cloneable
 	 *  CHECK AGAIN FOR EQ and constants
 	 */
 	public void addLiteral(Literal literal) {
+		//reset body size as body changed
+		this.bodySize = -1;
+		
 		this.bodyLiterals.add(literal);
-		
+
 		// set the flags bindsHeadVariables and hasFreeVariables
-		setFlags();
-		
-			
+		setFlags();	
 	}
 	
 	public String getRuleString() {
@@ -263,8 +274,8 @@ public class Rule implements Cloneable
 		}
 		return s;
 	}
-	public String printForParser()
-	{
+	
+	public String printForParser() {
 		String s=head.getRelation().getName()+"(?"+new Character((char)head.getFirstArgument()).toString()+",?"+new Character((char)head.getSecondArgument()).toString()+",1)<=";
 		String relation;
 		for (int i=0,len=this.bodyLiterals.size();i<len;i++) {
@@ -372,8 +383,7 @@ public class Rule implements Cloneable
 	/**
 	 * @return the number of free variables in the rule
 	 */
-	public int getNumOfFreeVariables()
-	{
+	public int getNumOfFreeVariables() {
 		return this.numOfFreeVariables;
 	}
 	/**
@@ -381,8 +391,7 @@ public class Rule implements Cloneable
 	 * @param position: the index in bodyLiterals of the literal on which the new Literal is connected
 	 * @param newLiteral
 	 */
-	private void updatePreviousLiteralForFreeVars(int position,Literal newLiteral)
-	{
+	private void updatePreviousLiteralForFreeVars(int position,Literal newLiteral) {
 		Literal previousLiteral=(position==-1?head:bodyLiterals.get(position));
 		
 		// if the previous literal had a free variable check if it is now connected
@@ -504,6 +513,7 @@ public class Rule implements Cloneable
 	
 	public String possiblePositivesToBeCoveredQuery(int inputArg) {
 		String patterns = head.getSparqlPattern(inputArg);
+		patterns += getBodyPatterns(); 
 		patterns = patterns.substring(0,patterns.length()-2);
 		switch (inputArg) {
 			case 1:  return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
@@ -517,19 +527,4 @@ public class Rule implements Cloneable
 		patterns = patterns.substring(0,patterns.length()-2);
 		return "SELECT COUNT ?count WHERE {"+patterns+"}" ;
 	}
-
-
-	public String mult1Query() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	public String mult2Query() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-
-	
 }

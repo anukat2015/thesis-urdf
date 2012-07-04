@@ -59,7 +59,7 @@ public final class Statement implements java.sql.Statement
     	  
     	 long t = System.currentTimeMillis(); 
     	 
-    	 logger.log(Level.INFO, query);
+    	 logger.log(Level.DEBUG, query);
     	 
          connection.assertOpen();
          connection.writeLine(query);
@@ -102,10 +102,16 @@ public final class Statement implements java.sql.Statement
          
          t = System.currentTimeMillis() - t;
          
-         Level level = (t<1000)?Level.INFO:Level.WARN;
-         String numberOfRows = ((header[1].equals("count") && !result.isEmpty())?result.get(0)[1]:Integer.toString(result.size()));         
-         logger.log(level, "["+(t)+"ms,"+numberOfRows+"rows] "+query);
-
+         
+         if (!query.startsWith("insert") && !query.startsWith("INSERT")) {
+	         String numberOfRows = ((header[1].equals("count") && result.size()==1)?result.get(0)[1]:Integer.toString(result.size()));
+	         if (t<1000)
+	        	 logger.log(Level.INFO, "["+(t)+"ms,"+numberOfRows+"rows] ");
+	         else
+	        	 logger.log(Level.WARN, "!!!!!!!!!["+(t)+"ms,"+numberOfRows+"rows] "+query);
+         }
+         //logger.log(Level.INFO, "["+(t)+"ms] ");
+         
          return new ResultSet(header,result.toArray(new String[0][]));
       }
    }
@@ -124,32 +130,43 @@ public final class Statement implements java.sql.Statement
      	  
      	  long t = System.currentTimeMillis(); 
      	 
-     	  logger.log(Level.INFO, query);
+     	  logger.log(Level.DEBUG, query);
      	 
           connection.assertOpen();
           connection.writeLine(query);
+          
+          String header[] = new String[1];
+          header[0] = "count";
+          String result[][] = new String[1][1];
+          result[0][0] = "0";
 
           // Check the answer
           String response=connection.readLine();
-          if (!("ok".equals(response)))
-             throw new SQLException(response);
+          if (!("ok".equals(response))) {
+        	  if (response.equalsIgnoreCase("internal error plan generation failed")) {
+        		  logger.log(Level.ERROR, response + " : " + query );
+        		  return new ResultSet(header,result); // Return 0 rows
+        	  }
+        	  else
+        		  throw new SQLException(response);
+          }
 
           // Header
-          String[] header=connection.readResultLine();
-          header = new String[1];
-          header[0] = "count";
-
+         connection.readResultLine();
+       
           // Collect entries
           int numberOfRows = 0;
           while (connection.readResultLine() != null) {
              numberOfRows++;
           }
-          String result[][] = new String[1][1];
           result[0][0] = Integer.toString(numberOfRows);
           
           t = System.currentTimeMillis() - t;
-          Level level = (t<1000)?Level.INFO:Level.WARN;
-          logger.log(level,"["+(t)+"ms,"+numberOfRows+"rows]");
+
+          if (t<1000)
+         	 logger.log(Level.INFO, "["+(t)+"ms,"+numberOfRows+"rows] ");
+          else
+         	 logger.log(Level.WARN, "!!!!!!!!!["+(t)+"ms,"+numberOfRows+"rows] "+query);
 
           return new ResultSet(header,result);
        }

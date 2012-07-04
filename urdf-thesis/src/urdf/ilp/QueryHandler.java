@@ -1,13 +1,8 @@
 package urdf.ilp;
 
-
-
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
+
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -27,119 +22,20 @@ public class QueryHandler
 {
 	private static Logger logger = Logger.getLogger(LearningManager.queriesLoggerName);
 	
-	private Connection conn;
 	private Statement stmt;
 	private RelationsInfo relationsInfo;
-	
-	// for train tables
- 	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForPositivesCovered=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating confidence	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForExamplesCovered=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating confidence	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForBody=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating specialityRatio	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForMult1=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating beta
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForMult2=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating beta
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForPossiblePosToBeCovered=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating support	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForConstants=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for finding nice constants
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForEntities1=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForEntities2=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForBodyAvgMult=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForBodyMultVar=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();
-	
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForOverlapEntities=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForUnionEntities=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();
-	
-	// for overlap and subsumption
-	private HashMap<Integer, HashMap<String,PreparedStatement>> queriesForOverlap=
-		new HashMap<Integer, HashMap<String,PreparedStatement>>();	// used by RuleLearner for calculating overlap between bodies
 	
 	 
 	public QueryHandler(Connection conn, String baseTbl, String headTbl) throws Exception {
 		PropertyConfigurator.configure(LearningManager.log4jConfig);
-		this.conn = conn; 	
 		this.stmt = (Statement) conn.createStatement();
 	}
 	
 	public QueryHandler(Connection conn, RelationsInfo relationsInfo) throws Exception {
 		PropertyConfigurator.configure(LearningManager.log4jConfig);
 		this.relationsInfo = relationsInfo;
-		this.conn = conn; 	
 		this.stmt = (Statement) conn.createStatement();
 	}
-
-
- 	
- 	/**
- 	 * @param whichStatements 0: for learning 2: for post-processing
- 	 * @throws SQLException
- 	 */
- 	public void clearAllStatements(int whichStatements) throws SQLException
- 	{
- 		ArrayList<HashMap<Integer, HashMap<String,PreparedStatement>>> array=new ArrayList<HashMap<Integer, HashMap<String,PreparedStatement>>>();
- 		
- 		switch(whichStatements)
- 		{
- 			case 0:
- 		 		array.add(queriesForExamplesCovered);
- 		 		array.add(queriesForBody);
- 		 		array.add(queriesForMult1);
- 		 		array.add(queriesForMult2);
- 		 		array.add(queriesForPossiblePosToBeCovered);
- 		 		array.add(queriesForPositivesCovered); 		 		
- 		 		array.add(queriesForConstants);
- 		 		array.add(queriesForOverlapEntities);
- 		 		array.add(queriesForUnionEntities);
- 		 		array.add(queriesForEntities1);
- 		 		array.add(queriesForEntities2);
- 		 		array.add(queriesForBodyAvgMult);
- 		 		array.add(queriesForBodyMultVar);
- 				break;
- 			default:
- 				array.add(queriesForOverlap);
- 		}
- 		for (int i=0,len=array.size();i<len;i++)
- 		{
- 	 		clearStatements(array.get(i));
- 		}
- 	}
- 	public void clearStatements(HashMap<Integer, HashMap<String,PreparedStatement>> queryMap) throws SQLException
- 	{
- 		Set<String> set2;
- 		Set<Integer> set1;
- 		Iterator<String> it2;
- 		Iterator<Integer> it1;
-
- 		set1=queryMap.keySet();
- 		it1=set1.iterator();
- 		int d, counter=0;
- 		HashMap<String,PreparedStatement> map;
-
- 		while (it1.hasNext())
- 		{
- 			
- 			d=it1.next();
- 			map=queryMap.get(d);
- 			set2=map.keySet();
- 			it2=set2.iterator();
- 			while (it2.hasNext())
- 			{
- 				map.get(it2.next()).close();
- 				counter++;
- 			}
- 		}
- 		queryMap.clear();
- 	}
 
 	//***************************** FOR RULELEARNER ********************************************
 	
@@ -159,7 +55,8 @@ public class QueryHandler
 		switch(forWhat){
 			case 0:	// positivesCovered
 				sparql = rule.positivesCoveredQuery();
-				info = "PositvesCovered=: "+rule.getRuleString();
+				info = "PositvesCovered = "+rule.getRuleString();
+				System.out.println(sparql);
 				rs = (ResultSet) stmt.executeQuery(sparql);
 				if (rs.next()) 
 					result = rs.getFloat(2);		
@@ -167,7 +64,7 @@ public class QueryHandler
 				
 			case 1: // examplesCovered
 				sparql = rule.examplesCoveredQuery(inputArg);
-				info = "ExamplesCovered= "+rule.getRuleString();
+				info = "ExamplesCovered = "+rule.getRuleString();
 				rs = (ResultSet) stmt.executeQueryCountRows(sparql);
 				if (rs.next()) 
 					result = rs.getFloat(1);		
@@ -175,7 +72,7 @@ public class QueryHandler
 				
 			case 2: // body
 				sparql = rule.bodySupportQuery();
-				info = "BodySupport: "+rule.getRuleString();
+				info = "BodySize = "+rule.getRuleString();
 				rs = (ResultSet) stmt.executeQuery(sparql);
 				if (rs.next()) 
 					result = rs.getFloat(2);
@@ -183,13 +80,14 @@ public class QueryHandler
 				
 			case 6: // possiblePositivesToBeCovered
 				sparql = rule.possiblePositivesToBeCoveredQuery(inputArg);
-				info = "PossiblePositivesToBeCovered= "+rule.getRuleString();
+				info = "PossiblePositivesToBeCovered = "+rule.getRuleString();
 				rs = (ResultSet) stmt.executeQueryCountRows(sparql);
 				if (rs.next()) 
 					result = rs.getFloat(1);		
 				break;
 				
-			default: throw new IllegalArgumentException("forWhat argument should be:  0=PositivesCovered, 1=examplesCovered 2=body 4=mult1 5=mult2 6=possiblePosToBeCovered");
+			default: 
+				throw new IllegalArgumentException("forWhat argument should be:  0=PositivesCovered, 1=examplesCovered 2=body 4=mult1 5=mult2 6=possiblePosToBeCovered");
 
 		}
 		logger.log(Level.INFO, info);
@@ -197,8 +95,6 @@ public class QueryHandler
 		rs.close();
 		return result;
 	}
-	
-
 	
 	public float[] getBodyAvgMultAndVar(Rule rule, int inputArg) throws SQLException {
 		String selectArg = (inputArg==1)? rule.getHead().getFirstArgumentVariable() : rule.getHead().getSecondArgumentVariable();
@@ -208,6 +104,36 @@ public class QueryHandler
 		String sparql = "SELECT COUNT "+selectArg+" WHERE {"+patterns+"}";
 		String info = "Get Avg(Mult) and Var(Mult) from arg"+ inputArg + " for  " + rule.getRuleString();
 		logger.log(Level.INFO, info);
+
+		ResultSet rs=(ResultSet) stmt.executeQuery(sparql);
+		
+		float avg = 0; 
+		int count = 0;
+		while (rs.next()) {
+			avg  += rs.getFloat(2);
+			count++;
+		}
+		avg /= (float) count;
+		
+		rs.beforeFirst();		
+		float var = 0;
+		while (rs.next()) {
+			var += (float) Math.pow(rs.getFloat(2)-avg, 2);
+		}
+		var /= ((float) count);
+		
+		rs.close();
+		
+		float result[] = new float[2];
+		result[0] = avg;
+		result[1] = var;
+
+		return result;
+	}
+	
+	public float[] getBodyAvgMultAndVar(String relation, int inputArg) throws SQLException {
+
+		String sparql = "SELECT COUNT ?arg"+inputArg+" WHERE {?arg1 "+relation+" ?arg2}";
 
 		ResultSet rs=(ResultSet) stmt.executeQuery(sparql);
 		
@@ -311,7 +237,7 @@ public class QueryHandler
 		return -1;
 	}
 
-	//***************************** FIRE QUERIES ***************************************
+
 	public int fireSampleQuery(Relation relation) throws SQLException
 	{
 		String sparql = "SELECT count ?count WHERE {?s "+relation.getName()+" ?o}";
@@ -349,9 +275,9 @@ public class QueryHandler
 	}
 
 	// TODO Substitute for RelationsInfo.getVar(arg)
-	public float getVarMult(String relationName, int arg) throws SQLException {
+	/*public float getVarMult(String relationName, int arg) throws SQLException {
 		return relationsInfo.getRelationFromRelations(relationName).getVar(arg);
-	}
+	}*/
 	
 	public float getParamForGeneralityRatio(String target, int inputArg) throws SQLException {	
 		String info = "GeneralityRation (#distinctRatio arg"+inputArg+") from "+target;
