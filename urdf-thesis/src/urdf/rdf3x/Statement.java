@@ -108,7 +108,7 @@ public final class Statement implements java.sql.Statement
 	         if (t<1000)
 	        	 logger.log(Level.INFO, "["+(t)+"ms,"+numberOfRows+"rows] ");
 	         else
-	        	 logger.log(Level.WARN, "!!!!!!!!!["+(t)+"ms,"+numberOfRows+"rows] "+query);
+	        	 logger.log(Level.WARN, "["+(t)+"ms,"+numberOfRows+"rows] "+query);
          }
          //logger.log(Level.INFO, "["+(t)+"ms] ");
          
@@ -166,7 +166,7 @@ public final class Statement implements java.sql.Statement
           if (t<1000)
          	 logger.log(Level.INFO, "["+(t)+"ms,"+numberOfRows+"rows] ");
           else
-         	 logger.log(Level.WARN, "!!!!!!!!!["+(t)+"ms,"+numberOfRows+"rows] "+query);
+         	 logger.log(Level.WARN, "["+(t)+"ms,"+numberOfRows+"rows] "+query);
 
           return new ResultSet(header,result);
        }

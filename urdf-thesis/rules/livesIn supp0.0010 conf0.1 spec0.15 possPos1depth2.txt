@@ -66,4 +66,4 @@ N+(c): 14 E+(c): 116 N(c): 95 B(c): 204 E+: 20882
 livesIn(A,B)<-influences(A,C)isCitizenOf(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
 confidence: 0.2701157 support: 0.001436644 specialityRatio: 0.2112676
 N+(c): 10 E+(c): 39 N(c): 30 B(c): 142 E+: 20882
-time elapsed for whole partition: 40247
+time elapsed for whole partition: 36665

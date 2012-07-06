@@ -23,6 +23,8 @@ public class LearningManager
 	
 	public static String log4jConfig = "src/log4j.properties";
 	
+	private static int gainMeasure = 3;
+	
 	RelationPreProcessor preprocessor;
 	RelationsInfo info;
 	HeadSampler sampler;
@@ -135,9 +137,8 @@ public class LearningManager
 	 * @param allowFreeVars true is I like rules which bind head args but also have free variables
 	 * @throws Exception
 	 */
-	public void learnOnCrossValidation(String[] relationsToBeLearned, int[] inputArg,int depth, boolean allowFreeVars, boolean tryConstants, boolean learnOnlyConstants) throws Exception
-	{
-		int gainMeasure=3;
+	public void learnOnCrossValidation(String[] relationsToBeLearned, int[] inputArg,int depth, boolean allowFreeVars, boolean tryConstants, boolean learnOnlyConstants) throws Exception {
+		
 		int beamWidth=0;
 		
 		int numOfPartitions = partitionNumber;

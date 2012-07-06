@@ -9,6 +9,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
 
@@ -27,8 +28,7 @@ import java.util.Hashtable;
  * 		LT for lower than
  *
  */
-public class RelationsInfo implements Serializable
-{
+public class RelationsInfo implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private Hashtable<String,Relation> relations;
@@ -39,9 +39,7 @@ public class RelationsInfo implements Serializable
 	public  HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1;
 	public  HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2;
 	public  HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1;
-	
-	
-	
+
 	public static final Relation EQ = new Relation("=", null, null);
 	public static final Relation NEQ = new Relation("!=", null, null);
 	public static final Relation GT = new Relation(">", null, null);
@@ -50,8 +48,8 @@ public class RelationsInfo implements Serializable
 	public RelationsInfo(Hashtable<String,Relation> relations, Hashtable<String,Type> types, 
 			HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1,
 			HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1,
-			HashMap<String,Integer> dangerousRelations)
-	{
+			HashMap<String,Integer> dangerousRelations) {
+		
 		this.types = types;
 		this.relations = relations;
 		this.arg1JoinOnArg1=arg1JoinOnArg1;
@@ -66,8 +64,8 @@ public class RelationsInfo implements Serializable
 	public RelationsInfo(ArrayList<Relation> relations,ArrayList<Type> types, 
 			HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1,
 			HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1,
-			HashMap<String,Integer> dangerousRelations)
-	{
+			HashMap<String,Integer> dangerousRelations) {
+		
 		this.types=new Hashtable<String,Type>();
 		this.relations=new Hashtable<String,Relation>();	
 		
@@ -90,26 +88,24 @@ public class RelationsInfo implements Serializable
 		
 		
 	}
-	public Type getTypeFromTypes(String typeName)
-	{
+	public Type getTypeFromTypes(String typeName){
 		return types.get(typeName);
 	}
-	public Relation getRelationFromRelations(String relationName)
-	{
+	
+	public Relation getRelationFromRelations(String relationName){
 		return relations.get(relationName);
 	}
-	public Hashtable<String,Relation> getAllRelations()
-	{
+	
+	public Hashtable<String,Relation> getAllRelations(){
 		return this.relations;
 	}
-	public Hashtable<String,Type> getAllTypes()
-	{
+	
+	public Hashtable<String,Type> getAllTypes(){
 		return this.types;
 	}
 	
 	
-	public static void printTypesAndRelations(RelationsInfo relationsInfo)
-	{
+	public static void printTypesAndRelations(RelationsInfo relationsInfo){
 		printTypes(relationsInfo);
 		printRelations(relationsInfo);
 	}
@@ -121,16 +117,24 @@ public class RelationsInfo implements Serializable
 							   " SuperType: " + (relationsInfo.getAllTypes().get(k).getSuperType()==null ? "null" : relationsInfo.getAllTypes().get(k).getSuperType().getName()));
 	}
 	
-	public static void printRelations(Hashtable<String,Relation> relations) {
+	public static void printRelations(Collection<Relation> relations) {
 		System.out.println("Relations:");
-		for (String k: relations.keySet()) {
-			System.out.println(relations.get(k).getName() + "("+  
-							   relations.get(k).getDomain().getName() + ", " + 
-							   relations.get(k).getRange().getName()+") " +
-							   "("+relations.get(k).getVar(1)+","+relations.get(k).getVar(2)+") " +
-							   "("+relations.get(k).getDistinctEntities(1)+","+relations.get(k).getDistinctEntities(2)+") " +
-							   "("+relations.get(k).getIdealMult(1)+","+relations.get(k).getIdealMult(2)+")");
+		for (Relation r: relations) {
+			System.out.println(r.getName() + "("+  
+							   r.getDomain().getName() + ", " + 
+							   r.getRange().getName()+") " +
+							   "("+r.getVar(1)+","+r.getVar(2)+") " +
+							   "("+r.getDistinctEntities(1)+","+r.getDistinctEntities(2)+") " +
+							   "("+r.getIdealMult(1)+","+r.getIdealMult(2)+")");
 		}
+	}
+	
+	public static void printRelations(Hashtable<String,Relation> relations) {		
+		printRelations(relations.values());
+	}
+	
+	public static void printRelations(RelationsInfo relationsInfo) {
+		printRelations(relationsInfo.getAllRelations());
 	}
 	
 	public void printJoinableRelations(String relationName) {
@@ -157,19 +161,6 @@ public class RelationsInfo implements Serializable
 		for (Relation r: this.arg2JoinOnArg2.get(relation)) {
 			System.out.println("\t" + r.getName());
 		}
-	}
-	
-	public static void printRelations(RelationsInfo relationsInfo) {
-		printRelations(relationsInfo.getAllRelations());
-		/*System.out.println("Relations:");
-		for (String k: relationsInfo.getAllRelations().keySet()) {
-			System.out.println(relationsInfo.getAllRelations().get(k).getName() + "("+  
-							   relationsInfo.getAllRelations().get(k).getDomain().getName() + ", " + 
-							   relationsInfo.getAllRelations().get(k).getRange().getName()+") " +
-							   "("+relationsInfo.getAllRelations().get(k).getVar(1)+","+relationsInfo.getAllRelations().get(k).getVar(2)+") " +
-							   "("+relationsInfo.getAllRelations().get(k).getDistinctEntities(1)+","+relationsInfo.getAllRelations().get(k).getDistinctEntities(2)+") " +
-							   "("+relationsInfo.getAllRelations().get(k).getIdealMult(1)+","+relationsInfo.getAllRelations().get(k).getIdealMult(2)+")");
-		}*/
 	}
 	
 	public void persist() {

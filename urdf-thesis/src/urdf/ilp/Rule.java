@@ -4,6 +4,8 @@ package urdf.ilp;
 
 import java.util.ArrayList;
 
+import javatools.administrative.Announce.Level;
+
 
 /**
  * @author Christina Teflioudi
@@ -23,7 +25,14 @@ public class Rule implements Cloneable{
 	private float confidence = 0;				
 	private float support = 0;				// (N+(c) or N(c))/Size(head)
 	private float specialityRatio;			// (N+(c)/Size(body))
-	public float origConf,headConf,ratio,missingHeadFactsOnlyHead,missingHeadFactsHeadBody,missingBodyFacts,multBody,multBodyIdeal;
+	public float origConf;
+	public float headConf;
+	public float ratio;
+	public float missingHeadFactsOnlyHead;
+	public float missingHeadFactsHeadBody;
+	public float missingBodyFacts;
+	public float multBody;
+	public float multBodyIdeal;
 	
 	
 	//private float testConfidence=0;
@@ -50,28 +59,15 @@ public class Rule implements Cloneable{
 		this.head=head;
 	}
 	
-	
 	//***************** GET METHODS ****************
  	public Literal getHead() {
 		return this.head;
 	}
  	
- 	public int getExamplesForSupport() {
+ 	public int getPossiblePositivesToBeCovered() {
  		return this.possiblePosToBeCovered;
  	}
-	
- 	public boolean hasFreeVariables() {
-		return this.hasFreeVariables;
-	}
  	
-	public boolean bindsHeadVariables() {
-		return this.bindsHeadVariables;
-	}
-	
-	public boolean isGood() {
-		return this.isGood;
-	}
-	
 	public int getPositivesCovered() {
 		return this.positivesCovered;
 	}
@@ -80,8 +76,8 @@ public class Rule implements Cloneable{
 		return this.examplesCovered;
 	}
 	
-	public ArrayList<Literal> getBodyLiterals() {
-		return this.bodyLiterals;
+	public int getBodySize() {
+		return this.bodySize;
 	}
 	
 	public float getSupport() {
@@ -92,25 +88,38 @@ public class Rule implements Cloneable{
 		return this.confidence;
 	}
 	
-	public boolean isInBeam() {
-		return this.isInBeam;
+	public float getSpecialityRatio() {
+		return this.specialityRatio;
 	}
 	
 	public double getGain() {
 		return this.gain;
 	}
 	
-	public int getBodySize() {
-		return this.bodySize;
+	public boolean isInBeam() {
+		return this.isInBeam;
 	}
+
+	public boolean hasFreeVariables() {
+		return this.hasFreeVariables;
+	}
+ 	
+	public boolean bindsHeadVariables() {
+		return this.bindsHeadVariables;
+	}
+	
+	public boolean isGood() {
+		return this.isGood;
+	}	
 	
 	public boolean isTooGeneral() {
 		return this.isTooGeneral;
 	}
-	
-	public float getSpecialityRatio() {
-		return this.specialityRatio;
+		
+	public ArrayList<Literal> getBodyLiterals() {
+		return this.bodyLiterals;
 	}
+
 
 	//***************** SET METHODS ****************
 	public void setOrigConf(float val) {
@@ -125,7 +134,7 @@ public class Rule implements Cloneable{
 		this.examplesCovered=groundings;
 	}
  	
- 	public void setPossiblePosToBeCovered(int groundings) {
+ 	public void setPossiblePositivesToBeCovered(int groundings) {
  		this.possiblePosToBeCovered=groundings;
  	}
  	
@@ -137,9 +146,8 @@ public class Rule implements Cloneable{
 		this.support=supp;
 	}
 	
-	public void setConfidence(float conf, int partition) {
+	public void setConfidence(float conf) {
 		this.confidence=conf;		
-		//this.weight=confidence;
 	}	
 	
 	public void setIsGood(boolean flag) {
@@ -207,8 +215,8 @@ public class Rule implements Cloneable{
 	 * @param position: the index in bodyLiterals of the literal on which the new Literal is connected
 	 */
 	public void addLiteral(Literal literal,int position) {
-		//reset body size as body changed
-		this.bodySize = -1;
+		//reset statistics as body is changed
+		resetStatistics();
 		
 		this.bodyLiterals.add(literal);
 		
@@ -224,9 +232,20 @@ public class Rule implements Cloneable{
 	 *  
 	 *  CHECK AGAIN FOR EQ and constants
 	 */
-	public void addLiteral(Literal literal) {
-		//reset body size as body changed
+	public void resetStatistics() {
+		System.out.println("Reseting all the statistics!");
 		this.bodySize = -1;
+		this.examplesCovered = -1;			// N(c)=N+(c)+N-(c)
+		this.positivesCovered = -1;	  		// N+(c)
+		this.possiblePosToBeCovered = -1;	// E+(c)	
+		this.confidence = 0;				
+		this.support = 0;					// (N+(c) or N(c))/Size(head)
+		this.specialityRatio = 0;			// (N+(c)/Size(body))
+	}
+	
+	public void addLiteral(Literal literal) {
+		//reset statistics as body is changed
+		resetStatistics();
 		
 		this.bodyLiterals.add(literal);
 
@@ -294,7 +313,7 @@ public class Rule implements Cloneable{
 	}
 	
 	public Rule clone() {
-	     Rule cloned;
+	    Rule cloned;
 		try {
 			cloned = (Rule)super.clone();
 			cloned.head = (Literal)head.clone();
@@ -338,7 +357,7 @@ public class Rule implements Cloneable{
 	private void setFlags() {	
 		boolean exist1st=false,exist2nd=false;
 		// first check for binding the head variables
-		if (!bindsHeadVariables) {
+		if (!this.bindsHeadVariables) {
 			
 			this.isInBeam=true; // to be change for relational info gain
 			
@@ -346,28 +365,26 @@ public class Rule implements Cloneable{
 				if (bodyLiterals.get(i).getRelation().isAuxiliary())
 					continue;
 
-				if(bodyLiterals.get(i).getFirstArgument()==66
-						||bodyLiterals.get(i).getSecondArgument()==66) {
-					exist2nd=true;
+				if(bodyLiterals.get(i).getFirstArgument()==66 ||bodyLiterals.get(i).getSecondArgument()==66) {
+					exist2nd = true;
 					if (exist1st) {
-						bindsHeadVariables=true;
+						this.bindsHeadVariables=true;
 						break;
 					}
 					
 				}
-				if(bodyLiterals.get(i).getFirstArgument()==65
-						||bodyLiterals.get(i).getSecondArgument()==65) {
-					exist1st=true;
+				if(bodyLiterals.get(i).getFirstArgument()==65 ||bodyLiterals.get(i).getSecondArgument()==65) {
+					exist1st = true;
 					if (exist2nd) {
-						bindsHeadVariables=true;
+						this.bindsHeadVariables = true;
 						break;
 					}
 					
 				}
 			}
 		}
-		if (!bindsHeadVariables) {
-			isGood=false;
+		if (!this.bindsHeadVariables) {
+			this.isGood = false;
 		}
 
 		// then check for free variables

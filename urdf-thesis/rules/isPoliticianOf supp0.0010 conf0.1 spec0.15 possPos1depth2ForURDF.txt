@@ -1,0 +1,2 @@
+<http://yago-knowledge.org/resource/isPoliticianOf>(?A,?B,1)<=<http://yago-knowledge.org/resource/livesIn>(?A,?B,1);<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>(?A,?C,1);equals(?C,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>,1);[0.15435833]
+<http://yago-knowledge.org/resource/isPoliticianOf>(?A,?B,1)<=<http://yago-knowledge.org/resource/livesIn>(?A,?B,1);<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>(?A,?C,1);equals(?C,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>,1);[0.3936906]

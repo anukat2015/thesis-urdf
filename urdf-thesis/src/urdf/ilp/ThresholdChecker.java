@@ -64,19 +64,18 @@ public class ThresholdChecker
 	}
 	
 	public boolean checkSupportThreshold(Rule rule, int FactsForHead,int inputArg) throws Exception  {
-		int examplesForSupport = (int) queryHandler.calcRuleProperties(rule, 6, inputArg);
-		
-		rule.setPossiblePosToBeCovered(examplesForSupport);
+		int possiblePositivesToBeCovered = (int) queryHandler.calcRuleProperties(rule, 6, inputArg);
+		//rule.setPossiblePosToBeCovered(possiblePositivesToBeCovered);
 		
 		int examplesCovered=(int)queryHandler.calcRuleProperties(rule, 1, inputArg);
-		rule.setExamplesCovered(examplesCovered);
+		//rule.setExamplesCovered(examplesCovered);
 		
-		int minExamples=(examplesForSupport<examplesCovered?examplesForSupport:examplesCovered);
+		int minExamples=(possiblePositivesToBeCovered<examplesCovered?possiblePositivesToBeCovered:examplesCovered);
 		
 		rule.setSupport((float)minExamples/(float)FactsForHead);
 		
 		if ((rule.getSupport()>this.supportThreshold && minExamples>=possiblePosToBeCoveredThreshold) && minExamples>=positivesCoveredThreshold) {
-			rule.setPossiblePosToBeCovered(examplesForSupport);
+			rule.setPossiblePositivesToBeCovered(possiblePositivesToBeCovered);
 			return true;
 		}
 		return false;
@@ -84,11 +83,11 @@ public class ThresholdChecker
 	
 	public boolean checkPositivesThreshold(Rule rule,int inputArg) throws Exception {
 		
-		if (rule.getExamplesForSupport()<positivesCoveredThreshold) 
+		if (rule.getPossiblePositivesToBeCovered()<positivesCoveredThreshold) 
 			return false;// do not store the rule and don't extend it
 		
 		int positivesCovered=(int)queryHandler.calcRuleProperties(rule, 0, inputArg);
-		rule.setPositivesCovered(positivesCovered);	
+		//rule.setPositivesCovered(positivesCovered);	
 	
 		if (positivesCovered < positivesCoveredThreshold) {
 			logger.log(Level.DEBUG, "Rule doesn't reach positivesCovered Threshold: "+positivesCovered+"<"+positivesCoveredThreshold );
@@ -100,16 +99,19 @@ public class ThresholdChecker
 		
 		//use conf or accuracy
 		calculateConfidence(rule, inputArg,positivesCovered);
+		
 		//calculateAccuracy(rule, inputArg, positivesCovered);
 		
 		return true;
 	}
 
-	public boolean checkComplementaryRule(Rule rule, Rule rule1,Rule rule2, int factsForHead,int inputArg) throws Exception
-	{
+	public boolean checkComplementaryRule(Rule rule, Rule rule1,Rule rule2, int factsForHead,int inputArg) throws Exception {
+		
+		logger.log(Level.DEBUG, "Checking complementary Rule");
+		
 		float conf;
 		int examplesCovered=rule1.getExamplesCovered()-rule2.getExamplesCovered();
-		int examplesForSupport=rule1.getExamplesForSupport()-rule2.getExamplesForSupport();
+		int examplesForSupport=rule1.getPossiblePositivesToBeCovered()-rule2.getPossiblePositivesToBeCovered();
 		int positivesCovered=rule1.getPositivesCovered()-rule2.getPositivesCovered();
 		
 		rule.setExamplesCovered(examplesCovered);
@@ -127,11 +129,11 @@ public class ThresholdChecker
 			case 0:
 				// no smoothing
 				conf=(float)(positivesCovered)/(float)rule.getExamplesCovered();				
-				rule.setConfidence(conf,partitionNumber);
+				rule.setConfidence(conf);
 				break;
 			default:  //1
 				// laplace smoothing? Lidstone?
-				rule.setConfidence(((float)positivesCovered+1)/((float)examplesCovered+2),partitionNumber);				
+				rule.setConfidence(((float)positivesCovered+1)/((float)examplesCovered+2));				
 		}	
 		
 		if (rule.getConfidence()>this.confidenceThreshold) {// check if rule is above confidence threshold without pruning	
@@ -151,19 +153,26 @@ public class ThresholdChecker
 	{
 		logger.log(Level.INFO,"Calculating Speciality Ratio for " + rule.getRuleString());	
 		
-		int bodySize=rule.getBodySize();
-		if (bodySize < 0) // BodySize from rule still not calculated
+		int bodySize = rule.getBodySize();
+		if (bodySize < 0) {// BodySize from rule still not calculated
 			bodySize = getBodySize(rule,inputArg);// be careful with the body size: I might have dangerous relations
-		rule.setBodySize(bodySize);
+			rule.setBodySize(bodySize);
+		}
+		
+		int examplesCovered = rule.getExamplesCovered();
+		if (examplesCovered < 0) {// BodySize from rule still not calculated
+			examplesCovered = (int) queryHandler.calcRuleProperties(rule, 1, inputArg);
+			rule.setExamplesCovered(examplesCovered);
+		}
 		
 		boolean comesFromGeneral = rule.isTooGeneral();
 		
 		
-		
-		rule.setSpecialityRatio(((float)rule.getExamplesCovered())/(float)bodySize); 
+		float spetialityRatio = (float)examplesCovered/(float)bodySize;
+		rule.setSpecialityRatio(spetialityRatio); 
 		//rule.setGeneralityRatio(((float)rule.getExamplesCovered()*partitionNumber)/(float)bodySize);
-
-		logger.log(Level.DEBUG,"SpecialityRatio=examplesCovered/BodySize=" + rule.getSpecialityRatio());
+		
+		logger.log(Level.DEBUG,"SpecialityRatio=examplesCovered/BodySize=" + rule.getSpecialityRatio() + "=("+examplesCovered+"/"+bodySize+")");
 		
 		if (rule.getSpecialityRatio() < specialityRatioThreshold) {
 			if (rule.getBodySize() > rule.getHead().getRelation().getSize() && rule.getSupport() >= 0.50) {
@@ -175,18 +184,20 @@ public class ThresholdChecker
 		}
 		else {
 			rule.setIsTooGeneral(false);
-			int minExamples=(rule.getExamplesForSupport() > rule.getExamplesCovered()?rule.getExamplesCovered():rule.getExamplesForSupport());
+			int minExamples=(rule.getPossiblePositivesToBeCovered() > rule.getExamplesCovered()?rule.getExamplesCovered():rule.getPossiblePositivesToBeCovered());
 			if (comesFromGeneral && minExamples < possiblePosToBeCoveredThreshold)
 				rule.setIsTooGeneral(true);
 		}
 		logger.log(Level.DEBUG,"Rule isTooGeneral=" + rule.isTooGeneral());
 
 	}
-	public void calculateSpecialityRatio2(Rule rule, String[] clauses, int inputArg) throws Exception
-	{
-		//int bodySize=rule.getBodySize();
-		int bodySize=getBodySize(rule,inputArg);// be careful with the body size: I might have dangerous relations
-		rule.setBodySize(bodySize);
+	public void calculateSpecialityRatio2(Rule rule, String[] clauses, int inputArg) throws Exception {
+		
+		int bodySize = rule.getBodySize(); // be careful with the body size: I might have dangerous relations
+		if (bodySize < 0) {
+			bodySize=getBodySize(rule,inputArg);
+			rule.setBodySize(bodySize);
+		}
 		
 		boolean comesFromGeneral=rule.isTooGeneral();
 		
@@ -235,23 +246,26 @@ public class ThresholdChecker
 	{
 		logger.log(Level.INFO,"Calculating confidence for arg"+inputArg+" in rule "+rule.getRuleString());
 		
-		float multHead1,multHead2,multHeadIdeal1,multHeadIdeal2,missingPairsFromHead, missingPairsFromHead1=0,missingPairsFromHead2=0, missingPairsFromBody=0, nom, denom, ratio1=0,ratio2=0,ratio, conf, idealExamplesCovered;
+		float multHead1,multHead2,multHeadIdeal1,multHeadIdeal2,missingPairsFromHead, missingPairsFromHead1=0,missingPairsFromHead2=0, nom, denom, ratio1=0,ratio2=0,ratio, conf, idealExamplesCovered;
 		
 		float idealExamplesCovered1=0,idealExamplesCovered2=0,multBody1,multBody2,missingPairsFromBody1=0,missingPairsFromBody2=0,multBodyIdeal1,multBodyIdeal2;
-		int n1,n2;
-		int examplesCovered=rule.getExamplesCovered();		
+		int n1,n2;	
 		
 		int bodySize = rule.getBodySize();
 		if (bodySize < 0) // If rule body size was still not calculated
 			bodySize = getBodySize(rule,inputArg);// be careful with the body size: I might have dangerous relations
 		rule.setBodySize(bodySize);
 		
+		int examplesCovered = rule.getExamplesCovered();
+		if (examplesCovered < 0) {// BodySize from rule still not calculated
+			examplesCovered = (int) queryHandler.calcRuleProperties(rule, 1, inputArg);
+			rule.setExamplesCovered(examplesCovered);
+		}
+		
 		
 		//TODO Why this method it OrigConfig is used for nothing and not even have a GETTER method
 		rule.setOrigConf(((float)positivesCovered)/(float)examplesCovered);
-		
-		logger.log(Level.DEBUG,"SpecialityRatio=examplesCovered/BodySize=" + rule.getSpecialityRatio());
-		
+
 		// case inputArg=1
 		if (inputArg!=2) {
 			if (!isDangerous(rule)) {
@@ -276,13 +290,13 @@ public class ThresholdChecker
 			multHeadIdeal1=rule.getHead().getRelation().getIdealMult(1);
 			
 			n1=rule.getHead().getRelation().getDistinctEntities(1); // distinct entities in the whole head
-			n1=n1*rule.getExamplesForSupport()/rule.getHead().getRelation().getSize(); // distinct entities in the overlap of head body
+			n1=n1*rule.getPossiblePositivesToBeCovered()/rule.getHead().getRelation().getSize(); // distinct entities in the overlap of head body
 			missingPairsFromHead1=n1*(multHeadIdeal1-multHead1);
 			
 			if (multHead1==1)
 				ratio1 = 0;
 			else
-				ratio1 = ((float)positivesCovered)/(float)rule.getExamplesForSupport();
+				ratio1 = ((float)positivesCovered)/(float)rule.getPossiblePositivesToBeCovered();
 		}
 		if (inputArg!=1) {
 			if (!isDangerous(rule)) {
@@ -306,13 +320,13 @@ public class ThresholdChecker
 			multHeadIdeal2 = rule.getHead().getRelation().getIdealMult(2);
 			
 			n2 = rule.getHead().getRelation().getDistinctEntities(2); // distinct entities in the whole head
-			n2 = n2*rule.getExamplesForSupport()/rule.getHead().getRelation().getSize(); // distinct entities in the overlap of head body
+			n2 = n2*rule.getPossiblePositivesToBeCovered()/rule.getHead().getRelation().getSize(); // distinct entities in the overlap of head body
 			missingPairsFromHead2 = n2*(multHeadIdeal2-multHead2);
 			
 			if (multHead2==1)
 				ratio2=0;
 			else
-				ratio2=((float)positivesCovered)/(float)rule.getExamplesForSupport();
+				ratio2=((float)positivesCovered)/(float)rule.getPossiblePositivesToBeCovered();
 			
 		}
 		
@@ -338,7 +352,6 @@ public class ThresholdChecker
 					missingPairsFromHead=missingPairsFromHead2;
 					idealExamplesCovered=idealExamplesCovered2;
 				}
-				
 		}
 		
 		rule.ratio=ratio;		
@@ -359,9 +372,9 @@ public class ThresholdChecker
 		
 		
 		conf=nom/denom;	
-		rule.setConfidence(conf,partitionNumber);	
+		rule.setConfidence(conf);	
 		
-		logger.log(Level.DEBUG,"Confidence=" + rule.getConfidence() + " // Calculation in ThresholdChecker::CalculateConfidence(line=350)");
+		logger.log(Level.DEBUG, "Confidence="+rule.getConfidence()+" from: "+rule.getRuleString());
 		
 		//TODO Why -0.15??????????????????????????
 		if (rule.getConfidence()>this.confidenceThreshold-0.15) {// check if rule is above confidence threshold without pruning
@@ -384,18 +397,22 @@ public class ThresholdChecker
 	
 
 	
-	private void calculateAccuracy(Rule rule, int inputArg, int positivesCovered) throws Exception {
+	/*private void calculateAccuracy(Rule rule, int inputArg, int positivesCovered) throws Exception {
 		
 		logger.log(Level.INFO,"Calculating Accuracy for arg"+inputArg+" in rule "+rule.getRuleString());
 		
 		float  conf,nom,denom;
-		int body=getBodySize(rule,inputArg);		
+		int bodySize = rule.getBodySize();
+		if (bodySize < 0) {  // If rule bodySize was still not calculated
+			bodySize = getBodySize(rule,inputArg);
+			rule.setBodySize(bodySize);
+		}
 		
 		//nom=(float)(positivesCovered +beta*(rule.getExamplesCovered()-positivesCovered));
-		nom=(float)positivesCovered;
-		denom=body;
-		conf=nom/denom;				
-		rule.setConfidence(conf,partitionNumber);	
+		nom = (float)positivesCovered;
+		denom = bodySize;
+		conf = nom/denom;				
+		rule.setConfidence(conf);	
 
 		if (rule.getConfidence()>this.confidenceThreshold) {// check if rule is above confidence threshold without pruning
 			calculateSpecialityRatio(rule, inputArg);
@@ -407,7 +424,7 @@ public class ThresholdChecker
 		else {
 			rule.setIsGood(false);
 		}
-	}
+	}*/
 	
 	private  boolean isDangerous(Rule rule) {
 		String rel;

@@ -31,7 +31,7 @@ public class ilpTesting {
 			HashMap<Integer, String> relationsForConstants = null;
 			int noise = 0;
 
-			int depth = 2;
+			int depth = 3;
 			boolean allowFreeVars = false;
 			boolean tryConstants = false;
 			boolean learnOnlyConstants = true;
@@ -77,8 +77,8 @@ public class ilpTesting {
 			
 			// relations for yago2
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
-			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
-			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/diedIn>"};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
+			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/diedIn>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/directed>"};
 			int[] inputArg={1};
 
