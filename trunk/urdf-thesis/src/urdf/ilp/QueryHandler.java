@@ -47,50 +47,54 @@ public class QueryHandler
 	 * @throws SQLException 
 	 * @throws Exception
 	 */
+	
 	public float calcRuleProperties(Rule rule, int forWhat, int inputArg) throws IllegalArgumentException, SQLException {
 		String sparql, info;
 		ResultSet rs;
-		float result = -1;
+		int result = -1;
 		
 		switch(forWhat){
 			case 0:	// positivesCovered
 				sparql = rule.positivesCoveredQuery();
-				info = "PositvesCovered = "+rule.getRuleString();
-				System.out.println(sparql);
 				rs = (ResultSet) stmt.executeQuery(sparql);
 				if (rs.next()) 
-					result = rs.getFloat(2);		
+					result = rs.getInt(2);		
+				rule.setPositivesCovered(result);
+				info = "PositvesCovered="+result+" from:"+rule.getRuleString();
 				break;
 				
 			case 1: // examplesCovered
 				sparql = rule.examplesCoveredQuery(inputArg);
-				info = "ExamplesCovered = "+rule.getRuleString();
 				rs = (ResultSet) stmt.executeQueryCountRows(sparql);
 				if (rs.next()) 
-					result = rs.getFloat(1);		
+					result = rs.getInt(1);	
+				rule.setExamplesCovered(result);
+				info = "ExamplesCovered="+result+" from:"+rule.getRuleString();
 				break;
 				
 			case 2: // body
-				sparql = rule.bodySupportQuery();
-				info = "BodySize = "+rule.getRuleString();
+				sparql = rule.bodySupportQuery();				
 				rs = (ResultSet) stmt.executeQuery(sparql);
 				if (rs.next()) 
-					result = rs.getFloat(2);
+					result = rs.getInt(2);				
+				rule.setBodySize(result);
+				info = "BodySize="+result+" from:"+rule.getRuleString();
 				break;
 				
 			case 6: // possiblePositivesToBeCovered
 				sparql = rule.possiblePositivesToBeCoveredQuery(inputArg);
-				info = "PossiblePositivesToBeCovered = "+rule.getRuleString();
 				rs = (ResultSet) stmt.executeQueryCountRows(sparql);
 				if (rs.next()) 
-					result = rs.getFloat(1);		
+					result = rs.getInt(1);					
+				rule.setPossiblePositivesToBeCovered(result);
+				info = "PossiblePositivesToBeCovered="+result+" from:"+rule.getRuleString();
 				break;
 				
 			default: 
 				throw new IllegalArgumentException("forWhat argument should be:  0=PositivesCovered, 1=examplesCovered 2=body 4=mult1 5=mult2 6=possiblePosToBeCovered");
 
 		}
-		logger.log(Level.INFO, info);
+		logger.log(Level.DEBUG, info);
 		
 		rs.close();
 		return result;
@@ -102,7 +106,7 @@ public class QueryHandler
 		patterns = patterns.substring(0,patterns.length()-2);
 
 		String sparql = "SELECT COUNT "+selectArg+" WHERE {"+patterns+"}";
-		String info = "Get Avg(Mult) and Var(Mult) from arg"+ inputArg + " for  " + rule.getRuleString();
+		String info = "Get Body Avg(Mult) and Var(Mult) from arg"+ inputArg + " for  " + rule.getRuleString();
 		logger.log(Level.INFO, info);
 
 		ResultSet rs=(ResultSet) stmt.executeQuery(sparql);
@@ -127,6 +131,8 @@ public class QueryHandler
 		float result[] = new float[2];
 		result[0] = avg;
 		result[1] = var;
+		
+		logger.log(Level.DEBUG, "Avg="+avg+" Var="+var);
 
 		return result;
 	}
@@ -182,38 +188,11 @@ public class QueryHandler
 		//rsCounter++;
 		//System.out.println(rsCounter);
 		while (rs.next())
-		{
 			outConstants.add(rs.getString(1));
-		}		
+		
 		return outConstants;	*/
 		return null;
 	}
- 	/*public ArrayList<String> findConstants(Rule rule, String[] clauses, int possiblePosToBeCoveredThershold, int positivesCoveredThreshold, float supportThreshold, int factsForHead, int inputArg,int depthOfRule) throws SQLException
-	{ 
-		String arg,put, finalClause, key;
-		ArrayList<String> outConstants=new ArrayList<String>();
-		
-		arg="arg"+rule.getHead().getRelation().getConstantInArg();
-		put=(rule.getHead().getRelation().getConstantInArg()==1?"input":"output");
-		finalClause="SELECT "+put+" FROM ("+clauses[0]+clauses[4]+clauses[5]+clauses[3]+") GROUP BY "+put+" HAVING count(*)>"+positivesCoveredThreshold;
-		finalClause+=" INTERSECT ";
-		finalClause+="SELECT "+arg+" FROM ("+clauses[7]+") GROUP BY "+arg+" HAVING count(*)>"+possiblePosToBeCoveredThershold+" OR count(*)>"+supportThreshold*factsForHead;
-		key=finalClause;
-		
-		System.out.println(finalClause);
-		
-		PreparedStatement ps=checkForQueryExistance(finalClause,key, 7, rule.getBodyLiterals().size());
-		ps=fillInPreparedStatement(ps, rule, 1, 0, inputArg);
-		ps=fillInPreparedStatement(ps, rule, depthOfRule+2, 6, inputArg);
-		ResultSet  rs = (ResultSet) ps.executeQuery();
-		//rsCounter++;
-		//System.out.println(rsCounter);
-		while (rs.next())
-		{
-			outConstants.add(rs.getString(1));
-		}		
-		return outConstants;		
-	}*/
 	
 	public int calcOverlap(Rule rule1, Rule rule2) throws SQLException {
 		String sparql = "SELECT count ?count WHERE {" + rule1.getBodyPatterns() + rule2.getBodyPatterns() + "}";

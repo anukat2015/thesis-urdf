@@ -17,8 +17,8 @@ import org.apache.log4j.PropertyConfigurator;
  * 	@author Christina Teflioudi
  *	This class tries to learn rules for given predicates  
  */
-public class RuleLearner 
-{
+public class RuleLearner {
+	
 	private static Logger logger = Logger.getLogger(LearningManager.loggerName);
 	
 	QueryHandler queryHandler;
@@ -31,14 +31,14 @@ public class RuleLearner
 	int inputArg;
 	int beamWidth; // if 0 do exhaustive search - no search heuristic 
 	
-	HashMap<Integer, ArrayList<BodyPredicate>> allowedRelations=new HashMap<Integer, ArrayList<BodyPredicate>>();	
+	HashMap<Integer, HashSet<BodyPredicate>> allowedRelations = new HashMap<Integer, HashSet<BodyPredicate>>();	
 	HashMap<Integer,HashSet<Rule>> rulesCheckedMap;
 	RuleTreeNode rulesTree;	
 	
-	boolean allowFreeVars=false;	//allow final rules with free variables
-	boolean tryConstants=false;		//allow rules with constants
-	int gainMeasure=0; 	// 0: accuracy gain 1: weighted accuracy gain 2: Information gain 3: weighted information gain
-	int numOfTries=20;	// how many constants I am going to try for the type relation
+	boolean allowFreeVars = false;		//allow final rules with free variables
+	boolean tryConstants = false;		//allow rules with constants
+	int gainMeasure = 0; 	// 0: accuracy gain 1: weighted accuracy gain 2: Information gain 3: weighted information gain
+	int numOfTries = 20;	// how many constants I am going to try for the type relation
 	String[] typeConstantsForArg1;
 	String[] typeConstantsForArg2;
 	
@@ -131,27 +131,38 @@ public class RuleLearner
 		}		
 	}
 	
-	private void refinePredicate(RuleTreeNode node, int joinCase, int d, int position) throws Exception
-	{
-		logger.log(Level.INFO,"Refining predicate from rule: " + node.getRule().getRuleString());
+	private void refinePredicate(RuleTreeNode node, int joinCase, int d, int position) throws Exception {
 		
-		Rule rule,newRule=null, freeRule=null,bindRule=null;
-		int arg1=0,arg2=0,freeVar;
+		logger.log(Level.INFO,"Refining predicate from rule: " + node.getRule().getRuleString());
+
+		Rule newRule=null;
+		Rule freeRule=null;
+		Rule bindRule=null;
+		
+		int arg1 = 0;
+		int arg2 = 0;
+		int mode1 = 0;
+		int mode2 = 0;
+		int freeVar;
+		
 		ArrayList<Relation> candidateRelations;
-		Literal newLiteral=null, freeLiteral=null;
+		Literal newLiteral = null;
+		Literal freeLiteral = null;
+		
 		boolean canCloseConnection=false;
 		boolean ruleStored=false;
-		int mode1=0,mode2=0;
+		
 		boolean[] out;
 		
-		rule=node.getRule();
-		
+		Rule rule = node.getRule();
 		Literal literal=(position==-1?rule.getHead():rule.getBodyLiterals().get(position));
 		
 		if (allowFreeVars) 
-			candidateRelations=getJoinableRelations(joinCase, literal.getRelation()); // no restriction at all
+			candidateRelations = getJoinableRelations(joinCase, literal.getRelation()); // no restriction at all
 		else
-			candidateRelations=getRelationsFromAllowedRelations(d,joinCase, literal.getRelation()); // restriction according to depth
+			candidateRelations = getRelationsFromAllowedRelations(d,joinCase, literal.getRelation()); // restriction according to depth
+		
+		
 		
 		switch(joinCase) {
 			case 1:				
@@ -183,33 +194,34 @@ public class RuleLearner
 		
 		if (candidateRelations!=null && candidateRelations.size()>0) {
 			for (int i=0,len=candidateRelations.size();i<len;i++) {
+								
+				Relation iCandidate = candidateRelations.get(i);
+				logger.log(Level.DEBUG, i+"th-CandidateRelation = "+iCandidate.getName());
+				
 				canCloseConnection=false;
 				ruleStored=false;	
 				freeRule=null;
 				bindRule=null;
 				
-				if (candidateRelations.get(i).getName().equals("hasUTCOffset") 
-						|| candidateRelations.get(i).getName().equals("bornOnDate")
-						|| candidateRelations.get(i).getName().equals("isOfGenre")) {
-					continue;
-				}
+				//if (iCandidate.getName().equals("hasUTCOffset") || iCandidate.getName().equals("bornOnDate") || iCandidate.getName().equals("isOfGenre")) {
+				//	continue;
+				//}
 				
 				
 				// STEP 1: WITH FREE VARIABLE	
 				newRule = rule.clone();
-				newLiteral = new Literal(candidateRelations.get(i),arg1,mode1,arg2,mode2,freeVar);				
+				newLiteral = new Literal(iCandidate,arg1,mode1,arg2,mode2,freeVar);		
+				
 				out = considerElimination(newRule,rule,newLiteral,literal,d,position);
 				
 				
 				if (out[0]) {
 					continue;
 				}
-				else if(!out[1])
-				{
-					if (evaluateRule(node,newRule,d))
-					{
-						ruleStored=true;
-						freeRule=newRule;
+				else if(!out[1]) {
+					if (evaluateRule(node,newRule,d)) {
+						ruleStored = true;
+						freeRule = newRule;
 						if (newRule.bindsHeadVariables() && newRule.isTooGeneral()&& newRule.isGood()) {
 							checkExtendRuleWithTypes(node, newRule, d);
 						}
@@ -222,36 +234,36 @@ public class RuleLearner
 				// STEP 2: WITH BOUND VARIABLES
 				if(inputArg==2) {
 					if ((joinCase==1 || joinCase==3) && info.arg1JoinOnArg2.get(head.getHeadRelation())!=null &&
-							info.arg1JoinOnArg2.get(head.getHeadRelation()).contains(candidateRelations.get(i)))
+							info.arg1JoinOnArg2.get(head.getHeadRelation()).contains(iCandidate))
 					{
 						// form the new Literal
-						newLiteral=new Literal(candidateRelations.get(i),arg1,65);
+						newLiteral=new Literal(iCandidate,arg1,65);
 						freeLiteral=new Literal(RelationsInfo.NEQ,arg2,65);
 						canCloseConnection=true;
 					}
 					else if ((joinCase==2 || joinCase==4)&& info.arg1JoinOnArg1.get(head.getHeadRelation())!=null &&
-							info.arg1JoinOnArg1.get(head.getHeadRelation()).contains(candidateRelations.get(i)))
+							info.arg1JoinOnArg1.get(head.getHeadRelation()).contains(iCandidate))
 					{
 						// form the new Literal
-						newLiteral=new Literal(candidateRelations.get(i),65,arg2);
+						newLiteral=new Literal(iCandidate,65,arg2);
 						freeLiteral=new Literal(RelationsInfo.NEQ,arg1,65);
 						canCloseConnection=true;
 					}
 				}
 				else {
 					if ((joinCase==1 || joinCase==3) && info.arg2JoinOnArg2.get(head.getHeadRelation())!=null &&
-							info.arg2JoinOnArg2.get(head.getHeadRelation()).contains(candidateRelations.get(i)))
+							info.arg2JoinOnArg2.get(head.getHeadRelation()).contains(iCandidate))
 					{
 						// form the new Literal
-						newLiteral=new Literal(candidateRelations.get(i),arg1,66);
+						newLiteral=new Literal(iCandidate,arg1,66);
 						freeLiteral=new Literal(RelationsInfo.NEQ,arg2,66);
 						canCloseConnection=true;
 					}
 					else if ((joinCase==2 || joinCase==4)&& info.arg2JoinOnArg1.get(head.getHeadRelation())!=null &&
-							info.arg2JoinOnArg1.get(head.getHeadRelation()).contains(candidateRelations.get(i)))
+							info.arg2JoinOnArg1.get(head.getHeadRelation()).contains(iCandidate))
 					{
 						// form the new Literal
-						newLiteral=new Literal(candidateRelations.get(i),66,arg2);
+						newLiteral=new Literal(iCandidate,66,arg2);
 						freeLiteral=new Literal(RelationsInfo.NEQ,arg1,66);
 						canCloseConnection=true;
 					}
@@ -354,7 +366,7 @@ public class RuleLearner
 		if (checkForSupportAndExactExamples(rule)) {				
 			// compute Gain and store
 			if(rule.bindsHeadVariables() && d>1 && rule.isGood()) 
-				checkGainFromBestAncestor(node,rule);	// set the is good flag							
+				checkGainFromBestAncestor(node,rule);	// set the is good flag
 			
 			node.addChild(new RuleTreeNode(rule,node,d));	
 			flag=true;
@@ -369,8 +381,8 @@ public class RuleLearner
 		return flag;
 	}
  	
-	private boolean evaluateRule(RuleTreeNode node,Rule rule, int d,Rule freeRule, Rule bindRule) throws Exception
-	{
+	private boolean evaluateRule(RuleTreeNode node,Rule rule, int d,Rule freeRule, Rule bindRule) throws Exception {
+		
 		boolean flag=false;
 		
 		logger.log(Level.INFO,"Evaluating Rule: " + rule.getRuleString() + "With FreeRule: " + freeRule.getRuleString() + "With BindRule: " + bindRule.getRuleString());
@@ -399,17 +411,13 @@ public class RuleLearner
 		if (allowedRelations.get(d-1)==null)
 			return null;
 		
-		for (int i=0,len=allowedRelations.get(d-1).size();i<len;i++) {
-			if (allowedRelations.get(d-1).get(i).hasRelation(relation)) {
+		for (BodyPredicate bp : allowedRelations.get(d-1)) {
+			if (bp.hasRelation(relation)) {
 				switch(joinCase) {
-					case 1:
-						return allowedRelations.get(d-1).get(i).arg1JoinOnArg1;						
-					case 2:
-						return allowedRelations.get(d-1).get(i).arg1JoinOnArg2;
-					case 3:
-						return allowedRelations.get(d-1).get(i).arg2JoinOnArg1;
-					case 4:
-						return allowedRelations.get(d-1).get(i).arg2JoinOnArg2;
+					case 1: return bp.arg1JoinOnArg1;						
+					case 2: return bp.arg1JoinOnArg2;
+					case 3: return bp.arg2JoinOnArg1;
+					case 4: return bp.arg2JoinOnArg2;
 				}
 			}
 		}
@@ -422,13 +430,14 @@ public class RuleLearner
 		Rule newRule, newRule2;
 		Literal lit;
 		int var;
+		Relation typeRelation = info.getRelationFromRelations("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>");
 		
 		if (inputArg!=2) {// 1 or 0 
 			
 			for (int i=0;i<numOfTries;i++) {
 				newRule = rule.clone();
 				var = newRule.getNextVariableNumber();
-				lit = new Literal(info.getRelationFromRelations("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"),65,1,var,0,2);
+				lit = new Literal(typeRelation,65,1,var,0,2);
 				newRule.addLiteral(lit,0);	
 				lit = new Literal(RelationsInfo.EQ,var,1,-1,0,typeConstantsForArg1[i]);
 				newRule.addLiteral(lit);				
@@ -437,7 +446,7 @@ public class RuleLearner
 					for (int j=0;j<numOfTries;j++) {
 						newRule2 = newRule.clone();
 						var = newRule.getNextVariableNumber();
-						lit = new Literal(info.getRelationFromRelations("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"),66,1,var,0,2);	
+						lit = new Literal(typeRelation,66,1,var,0,2);	
 						newRule2.addLiteral(lit);				
 						lit = new Literal(RelationsInfo.EQ,var,1,-1,0,typeConstantsForArg2[i]);
 						newRule2.addLiteral(lit);
@@ -462,12 +471,11 @@ public class RuleLearner
 				
 			}			
 		}
-		else {
-			
+		else {		
 			for (int i=0;i<numOfTries;i++) {
 				newRule=rule.clone();
 				var=newRule.getNextVariableNumber();
-				lit=new Literal(info.getRelationFromRelations("<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>"),66,1,var,0,2);
+				lit=new Literal(typeRelation,66,1,var,0,2);
 				newRule.addLiteral(lit,0);				
 				lit=new Literal(RelationsInfo.EQ,var,1,-1,0,typeConstantsForArg2[i]);
 				newRule.addLiteral(lit);
@@ -487,7 +495,7 @@ public class RuleLearner
 		Literal lit;
 		int var=(head.getHeadRelation().getConstantInArg()==1?65:66);
 		// first get the constants if any
-		ArrayList<String> consts=queryHandler.findConstants(rule, tChecker.getPossiblePosToBeCoveredThreshold(), tChecker.getPositivesCoveredThreshold(), tChecker.getSupportThreshold(), FactsForHead, inputArg, d);
+		ArrayList<String> consts = queryHandler.findConstants(rule, tChecker.getPossiblePosToBeCoveredThreshold(), tChecker.getPositivesCoveredThreshold(), tChecker.getSupportThreshold(), FactsForHead, inputArg, d);
 		
 		for (int i=0, len=consts.size();i<len;i++) {
 			newRule = rule.clone();
@@ -652,17 +660,14 @@ public class RuleLearner
 	
 	// *************************** METHODS FOR CHECKING **********************************
 	
-	private boolean checkForSupportAndExactExamples(Rule rule) throws Exception
-	{		
+	private boolean checkForSupportAndExactExamples(Rule rule) throws Exception {		
+		
+		logger.log(Level.DEBUG, "Checking for Support and Exact examples");
+		
 		if (tChecker.checkSupportThreshold(rule,FactsForHead,inputArg)) {			
 			if (rule.bindsHeadVariables()) {
-				if (!rule.hasFreeVariables()||allowFreeVars) {
-					if(checkForPositives(rule)) {
-						return true;
-					}
-					else {
-						return false;
-					}
+				if (!rule.hasFreeVariables() || allowFreeVars) {
+					return tChecker.checkPositivesThreshold(rule,inputArg);
 				}				
 			}				
 			return true;			
@@ -671,55 +676,34 @@ public class RuleLearner
 	}
  	
  	/**
- 	 * @param oldNode: parent node
- 	 * @param newRule: the rule to be added as child
- 	 * @return true if the gain from the closest Final ancestor is positive
- 	 */
- 	private boolean checkGainFromFather(RuleTreeNode oldNode,Rule newRule) {
- 		Rule rule;
- 		
- 		if (oldNode.getRule().bindsHeadVariables()) 
- 			rule=oldNode.getRule();
- 		else 
- 			rule=oldNode.getFirstFinalParentRule();
- 		
- 		if (rule==null) 
- 			return true;
- 		
- 		if(calcGain(rule,newRule)>0) 
- 			return true;
- 		else 
- 			return false;
- 	}
- 	
- 	/**
  	 * @param rule: some rule which is ancestor of the new rule
  	 * @param newRule
  	 * @return the gain of the new rule in compare with the old one
  	 */
  	private double calcGain(Rule rule, Rule newRule) {
+ 		logger.log(Level.DEBUG,"Calculating Gain from rule " + newRule.getRuleString() + "=" + newRule.getConfidence() + " in relation to " + rule.getRuleString() + "=" + rule.getConfidence());
  		
  		double gain;
  		switch(gainMeasure){
  			case 0:
  				// Use the accuracy measure: AG(c',c)=A(c')-A(c)=conf(c')-conf(c)
- 				gain=newRule.getConfidence()-rule.getConfidence(); 		 		
+ 				gain = newRule.getConfidence()-rule.getConfidence(); 		 		
  				break;
  			case 1:
  				// Use the weighted accuracy measure: WAG(c',c)=(conf(c')-conf(c))* exact(c')/exact(c)
- 				gain=(newRule.getConfidence()-rule.getConfidence())* newRule.getPositivesCovered()/rule.getExamplesCovered(); 		 		
+ 				gain = (newRule.getConfidence()-rule.getConfidence())* newRule.getPositivesCovered()/rule.getExamplesCovered(); 		 		
  				break; 				
  			case 2:
  				// Use the information gain measure: IG(c',c)=log2(conf(c'))-log2(conf(c))
- 				gain=(Math.log(newRule.getConfidence())-Math.log(rule.getConfidence()))/Math.log(2); 		 		
+ 				gain = (Math.log(newRule.getConfidence())-Math.log(rule.getConfidence()))/Math.log(2); 		 		
  				break; 				
  			default://3
  				// Use the weighted information gain: WIG(c',c)=(log2(conf(c'))-log2(conf(c)))* exact(c')/exact(c)
- 				gain=(Math.log(newRule.getConfidence())-Math.log(rule.getConfidence()))* newRule.getPositivesCovered()/(rule.getExamplesCovered()*Math.log(2)); 		 		
+ 				gain = (Math.log(newRule.getConfidence())-Math.log(rule.getConfidence()))* newRule.getPositivesCovered()/(rule.getExamplesCovered()*Math.log(2)); 		 		
  				
  		}		
  		newRule.setGain(gain);
- 		logger.log(Level.INFO,"Gain="+gain+" from rule " + newRule.getRuleString() + " in relation to " + rule.getRuleString());
+ 		logger.log(Level.DEBUG,"Gain="+gain);
  		return gain;
  	}
  	
@@ -731,8 +715,10 @@ public class RuleLearner
  	 */
  	private void checkGainFromBestAncestor(RuleTreeNode oldNode,Rule newRule) {
  		
- 		Rule lastParentRule=oldNode.getBestFinalParentRule();
+ 		logger.log(Level.DEBUG, "Calculating gain from best ancestor");
+ 		Rule lastParentRule = oldNode.getBestFinalParentRule();
  		if (lastParentRule!=null) {
+ 			logger.log(Level.DEBUG, "Best parent rule ="+lastParentRule.getRuleString()+" with conf="+lastParentRule.getConfidence());
  			if(calcGain(lastParentRule,newRule)>0) {
  				newRule.setIsGood(true);
  				logger.log(Level.DEBUG, "Rule " + newRule.getRuleString() + " is Good, i.e. it's better than its best ancestor");
@@ -744,14 +730,7 @@ public class RuleLearner
  		} 	
  		
  	}
- 	
-	private boolean checkForPositives(Rule rule) throws Exception {
-		
-		if (tChecker.checkPositivesThreshold(rule,inputArg))					
-			return true;
-		
-		return false;		
-	}
+ 
 
 // *************************** METHODS FOR STRUCTURE PRUNING *************************
  	
@@ -774,7 +753,7 @@ public class RuleLearner
  		// allow locatedIn(x,y):-locatedIn(x,z)  for transitivity
 		if (newLiteral.getRelation().equals(head.getHeadRelation())) {
 			if (newLiteral.getFirstArgument()==65 && newLiteral.getRelation().getRelationsForm()==2 && (inputArg==1 || inputArg==2)) {
-				logger.log(Level.DEBUG, "Eliminated: New Literal of the kind rel(x,y):-rel(x,z) with different domain and range (no transitivity possible)");
+				logger.log(Level.DEBUG, "Eliminated: New Literal of the kind rel(x,y):-rel(x,z) with different domain and range (no future transitivity possible)");
 				return true;// avoid livesIn(65,66) and livesIn(65,67)
 			}
 			//if (newLiteral.getFirstArgument()==66 && newLiteral.getRelation().getRelationsForm()==2 && inputArg==2) {
@@ -877,10 +856,16 @@ public class RuleLearner
 		
 		// I have already considered this rule (or an equivalent one) before
 		if (rulesCheckedMap.get(d)!=null) {
-			if (rulesCheckedMap.get(d).contains(newRule)) {
-				logger.log(Level.DEBUG, "Eliminated: Rule was already considered before");
-				return true;
+			for (Rule r : rulesCheckedMap.get(d)) {
+				if (r.equals(newRule)) {
+					logger.log(Level.DEBUG, "Eliminated: Rule was already considered before");
+					return true;
+				}
 			}
+			//if (rulesCheckedMap.get(d).contains(newRule)) {
+			//	logger.log(Level.DEBUG, "Eliminated: Rule was already considered before");
+			//	return true;
+			//}
 			
 			//for (int i=0,len=rulesCheckedMap.get(d).size();i<len;i++) {
 			//	if (rulesCheckedMap.get(d).get(i).equals(newRule))
@@ -928,10 +913,10 @@ public class RuleLearner
 	}
 	private void checkOverlap(RuleTreeNode node1, RuleTreeNode node2) throws SQLException
 	{	
-		Rule rule2=node2.getRule();
-		Rule rule1=node1.getRule();	
+		Rule rule2 = node2.getRule();
+		Rule rule1 = node1.getRule();	
 		boolean goodRule=false;	
-		int overlap=0;
+		int overlap = 0;
 		ArrayList<Rule> array=new ArrayList<Rule>();
 
 		if (rule2.isGood() && !rule2.isTooGeneral()) {
