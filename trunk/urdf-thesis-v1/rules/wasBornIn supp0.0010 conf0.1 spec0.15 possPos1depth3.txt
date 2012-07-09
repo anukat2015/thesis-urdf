@@ -1,0 +1,36 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/wasBornIn>
+ 
+wasBornIn(A,B)<-diedIn(A,C)livesIn(D,C)diedIn(D,B)
+confidence: 0.17788689 support: 0.07363228 specialityRatio: 0.176981
+N+(c): 6116 E+(c): 6716 N(c): 16664 B(c): 94157 E+: 91210
+wasBornIn(A,B)<-diedIn(A,C)wasBornIn(D,C)diedIn(D,B)
+confidence: 0.10481912 support: 0.12702554 specialityRatio: 0.17234465
+N+(c): 91172 E+(c): 11586 N(c): 350766 B(c): 2035259 E+: 91210
+wasBornIn(A,B)<-diedIn(A,B)
+confidence: 0.1972065 support: 0.14521433 specialityRatio: 0.4532699
+N+(c): 2612 E+(c): 13245 N(c): 13245 B(c): 29221 E+: 91210
+wasBornIn(A,B)<-hasAcademicAdvisor(A,C)diedIn(C,B)
+confidence: 0.11624156 support: 0.0035303147 specialityRatio: 0.36008677
+N+(c): 45 E+(c): 322 N(c): 332 B(c): 922 E+: 91210
+wasBornIn(A,B)<-hasChild(A,C)diedIn(C,B)
+confidence: 0.10381779 support: 0.0049775243 specialityRatio: 0.27906978
+N+(c): 100 E+(c): 454 N(c): 612 B(c): 2193 E+: 91210
+wasBornIn(A,B)<-hasChild(A,C)isMarriedTo(C,D)diedIn(D,B)
+confidence: 0.10271292 support: 0.0027738186 specialityRatio: 0.29881155
+N+(c): 57 E+(c): 253 N(c): 352 B(c): 1178 E+: 91210
+wasBornIn(A,B)<-isPoliticianOf(A,C)livesIn(D,C)diedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Living_people>)
+confidence: 0.11631515 support: 0.0014691371 specialityRatio: 0.19882353
+N+(c): 132 E+(c): 134 N(c): 338 B(c): 1700 E+: 91210
+wasBornIn(A,B)<-livesIn(A,B)
+confidence: 0.11952521 support: 0.06765705 specialityRatio: 0.38664877
+N+(c): 1408 E+(c): 6171 N(c): 8074 B(c): 20882 E+: 91210
+wasBornIn(A,B)<-hasPreferredName(A,C)isCalled(D,C)diedIn(D,B)
+confidence: 0.17953025 support: 0.07521105 specialityRatio: 0.376945
+N+(c): 1333 E+(c): 6860 N(c): 6880 B(c): 18252 E+: 91210
+wasBornIn(A,B)<-isMarriedTo(A,C)diedIn(C,B)
+confidence: 0.12945594 support: 0.0082118185 specialityRatio: 0.27962428
+N+(c): 120 E+(c): 749 N(c): 774 B(c): 2768 E+: 91210
+wasBornIn(A,B)<-isMarriedTo(C,A)diedIn(C,B)
+confidence: 0.12945594 support: 0.0082118185 specialityRatio: 0.27962428
+N+(c): 120 E+(c): 749 N(c): 774 B(c): 2768 E+: 91210
+time elapsed for whole partition: 615350

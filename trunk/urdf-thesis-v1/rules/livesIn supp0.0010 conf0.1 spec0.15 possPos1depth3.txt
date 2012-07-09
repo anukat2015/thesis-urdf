@@ -1,0 +1,12 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/livesIn>
+ 
+livesIn(A,B)<-diedIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.24524543 support: 0.004262044 specialityRatio: 0.15033785
+N+(c): 15 E+(c): 133 N(c): 89 B(c): 592 E+: 20882
+livesIn(A,B)<-diedIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_lawyer_110249950>)
+confidence: 0.74385566 support: 0.0029690643 specialityRatio: 0.22878228
+N+(c): 39 E+(c): 126 N(c): 62 B(c): 271 E+: 20882
+livesIn(A,B)<-diedIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.158935 support: 0.0026338473 specialityRatio: 0.1923077
+N+(c): 6 E+(c): 73 N(c): 55 B(c): 286 E+: 20882
+time elapsed for whole partition: 6976

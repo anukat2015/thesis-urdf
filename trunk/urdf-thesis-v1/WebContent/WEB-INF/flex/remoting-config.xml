@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<service id="remoting-service" 
+    class="flex.messaging.services.RemotingService">
+
+    <adapters>
+        <adapter-definition id="java-object" class="flex.messaging.services.remoting.adapters.JavaAdapter" default="true"/>
+    </adapters>
+
+    <default-channels>
+        <channel ref="my-amf"/>
+    </default-channels>
+	
+	<destination id="UReasoner">
+		<properties>
+			<source>urdf.api.UReasoner</source>
+		    <scope>session</scope>
+		</properties>
+	</destination>
+	
+<!--	
+	
+	<destination id="UBinding">
+		<properties>
+			<source>urdf.api.UBinding</source>
+		    <scope>request</scope>
+		</properties>
+	</destination> 
+	
+	<destination id="UBindingSet">
+		<properties>
+			<source>urdf.api.UBindingSet</source>
+		    <scope>request</scope>
+		</properties>
+	</destination> 
+  
+    <destination id="UArgument">
+		<properties>
+			<source>urdf.api.UArgument</source>
+		    <scope>request</scope>
+		</properties>
+	</destination> 
+
+    <destination id="UDomain">
+		<properties>
+			<source>urdf.api.UDomain</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UObject">
+		<properties>
+			<source>urdf.api.UObject</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UTest">
+		<properties>
+			<source>testing.UTest</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>	
+	
+	<destination id="UEntity">
+		<properties>
+			<source>urdf.api.UEntity</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UTriplet">
+		<properties>
+			<source>urdf.api.UTriplet</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="URelation">
+		<properties>
+			<source>urdf.api.URelation</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="ULiteral">
+		<properties>
+			<source>urdf.api.ULiteral</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UStatistics">
+		<properties>
+			<source>urdf.api.UStatistics</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="URule">
+		<properties>
+			<source>urdf.api.URule</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UQuery">
+		<properties>
+			<source>urdf.api.UQuery</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="USoftRule">
+		<properties>
+			<source>urdf.api.USoftRule</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UHardRule">
+		<properties>
+			<source>urdf.api.UHardRule</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UOptions">
+		<properties>
+			<source>urdf.api.UOptions</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="ULineage">
+		<properties>
+			<source>urdf.api.ULineage</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UFact">
+		<properties>
+			<source>urdf.api.UFact</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UFactSet">
+		<properties>
+			<source>urdf.api.UFactSet</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UGroundedSoftRule">
+		<properties>
+			<source>urdf.api.UGroundedSoftRule</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UGroundedHardRule">
+		<properties>
+			<source>urdf.api.UGroundedHardRule</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+	
+	<destination id="UQueryResult">
+		<properties>
+			<source>urdf.api.UQueryResult</source>
+		    <scope>request</scope>
+		</properties>
+	</destination>
+    
+-->
+	
+	
+</service>

@@ -1,0 +1,3532 @@
+1	Americas/Western Europe
+2	Eastern Europe
+3	Africa/Middle East
+4	Russia/ Central Asia
+5	Asia/Pacific
+6	Vietnam
+A013	Namibe    
+AA	ARUBA    
+AC	ANTIGUA AND BARBUDA  
+AC01	Barbuda    
+AC03	Saint George   
+AC04	Saint John   
+AC05	Saint Mary   
+AC06	Saint Paul   
+AC07	Saint Peter   
+AC08	Saint Philip   
+AF	AFGHANISTAN    
+AF01	Badakhshan    
+AF02	Badghis    
+AF03	Baghlan    
+AF05	Bamian    
+AF06	Farah    
+AF07	Faryab    
+AF08	Ghazni    
+AF09	Ghor
+AF09	Ghowr
+AF10	Helmand    
+AF11	Herat    
+AF13	Kabol    
+AF14	Kapisa    
+AF15	Konar    
+AF16	Laghman    
+AF17	Lowgar
+AF17	Logar
+AF18	Nangarhar    
+AF19	Nimruz   
+AF19	Chakhansur
+AF20	Uruzgan
+AF20	Oruzgan
+AF21	Paktia    
+AF22	Parvan
+AF22	Parwan
+AF23	Kandahar
+AF24	Kondoz
+AF24	Kunduz
+AF26	Takhar    
+AF27	Vardak
+AF27	Warkak
+AF28	Zabol
+AF28	Zabul
+AF29	Paktika    
+AF30	Balkh    
+AF31	Jowzjan    
+AF32	Samangan    
+AF33	Sar-e Pol   
+AG	ALGERIA    
+AG01	Alger    
+AG03	Batna    
+AG04	Constantine    
+AG06	Medea    
+AG07	Mostaganem    
+AG09	Oran    
+AG10	Saida    
+AG12	Setif    
+AG13	Tiaret    
+AG14	Tizi Ouzou   
+AG15	Tlemcen    
+AG18	Bejaia    
+AG19	Biskra    
+AG20	Blida    
+AG21	Bouira    
+AG22	Djelfa    
+AG23	Guelma    
+AG24	Jijel    
+AG25	Laghouat    
+AG26	Mascara    
+AG27	M'sila    
+AG29	Oum el Bouaghi  
+AG30	Sidi Bel Abbes  
+AG31	Skikda    
+AG33	Tebessa    
+AG34	Adrar    
+AG35	Ain Defla   
+AG36	Ain Temouchent   
+AG37	Annaba    
+AG38	Bechar    
+AG39	Bordj Bou Arreridj  
+AG40	Boumerdes    
+AG41	Chlef    
+AG42	El Bayadh   
+AG43	El Oued   
+AG44	El Tarf   
+AG45	Ghardaia    
+AG46	Illizi    
+AG47	Khenchela    
+AG48	Mila    
+AG49	Naama    
+AG50	Ouargla    
+AG51	Relizane    
+AG52	Souk Ahras   
+AG53	Tamanghasset    
+AG54	Tindouf    
+AG55	Tipaza    
+AG56	Tissemsilt    
+AJ	AZERBAIJAN    
+AL	ALBANIA    
+AL01	Berat    
+AL02	Dibre    
+AL03	Durres    
+AL04	Elbasan    
+AL05	Fier    
+AL06	Gjirokaster    
+AL07	Gramsh    
+AL08	Kolonje    
+AL09	Korce    
+AL10	Kruje    
+AL11	Kukes    
+AL12	Lezhe    
+AL13	Librazhd    
+AL14	Lushnje    
+AL15	Mat    
+AL16	Mirdite    
+AL17	Permet    
+AL18	Pogradec    
+AL19	Puke    
+AL20	Sarande    
+AL21	Shkoder    
+AL22	Skrapar    
+AL23	Tepelene    
+AL26	Tropoje    
+AL27	Vlore    
+AL28	Tirane    
+AM	ARMENIA    
+AN	ANDORRA    
+AN01	Andorra    
+AN02	Canillo    
+AN03	Encamp    
+AN04	La Massana   
+AN05	Ordino    
+AN06	Sant Julia de Loria 
+AO	ANGOLA    
+AO01	Benguela    
+AO02	Bie    
+AO03	Cabinda    
+AO04	Cuando Cubango   
+AO05	Cuanza Norte   
+AO06	Cuanza Sul   
+AO07	Cunene    
+AO08	Huambo    
+AO09	Huila    
+AO12	Malanje    
+AO14	Moxico    
+AO15	Uige    
+AO16	Zaire    
+AO17	Lunda Norte   
+AO18	Lunda Sul   
+AO19	Bengo    
+AO20	Luanda    
+AQ	AMERICAN SAMOA   
+AR	ARGENTINA    
+AR01	Buenos Aires   
+AR02	Catamarca    
+AR03	Chaco    
+AR04	Chubut    
+AR05	Cordoba    
+AR06	Corrientes    
+AR07	Distrito Federal   
+AR08	Entre Rios   
+AR09	Formosa    
+AR10	Jujuy    
+AR11	La Pampa   
+AR12	La Rioja   
+AR13	Mendoza    
+AR14	Misiones    
+AR15	Neuquen    
+AR16	Rio Negro   
+AR17	Salta    
+AR18	San Juan   
+AR19	San Luis   
+AR20	Santa Cruz   
+AR21	Santa Fe   
+AR22	Santiago del Estero  
+AR23	Tierra del Fuego, Antartida e
+AR24	Tucuman    
+AS	AUSTRALIA    
+AS01	Australian Capital Territory  
+AS02	New South Wales  
+AS03	Northern Territory   
+AS04	Queensland    
+AS05	South Australia   
+AS06	Tasmania    
+AS07	Victoria    
+AS08	Western Australia   
+AT	ASHMORE AND CARTIER ISLANDS 
+AU	AUSTRIA    
+AU01	Burgenland    
+AU02	Karnten    
+AU03	Niederosterreich    
+AU04	Oberosterreich    
+AU05	Salzburg    
+AU06	Steiermark    
+AU07	Tirol    
+AU08	Vorarlberg    
+AU09	Wien    
+AV	ANGUILLA    
+AY	ANTARCTICA    
+BA	BAHRAIN    
+BA01	Al Hadd   
+BA02	Al Manamah   
+BA03	Al Muharraq   
+BA05	Jidd Hafs   
+BA06	Sitrah    
+BA08	Al Mintaqah al Gharbiyah 
+BA09	Mintaqat Juzur Hawar  
+BA10	Al Mintaqah ash Shamaliyah 
+BA11	Al Mintaqah al Wusta 
+BA12	Madinat `Isa   
+BA13	Ar Rifa` wa al Mintaqah
+BA14	Madinat Hamad   
+BB	BARBADOS    
+BB01	Christ Church   
+BB02	Saint Andrew   
+BB03	Saint George   
+BB04	Saint James   
+BB05	Saint John   
+BB06	Saint Joseph   
+BB07	Saint Lucy   
+BB08	Saint Michael   
+BB09	Saint Peter   
+BB10	Saint Philip   
+BB11	Saint Thomas   
+BC	BOTSWANA    
+BC01	Central    
+BC02	Chobe    
+BC03	Ghanzi    
+BC04	Kgalagadi    
+BC05	Kgatleng    
+BC06	Kweneng    
+BC07	Ngamiland    
+BC08	North-East    
+BC09	South-East    
+BC10	Southern    
+BD	BERMUDA    
+BD01	Devonshire    
+BD02	Hamilton    
+BD03	Hamilton    
+BD04	Paget    
+BD05	Pembroke    
+BD06	Saint George   
+BD07	Saint George's   
+BD08	Sandys    
+BD09	Smiths    
+BD10	Southampton    
+BD11	Warwick    
+BE	BELGIUM    
+BE01	Antwerpen    
+BE02	Brabant    
+BE03	Hainaut    
+BE04	Liege    
+BE05	Limburg    
+BE06	Luxembourg    
+BE07	Namur    
+BE08	Oost-Vlaanderen    
+BE09	West-Vlaanderen    
+BF	BAHAMAS, THE   
+BF05	Bimini    
+BF06	Cat Island   
+BF10	Exuma    
+BF13	Inagua    
+BF15	Long Island   
+BF16	Mayaguana    
+BF18	Ragged Island   
+BF22	Harbour Island   
+BF23	New Providence   
+BF24	Acklins and Crooked Islands 
+BF25	Freeport    
+BF26	Fresh Creek   
+BF27	Governor's Harbour   
+BF28	Green Turtle Cay  
+BF29	High Rock   
+BF30	Kemps Bay   
+BF31	Marsh Harbour   
+BF32	Nichollstown and Berry Islands 
+BF33	Rock Sound   
+BF34	Sandy Point   
+BF35	San Salvador and Rum Cay
+BG	BANGLADESH    
+BG01	Barisal    
+BG04	Bandarban    
+BG05	Comilla    
+BG12	Mymensingh    
+BG13	Noakhali    
+BG15	Patuakhali    
+BG22	Bagerhat    
+BG23	Bhola    
+BG24	Bogra    
+BG25	Barguna    
+BG26	Brahmanbaria    
+BG27	Chandpur    
+BG28	Chapai Nawabganj   
+BG29	Chattagram    
+BG30	Chuadanga    
+BG31	Cox's Bazar   
+BG32	Dhaka    
+BG33	Dinajpur    
+BG34	Faridpur    
+BG35	Feni    
+BG36	Gaibandha    
+BG37	Gazipur    
+BG38	Gopalganj    
+BG39	Habiganj    
+BG40	Jaipurhat    
+BG41	Jamalpur    
+BG42	Jessore    
+BG43	Jhalakati    
+BG44	Jhenaidah    
+BG45	Khagrachari    
+BG46	Khulna    
+BG47	Kishorganj    
+BG48	Kurigram    
+BG49	Kushtia    
+BG50	Laksmipur    
+BG51	Lalmonirhat    
+BG52	Madaripur    
+BG53	Magura    
+BG54	Manikganj    
+BG55	Meherpur    
+BG56	Moulavibazar    
+BG57	Munshiganj    
+BG58	Naogaon    
+BG59	Narail    
+BG60	Narayanganj    
+BG61	Narsingdi    
+BG62	Nator    
+BG63	Netrakona    
+BG64	Nilphamari    
+BG65	Pabna    
+BG66	Panchagar    
+BG67	Parbattya Chattagram   
+BG68	Pirojpur    
+BG69	Rajbari    
+BG70	Rajshahi    
+BG71	Rangpur    
+BG72	Satkhira    
+BG73	Shariyatpur    
+BG74	Sherpur    
+BG75	Sirajganj    
+BG76	Sunamganj    
+BG77	Sylhet    
+BG78	Tangail    
+BG79	Thakurgaon    
+BH	BELIZE    
+BH01	Belize    
+BH02	Cayo    
+BH03	Corozal    
+BH04	Orange Walk   
+BH05	Stann Creek   
+BH06	Toledo    
+BK	BOSNIA AND HERZEGOVINA  
+BL	BOLIVIA    
+BL01	Chuquisaca    
+BL02	Cochabamba    
+BL03	El Beni   
+BL04	La Paz   
+BL05	Oruro    
+BL06	Pando    
+BL07	Potosi    
+BL08	Santa Cruz   
+BL09	Tarija    
+BM	BURMA    
+BM01	Rakhine State   
+BM02	Chin State   
+BM03	Irrawaddy    
+BM04	Kachin State   
+BM05	Karan State   
+BM06	Kayah State   
+BM07	Magwe    
+BM08	Mandalay    
+BM09	Pegu    
+BM10	Sagaing    
+BM11	Shan State   
+BM12	Tenasserim    
+BM13	Mon State   
+BM14	Rangoon    
+BN	BENIN    
+BN01	Atakora    
+BN02	Atlantique    
+BN03	Borgou    
+BN04	Mono    
+BN05	Oueme    
+BN06	Zou    
+BO	BELARUS    
+BP	SOLOMON ISLANDS   
+BP03	Malaita    
+BP04	Western    
+BP05	Central    
+BP06	Guadalcanal    
+BP07	Isabel    
+BP08	Makira    
+BP09	Temotu    
+BQ	NAVASSA ISLAND   
+BR	BRAZIL    
+BR01	Acre    
+BR02	Alagoas    
+BR03	Amapa    
+BR04	Amazonas    
+BR05	Bahia    
+BR06	Ceara    
+BR07	Distrito Federal   
+BR08	Espirito Santo   
+BR11	Mato Grosso do Sul 
+BR13	Maranhao    
+BR14	Mato Grosso   
+BR15	Minas Gerais   
+BR16	Para    
+BR17	Paraiba    
+BR18	Parana    
+BR20	Piaui    
+BR21	Rio de Janeiro  
+BR22	Rio Grande do Norte 
+BR23	Rio Grande do Sul 
+BR24	Rondonia    
+BR25	Roraima    
+BR26	Santa Catarina   
+BR27	Sao Paulo   
+BR28	Sergipe    
+BR29	Goias    
+BR30	Pernambuco    
+BR31	Tocantins    
+BS	BASSAS DA INDIA  
+BT	BHUTAN    
+BT05	Bumthang    
+BT06	Chhukha    
+BT07	Chirang    
+BT08	Daga    
+BT09	Geylegphug    
+BT10	Ha    
+BT11	Lhuntshi    
+BT12	Mongar    
+BT13	Paro    
+BT14	Pemagatsel    
+BT15	Punakha    
+BT16	Samchi    
+BT17	Samdrup    
+BT18	Shemgang    
+BT19	Tashigang    
+BT20	Thimphu    
+BT21	Tongsa    
+BT22	Wangdi Phodrang   
+BU	BULGARIA    
+BU29	Burgas    
+BU30	Grad Sofiya   
+BU31	Khaskovo    
+BU32	Lovech    
+BU33	Mikhaylovgrad    
+BU34	Plovdiv    
+BU35	Razgrad    
+BU36	Sofiya    
+BU37	Varna    
+BV	BOUVET ISLAND   
+BX	BRUNEI    
+BX01	Belait    
+BX02	Brunei and Muara  
+BX03	Temburong    
+BX04	Tutong    
+BY	BURUNDI    
+BY02	Bujumbura    
+BY05	Muramvya    
+BY09	Bubanza    
+BY10	Bururi    
+BY11	Cankuzo    
+BY12	Cibitoke    
+BY13	Gitega    
+BY14	Karuzi    
+BY15	Kayanza    
+BY16	Kirundo    
+BY17	Makamba    
+BY18	Muyinga    
+BY19	Ngozi    
+BY20	Rutana    
+BY21	Ruyigi    
+CA	CANADA    
+CA01	Alberta    
+CA02	British Columbia   
+CA03	Manitoba    
+CA04	New Brunswick   
+CA05	Newfoundland    
+CA06	Northwest Territories   
+CA07	Nova Scotia   
+CA08	Ontario    
+CA09	Prince Edward Island  
+CA10	Quebec    
+CA11	Saskatchewan    
+CA12	Yukon Territory   
+CB	CAMBODIA    
+CB01	Batdambang    
+CB02	Kampong Cham   
+CB03	Kampong Chhnang   
+CB04	Kampong Spoe   
+CB05	Kampong Thum   
+CB06	Kampot    
+CB07	Kandal    
+CB08	Kaoh Kong   
+CB09	Kracheh    
+CB10	Mondol Kiri   
+CB11	Phnum Penh   
+CB12	Pouthisat    
+CB13	Preah Vihear   
+CB14	Prey Veng   
+CB15	Rotanokiri    
+CB16	Siemreab-Otdar Meanchey   
+CB17	Stoeng Treng   
+CB18	Svay Rieng   
+CB19	Takev    
+CD	CHAD    
+CD01	Batha    
+CD02	Biltine    
+CD03	Borkou-Ennedi-Tibesti    
+CD04	Chari-Baguirmi    
+CD05	Guera    
+CD06	Kanem    
+CD07	Lac    
+CD08	Logone Occidental   
+CD09	Logone Oriental   
+CD10	Mayo-Kebbi    
+CD11	Moyen-Chari    
+CD12	Ouaddai    
+CD13	Salamat    
+CD14	Tandjile    
+CE	SRI LANKA   
+CE01	Amparai    
+CE02	Anuradhapura    
+CE03	Badulla    
+CE04	Batticaloa    
+CE06	Galle    
+CE07	Hambantota    
+CE09	Kalutara    
+CE10	Kandy    
+CE11	Kegalla    
+CE12	Kurunegala    
+CE14	Matale    
+CE15	Matara    
+CE16	Moneragala    
+CE17	Nuwara Eliya   
+CE18	Polonnaruwa    
+CE19	Puttalam    
+CE20	Ratnapura    
+CE21	Trincomalee    
+CE23	Colombo    
+CE24	Gampaha    
+CE25	Jaffna    
+CE26	Mannar    
+CE27	Mullaittivu    
+CE28	Vavuniya    
+cercle	    
+CF	CONGO    
+CF01	Bouenza    
+CF03	Cuvette    
+CF04	Kouilou    
+CF05	Lekoumou    
+CF06	Likouala    
+CF07	Niari    
+CF08	Plateaux    
+CF10	Sangha    
+CF11	Pool    
+CF12	Brazzaville    
+CG	ZAIRE    
+CG01	Bandundu    
+CG02	Equateur    
+CG03	Kasai-Occidental    
+CG04	Kasai-Oriental    
+CG05	Shaba    
+CG06	Kinshasa    
+CG07	Kivu    
+CG08	Bas-Zaire    
+CG09	Haut-Zaire    
+CH	CHINA    
+CH01	Anhui
+CH01	Anhwei
+CH02	Zhejiang
+CH02	Chekiang
+CH03	Jiangxi
+CH04	Kiangsu  
+CH05	Jilin
+CH06	Qinghai
+CH07	Fujian
+CH08	Heilongjiang
+CH09	Henan
+CH10	Hebei
+CH03	Jiangxi  
+CH04	Jiangsu
+ 
+CH05	Kirin
+CH06	Tsinghai  
+CH07	Fukien
+CH08	Heilungkiang
+CH09	Honan
+CH10	Hopeh
+CH11	Hunan    
+CH12	Hubei
+CH13	Xinjiang
+CH12	Hupeh
+CH13	Sinkiang
+CH14	Xizang
+CH14	Tibet   
+CH15	Gansu
+CH16	Guangxi
+CH18	Guizhou
+CH15	Kansu
+CH16	Kwangsi 
+CH18	Kweichow
+CH19	Liaoning    
+CH20	Nei Mongol
+CH20	Inner Mongolia
+CH21	Ningxia
+CH22	Beijing
+CH22	Peking
+CH23	Shanghai    
+CH24	Shanxi
+CH25	Shandong
+CH26	Shaanxi
+CH27	Sichuan
+CH24	Shansi 
+CH25	Shantung
+CH26	Shensi
+CH27	Szechwan
+CH28	Tianjin    
+CH29	Yunnan    
+CH30	Guangdong
+CH30	Kwangtung
+CH31	Hainan    
+CI	CHILE    
+CI01	Valparaiso    
+CI02	Aisen del General Carlos Ibanez
+CI03	Antofagasta    
+CI04	Araucania    
+CI05	Atacama    
+CI06	Bio-Bio    
+CI07	Coquimbo    
+CI08	Libertador General Bernardo O'Higgins 
+CI09	Los Lagos   
+CI10	Magallanes y de la Antartica
+CI11	Maule    
+CI12	Region Metropolitana   
+CI13	Tarapaca    
+CJ	CAYMAN ISLANDS   
+CJ01	Creek    
+CJ02	Eastern    
+CJ03	Midland    
+CJ04	South Town   
+CJ05	Spot Bay   
+CJ06	Stake Bay   
+CJ07	West End   
+CJ08	Western    
+CK	COCOS ISLANDS  
+CK	KEELING ISLANDS 
+CM	CAMEROON    
+CM04	Est   
+CM05	Littoral    
+CM07	Nord-Ouest
+CM08	Ouest
+CM09	Sud-Ouest
+CM10	Adamaoua    
+CM11	Centre    
+CM12	Extreme-Nord
+CM13	Nord   
+CM14	Sud   
+CN	COMOROS    
+CN01	Anjouan    
+CN02	Grande Comore   
+CN03	Moheli    
+CO	COLOMBIA    
+CO01	Amazonas    
+CO02	Antioquia    
+CO03	Arauca    
+CO04	Atlantico    
+CO08	Caqueta    
+CO09	Cauca    
+CO10	Cesar    
+CO11	Choco    
+CO12	Cordoba    
+CO14	Guaviare    
+CO15	Guainia    
+CO16	Huila    
+CO17	La Guajira   
+CO19	Meta    
+CO20	Narino    
+CO21	Norte de Santander  
+CO22	Putumayo    
+CO23	Quindio    
+CO24	Risaralda    
+CO25	San Andres y Providencia 
+CO26	Santander    
+CO27	Sucre    
+CO28	Tolima    
+CO29	Valle del Cauca  
+CO30	Vaupes    
+CO31	Vichada    
+CO32	Casanare    
+CO33	Cundinamarca    
+CO34	Distrito Especial   
+CO35	Bolivar    
+CO36	Boyaca    
+CO37	Caldas    
+CO38	Magdalena    
+CQ	NORTHERN MARIANA ISLANDS  
+CR	CORAL SEA ISLANDS  
+CS	COSTA RICA   
+CS01	Alajuela    
+CS02	Cartago    
+CS03	Guanacaste    
+CS04	Heredia    
+CS06	Limon    
+CS07	Puntarenas    
+CS08	San Jose   
+CT	CENTRAL AFRICAN REPUBLIC  
+CT01	Bamingui-Bangoran    
+CT02	Basse-Kotto    
+CT03	Haute-Kotto    
+CT04	Haute-Sangha    
+CT05	Haut-Mbomou    
+CT06	Kemo-Gribingui    
+CT07	Lobaye    
+CT08	Mbomou    
+CT09	Nana-Mambere
+CT09	Nana-Nambere
+CT11	Ouaka    
+CT12	Ouham    
+CT13	Ouham-Pende    
+CT14	Vakaga    
+CT15	Gribingui    
+CT16	Sangha    
+CT17	Ombella-Mpoko    
+CT18	Bangui    
+CU	CUBA    
+CU01	Pinar del Rio  
+CU02	Ciudad de la Habana 
+CU03	Matanzas    
+CU04	Isla de la Juventud 
+CU05	Camaguey    
+CU07	Ciego de Avila  
+CU08	Cienfuegos    
+CU09	Granma    
+CU10	Guantanamo    
+CU11	La Habana   
+CU12	Holguin    
+CU13	Las Tunas   
+CU14	Sancti Spiritus   
+CU15	Santiago de Cuba  
+CU16	Villa Clara   
+CV	CAPE VERDE   
+CV01	Boa Vista   
+CV02	Brava    
+CV03	Fogo    
+CV04	Maio    
+CV05	Paul    
+CV06	Praia    
+CV07	Ribeira Grande   
+CV08	Sal    
+CV09	Santa Catarina   
+CV10	Sao Nicolau   
+CV11	Sao Vicente   
+CV12	Tarrafal    
+CW	COOK ISLANDS   
+CY	CYPRUS    
+CY01	Famagusta    
+CY02	Kyrenia    
+CY03	Larnaca    
+CY04	Nicosia    
+CY05	Limassol    
+CY06	Paphos    
+DA	DENMARK    
+DA01	Arhus    
+DA02	Bornholm    
+DA03	Frederiksborg    
+DA04	Fyn    
+DA05	Kobenhavn    
+DA06	Staden Kobenhavn   
+DA07	Nordjylland    
+DA08	Ribe    
+DA09	Ringkobing    
+DA10	Roskilde    
+DA11	Sonderjylland    
+DA12	Storstrom    
+DA13	Vejle    
+DA14	Vestsjalland    
+DA15	Viborg    
+DJ	DJIBOUTI    
+DJ01	`Ali Sabih   
+DJ02	Dikhil    
+DJ03	Djibouti    
+DJ04	Obock    
+DJ05	Tadjoura    
+DO	DOMINICA    
+DO02	Saint Andrew   
+DO03	Saint David   
+DO04	Saint George   
+DO05	Saint John   
+DO06	Saint Joseph   
+DO07	Saint Luke   
+DO08	Saint Mark   
+DO09	Saint Patrick   
+DO10	Saint Paul   
+DO11	Saint Peter   
+DQ	JARVIS ISLAND   
+DR	DOMINICAN REPUBLIC   
+DR01	Azua    
+DR02	Baoruco    
+DR03	Barahona    
+DR04	Dajabon    
+DR05	Distrito Nacional   
+DR06	Duarte    
+DR08	Espaillat    
+DR09	Independencia    
+DR10	La Altagracia   
+DR11	Elias Pina   
+DR12	La Romana   
+DR14	Maria Trinidad Sanchez  
+DR15	Monte Cristi   
+DR16	Pedernales    
+DR17	Peravia    
+DR18	Puerto Plata   
+DR19	Salcedo    
+DR20	Samana    
+DR21	Sanchez Ramirez   
+DR23	San Juan   
+DR24	San Pedro De Macoris 
+DR25	Santiago    
+DR26	Santiago Rodriguez   
+DR27	Valverde    
+DR28	El Seibo   
+DR29	Hato Mayor   
+DR30	La Vega   
+DR31	Monsenor Nouel   
+DR32	Monte Plata   
+DR33	San Cristobal   
+EC	ECUADOR    
+EC01	Galapagos    
+EC02	Azuay    
+EC03	Bolivar    
+EC04	Canar    
+EC05	Carchi    
+EC06	Chimborazo    
+EC07	Cotopaxi    
+EC08	El Oro   
+EC09	Esmeraldas    
+EC10	Guayas    
+EC11	Imbabura    
+EC12	Loja    
+EC13	Los Rios   
+EC14	Manabi    
+EC15	Morona-Santiago    
+EC17	Pastaza    
+EC18	Pichincha    
+EC19	Tungurahua    
+EC20	Zamora-Chinchipe    
+EC21	Napo    
+EC22	Sucumbios    
+EG	EGYPT    
+EG01	Ad Daqahliyah   
+EG02	Al Bahr al Ahmar 
+EG03	Al Buhayrah   
+EG04	Al Fayyum   
+EG05	Al Gharbiyah   
+EG06	Al Iskandariyah   
+EG07	Al Isma'iliyah   
+EG08	Al Jizah   
+EG09	Al Minufiyah   
+EG10	Al Minya   
+EG11	Al Qahirah   
+EG12	Al Qalyubiyah   
+EG13	Al Wadi al Jadid 
+EG14	Ash Sharqiyah   
+EG15	As Suways   
+EG16	Aswan    
+EG17	Asyut    
+EG18	Bani Suwayf   
+EG19	Bur Sa'id   
+EG20	Dumyat    
+EG21	Kafr ash Shaykh  
+EG22	Matruh    
+EG23	Qina    
+EG24	Suhaj    
+EG26	Janub Sina'   
+EG27	Shamal Sina'   
+EI	IRELAND    
+EI01	Carlow    
+EI02	Cavan    
+EI03	Clare    
+EI04	Cork    
+EI06	Donegal    
+EI07	Dublin    
+EI10	Galway    
+EI11	Kerry    
+EI12	Kildare    
+EI13	Kilkenny    
+EI14	Leitrim    
+EI15	Laois    
+EI16	Limerick    
+EI18	Longford    
+EI19	Louth    
+EI20	Mayo    
+EI21	Meath    
+EI22	Monaghan    
+EI23	Offaly    
+EI24	Roscommon    
+EI25	Sligo    
+EI26	Tipperary    
+EI27	Waterford    
+EI29	Westmeath    
+EI30	Wexford    
+EI31	Wicklow    
+EK	EQUATORIAL GUINEA   
+EK03	Annobon    
+EK04	Bioko Norte   
+EK05	Bioko Sur   
+EK06	Centro Sur   
+EK07	Kie-Ntem    
+EK08	Litoral    
+EK09	Wele-Nzas    
+EN	ESTONIA    
+EN01	Harjumaa    
+EN02	Hiiumaa    
+EN03	Ida-Virumaa    
+EN04	Jarvamaa    
+EN05	Jogevamaa    
+EN06	Kohtla-Jarve    
+EN07	Laanemaa    
+EN08	Laane-Virumaa    
+EN09	Narva    
+EN10	Parnu    
+EN11	Parnumaa    
+EN12	Polvamaa    
+EN13	Raplamaa    
+EN14	Saaremaa    
+EN15	Sillamae    
+EN16	Tallinn    
+EN17	Tartu    
+EN18	Tartumaa    
+EN19	Valgamaa    
+EN20	Viljandimaa    
+EN21	Vorumaa    
+ER	ERITREA    
+ES	EL SALVADOR   
+ES01	Ahuachapan    
+ES02	Cabanas    
+ES03	Chalatenango    
+ES04	Cuscatlan    
+ES05	La Libertad   
+ES06	La Paz   
+ES07	La Union   
+ES08	Morazan    
+ES09	San Miguel   
+ES10	San Salvador   
+ES11	Santa Ana   
+ES12	San Vicente   
+ES13	Sonsonate    
+ES14	Usulutan    
+ET	ETHIOPIA    
+ET01	Arsi
+ET01	Arusi
+ET15	Adis Abeba   
+ET17	Asosa    
+ET18	Borena    
+ET19	Debub Gonder   
+ET20	Debub Shewa   
+ET21	Debub Welo   
+ET22	Dire Dawa   
+ET23	Gambela    
+ET24	Metekel    
+ET25	Mirab Gojam   
+ET26	Mirab Harerge   
+ET27	Mirab Shewa   
+ET28	Misrak Gojam   
+ET29	Misrak Harerge   
+ET30	Nazret    
+ET31	Ogaden    
+ET32	Omo    
+ET33	Semen Gonder   
+ET34	Semen Shewa   
+ET35	Semen Welo   
+ET37	Tigray 
+ET38	Bale
+ET37	Tigre 
+ET38	Mendebo
+ET39	Gamo Gofa
+ET39	Gemu Gwefa
+ET40	Ilubabor    
+ET41	Kefa    
+ET42	Sidamo    
+ET43	Walaga
+ET43	Welega
+EU	EUROPA ISLAND   
+EZ	CZECH REPUBLIC   
+FG	FRENCH GUIANA   
+FI	FINLAND    
+FI01	Ahvenanmaa    
+FI02	Hame    
+FI03	Keski-Suomi    
+FI04	Kuopio    
+FI05	Kymi    
+FI06	Lappi    
+FI07	Mikkeli    
+FI08	Oulu    
+FI09	Pohjois-Karjala    
+FI10	Turku ja Pori  
+FI11	Uusimaa    
+FI12	Vaasa    
+FJ	FIJI    
+FJ01	Central    
+FJ02	Eastern    
+FJ03	Northern    
+FJ04	Rotuma    
+FJ05	Western    
+FK	FALKLAND ISLANDS
+FK	ISLAS MALVINAS
+FM	FEDERATED STATES OF MICRONESIA 
+FM01	Kosrae    
+FM02	Pohnpei    
+FM03	Chuuk    
+FM04	Yap    
+FO	FAROE ISLANDS   
+FP	FRENCH POLYNESIA   
+FQ	BAKER ISLAND   
+FR	FRANCE    
+FR97	Aquitaine    
+FR98	Auvergne    
+FR99	Basse-Normandie    
+FRA1	Bourgogne    
+FRA2	Bretagne    
+FRA3	Centre    
+FRA4	Champagne-Ardenne    
+FRA5	Corse    
+FRA6	Franche-Comte    
+FRA7	Haute-Normandie    
+FRA8	Ile-de-France    
+FRA9	Languedoc-Roussillon    
+FRB1	Limousin    
+FRB2	Lorraine    
+FRB3	Midi-Pyrenees    
+FRB4	Nord-Pas-de-Calais    
+FRB5	Pays de la Loire 
+FRB6	Picardie    
+FRB7	Poitou-Charentes    
+FRB8	Provence-Alpes-Cote d'Azur   
+FRB9	Rhone-Alpes    
+FRC1	Alsace    
+FS	FRENCH SOUTHERN AND ANTARCTIC LANDS
+GA	GAMBIA, THE   
+GA01	Banjul    
+GA02	Lower River   
+GA03	MacCarthy Island   
+GA04	Upper River   
+GA05	Western    
+GA07	North Bank   
+GB	GABON    
+GB01	Estuaire    
+GB02	Haut-Ogooue    
+GB03	Moyen-Ogooue    
+GB04	Ngounie    
+GB05	Nyanga    
+GB06	Ogooue-Ivindo    
+GB07	Ogooue-Lolo    
+GB08	Ogooue-Maritime    
+GB09	Woleu-Ntem    
+GG	GEORGIA    
+GH	GHANA    
+GH01	Greater Accra   
+GH02	Ashanti    
+GH03	Brong-Ahafo    
+GH04	Central    
+GH05	Eastern    
+GH06	Northern    
+GH08	Volta    
+GH09	Western    
+GH10	Upper East   
+GH11	Upper West   
+GI	GIBRALTAR    
+GJ	GRENADA    
+GJ01	Saint Andrew   
+GJ02	Saint David   
+GJ03	Saint George   
+GJ04	Saint John   
+GJ05	Saint Mark   
+GJ06	Saint Patrick   
+GK	GUERNSEY    
+GL	GREENLAND    
+GL01	Nordgronland    
+GL02	Ostgronland    
+GL03	Vestgronland    
+GM	GERMANY    
+GM01	Baden-Wurttemberg    
+GM02	Bavaria
+GM02	Bayern
+GM03	Bremen    
+GM04	Hamburg    
+GM05	Hessen    
+GM06	Niedersachsen    
+GM07	Nordrhein-Westfalen    
+GM08	Rheinland-Pfalz    
+GM09	Saarland    
+GM10	Schleswig-Holstein    
+GM11	Brandenburg    
+GM12	Mecklenburg-Vorpommern    
+GM13	Sachsen    
+GM14	Sachsen-Anhalt    
+GM15	Thuringen    
+GM16	Berlin    
+GO	GLORIOSO ISLANDS   
+GP	GUADELOUPE    
+GQ	GUAM    
+GR	GREECE    
+GR01	Evros    
+GR02	Rodhopi    
+GR03	Xanthi    
+GR04	Drama    
+GR05	Serrai    
+GR06	Kilkis    
+GR07	Pella    
+GR08	Florina    
+GR09	Kastoria    
+GR10	Grevena    
+GR11	Kozani    
+GR12	Imathia    
+GR13	Thessaloniki    
+GR14	Kavala    
+GR15	Khalkidhiki    
+GR16	Pieria    
+GR17	Ioannina    
+GR18	Thesprotia    
+GR19	Preveza    
+GR20	Arta    
+GR21	Larisa    
+GR22	Trikala    
+GR23	Kardhitsa    
+GR24	Magnisia    
+GR25	Kerkira    
+GR26	Levkas    
+GR27	Kefallinia    
+GR28	Zakinthos    
+GR29	Fthiotis    
+GR30	Evritania    
+GR31	Aitolia kai Akarnania  
+GR32	Fokis    
+GR33	Voiotia    
+GR34	Evvoia    
+GR35	Attiki    
+GR36	Argolis    
+GR37	Korinthia    
+GR38	Akhaia    
+GR39	Ilia    
+GR40	Messinia    
+GR41	Arkadhia    
+GR42	Lakonia    
+GR43	Khania    
+GR44	Rethimni    
+GR45	Iraklion    
+GR46	Lasithi    
+GR47	Dhodhekanisos    
+GR48	Samos    
+GR49	Kikladhes    
+GR50	Khios    
+GR51	Lesvos    
+GT	GUATEMALA    
+GT01	Alta Verapaz   
+GT02	Baja Verapaz   
+GT03	Chimaltenango    
+GT04	Chiquimula    
+GT05	El Progreso   
+GT06	Escuintla    
+GT07	Guatemala    
+GT08	Huehuetenango    
+GT09	Izabal    
+GT10	Jalapa    
+GT11	Jutiapa    
+GT12	Peten    
+GT13	Quetzaltenango    
+GT14	Quiche    
+GT15	Retalhuleu    
+GT16	Sacatepequez    
+GT17	San Marcos   
+GT18	Santa Rosa   
+GT19	Solola    
+GT20	Suchitepequez    
+GT21	Totonicapan    
+GT22	Zacapa    
+GV	GUINEA    
+GV01	Beyla    
+GV02	Boffa    
+GV03	Boke    
+GV04	Conakry    
+GV05	Dabola    
+GV06	Dalaba    
+GV07	Dinguiraye    
+GV08	Dubreka    
+GV09	Faranah    
+GV10	Forecariah    
+GV11	Fria    
+GV12	Gaoual    
+GV13	Gueckedou    
+GV14	Kankan    
+GV15	Kerouane    
+GV16	Kindia    
+GV17	Kissidougou    
+GV18	Koundara    
+GV19	Kouroussa    
+GV20	Labe    
+GV21	Macenta    
+GV22	Mali    
+GV23	Mamou    
+GV24	Nzerekore    
+GV25	Pita    
+GV26	Siguiri    
+GV27	Telimele    
+GV28	Tougue    
+GV29	Yomou    
+GY	GUYANA    
+GY10	Barima-Waini    
+GY11	Cuyuni-Mazaruni    
+GY12	Demerara-Mahaica    
+GY13	East Berbice-Corentyne   
+GY14	Essequibo Islands-West Demerara  
+GY15	Mahaica-Berbice    
+GY16	Pomeroon-Supenaam    
+GY17	Potaro-Siparuni    
+GY18	Upper Demerara-Berbice   
+GY19	Upper Takutu-Upper Essequibo  
+GZ	GAZA STRIP   
+HA	HAITI    
+HA03	Nord-Ouest    
+HA06	Artibonite    
+HA07	Centre    
+HA08	Grand' Anse   
+HA09	Nord    
+HA10	Nord-Est    
+HA11	Ouest    
+HA12	Sud    
+HA13	Sud-Est    
+HK	HONG KONG   
+HM	HEARD ISLAND AND MCDONALD ISLANDS
+HO	HONDURAS    
+HO01	Atlantida    
+HO02	Choluteca    
+HO03	Colon    
+HO04	Comayagua    
+HO05	Copan    
+HO06	Cortes    
+HO07	El Paraiso   
+HO08	Francisco Morazan   
+HO09	Gracias a Dios  
+HO10	Intibuca    
+HO11	Islas de la Bahia 
+HO12	La Paz   
+HO13	Lempira    
+HO14	Ocotepeque    
+HO15	Olancho    
+HO16	Santa Barbara   
+HO17	Valle    
+HO18	Yoro    
+HQ	HOWLAND ISLAND   
+HR	CROATIA    
+HU	HUNGARY    
+HU01	Bacs-Kiskun    
+HU02	Baranya    
+HU03	Bekes    
+HU04	Borsod-Abauj-Zemplen    
+HU05	Budapest    
+HU06	Csongrad    
+HU07	Debrecen    
+HU08	Fejer    
+HU09	Gyor-Moson-Sopron    
+HU10	Hajdu-Bihar    
+HU11	Heves    
+HU12	Komarom-Esztergom    
+HU13	Miskolc    
+HU14	Nograd    
+HU15	Pecs    
+HU16	Pest    
+HU17	Somogy    
+HU18	Szabolcs-Szatmar-Bereg    
+HU19	Szeged    
+HU20	Jasz-Nagykun-Szolnok    
+HU21	Tolna    
+HU22	Vas    
+HU23	Veszprem    
+HU24	Zala    
+HU25	Gyor    
+HU26	Bekescsaba    
+HU27	Dunaujvaros    
+HU28	Eger    
+HU29	Hodmezovasarhely    
+HU30	Kaposvar    
+HU31	Kecskemet    
+HU32	Nagykanizsa    
+HU33	Nyiregyhaza    
+HU34	Sopron    
+HU35	Szekesfehervar    
+HU36	Szolnok    
+HU37	Szombathely    
+HU38	Tatabanya    
+HU39	Veszprem    
+HU40	Zalaegerszeg    
+IC	ICELAND    
+IC01	Akranes    
+IC02	Akureyri    
+IC03	Arnessysla    
+IC04	Austur-Bardastrandarsysla    
+IC05	Austur-Hunavatnssysla    
+IC06	Austur-Skaftafellssysla    
+IC07	Borgarfjardarsysla    
+IC08	Dalasysla    
+IC09	Eyjafjardarsysla    
+IC10	Gullbringusysla    
+IC11	Hafnarfjordur    
+IC12	Husavik    
+IC13	Isafjordur    
+IC14	Keflavik    
+IC15	Kjosarsysla    
+IC16	Kopavogur    
+IC17	Myrasysla    
+IC18	Neskaupstadur    
+IC19	Nordur-Isafjardarsysla    
+IC20	Nordur-Mulasysla    
+IC21	Nordur-Tingeyjarsysla    
+IC22	Olafsfjordur    
+IC23	Rangarvallasysla    
+IC24	Reykjavik    
+IC25	Saudarkrokur    
+IC26	Seydisfjordur    
+IC27	Siglufjordur    
+IC28	Skagafjardarsysla    
+IC29	Snafellsnes- og Hnappadalssysla  
+IC30	Strandasysla    
+IC31	Sudur-Mulasysla    
+IC32	Sudur-Tingeyjarsysla    
+IC33	Vestmannaeyjar    
+IC34	Vestur-Bardastrandarsysla    
+IC35	Vestur-Hunavatnssysla    
+IC36	Vestur-Isafjardarsysla    
+IC37	Vestur-Skaftafellssysla    
+ID	INDONESIA    
+ID01	Aceh
+ID01	Atjeh
+ID02	Bali    
+ID03	Bengkulu    
+ID04	Jakarta Raya
+ID05	Jambi
+ID06	Jawa Barat
+ID07	Jawa Tengah
+ID08	Jawa Timur
+ID04	Djakarta Raya
+ID05	Djambi
+ID06	Djawa Barat
+ID07	Djawa Tengah
+ID08	Djawa Timur
+ID09	Irian Jaya   
+ID10	Yogyakarta
+ID10	Jogjakarta
+ID11	Kalimantan Barat   
+ID12	Kalimantan Selatan   
+ID13	Kalimantan Tengah   
+ID14	Kalimantan Timur   
+ID15	Lampung    
+ID16	Maluku    
+ID17	Nusa Tenggara Barat  
+ID18	Nusa Tenggara Timur  
+ID19	Riau    
+ID20	Sulawesi Selatan   
+ID21	Sulawesi Tengah   
+ID22	Sulawesi Tenggara   
+ID23	Sulawesi Utara   
+ID24	Sumatera Barat   
+ID25	Sumatera Selatan   
+ID26	Sumatera Utara   
+ID27	Timor Timur   
+IM	MAN, ISLE OF  
+IN	INDIA    
+IN01	Andaman and Nicobar Islands 
+IN02	Andhra Pradesh   
+IN03	Assam    
+IN04	Bihar    
+IN05	Chandigarh    
+IN06	Dadra and Nagar Haveli 
+IN07	Delhi    
+IN09	Gujarat    
+IN10	Haryana    
+IN11	Himachal Pradesh   
+IN12	Jammu and Kashmir  
+IN13	Kerala    
+IN14	Lakshadweep
+IN15	Madhya Pradesh   
+IN16	Maharashtra    
+IN17	Manipur    
+IN18	Meghalaya    
+IN19	Karnataka    
+IN20	Nagaland    
+IN21	Orissa    
+IN22	Pondicherry    
+IN23	Punjab    
+IN24	Rajasthan    
+IN25	Tamil Nadu
+IN26	Tripura    
+IN27	Uttar Pradesh   
+IN28	West Bengal   
+IN29	Sikkim    
+IN30	Arunachal Pradesh   
+IN31	Mizoram    
+IN32	Daman and Diu  
+IN33	Goa    
+IO	BRITISH INDIAN OCEAN TERRITORY 
+IP	CLIPPERTON ISLAND   
+IR	IRAN    
+IR01	Azarbayjan-e Bakhtari   
+IR02	Azarbayjan-e Khavari   
+IR03	Chahar Mahall va Bakhtiari 
+IR04	Sistan va Baluchestan  
+IR05	Kohkiluyeh va Buyer Ahmadi 
+IR07	Fars    
+IR08	Gilan    
+IR09	Hamadan    
+IR10	Ilam    
+IR11	Hormozgan    
+IR13	Bakhtaran    
+IR15	Khuzestan    
+IR16	Kordestan    
+IR17	Mazandaran    
+IR22	Bushehr    
+IR23	Lorestan    
+IR24	Markazi    
+IR25	Semnan    
+IR26	Tehran    
+IR27	Zanjan    
+IR28	Esfahan    
+IR29	Kerman    
+IR30	Khorasan    
+IR31	Yazd    
+IS	ISRAEL    
+IS01	HaDarom
+IS02	HaMerkaz
+IS03	HaZafon
+IS04	Hefa
+IS04	Haifa
+IS05	Tel Aviv   
+IS06	Yerushalayim
+IS06	Jerusalem
+IT	ITALY    
+IT01	Abruzzi    
+IT02	Basilicata    
+IT03	Calabria    
+IT04	Campania    
+IT05	Emilia-Romagna    
+IT06	Friuli-Venezia Giulia   
+IT07	Lazio    
+IT08	Liguria    
+IT09	Lombardia    
+IT10	Marche    
+IT11	Molise    
+IT12	Piemonte    
+IT13	Puglia    
+IT14	Sardegna    
+IT15	Sicilia    
+IT16	Toscana    
+IT17	Trentino-Alto Adige   
+IT18	Umbria    
+IT19	Valle d'Aosta   
+IT20	Veneto    
+IV	COTE D'IVOIRE   
+IV01	Abengourou    
+IV03	Dabakala    
+IV04	Aboisso    
+IV05	Adzope    
+IV06	Agboville    
+IV07	Biankouma    
+IV11	Bouna    
+IV12	Boundiali    
+IV14	Danane    
+IV16	Divo    
+IV17	Ferkessedougou    
+IV18	Gagnoa    
+IV20	Katiola    
+IV21	Korhogo    
+IV23	Odienne    
+IV25	Seguela    
+IV26	Touba    
+IV27	Bongouanou    
+IV28	Issia    
+IV29	Lakota    
+IV30	Mankono    
+IV31	Oume    
+IV32	Soubre    
+IV33	Tingrela    
+IV34	Zuenoula    
+IV35	Abidjan    
+IV36	Bangolo    
+IV37	Beoumi    
+IV38	Bondoukou    
+IV39	Bouafle    
+IV40	Bouake    
+IV41	Daloa    
+IV42	Daoukro    
+IV43	Dimbokro    
+IV44	Duekoue    
+IV45	Grand-Lahou    
+IV46	Guiglo    
+IV47	Man    
+IV48	Mbahiakro    
+IV49	Sakassou    
+IV50	San Pedro   
+IV51	Sassandra    
+IV52	Sinfra    
+IV53	Tabou    
+IV54	Tanda    
+IV55	Tiassale    
+IV56	Toumodi    
+IV57	Vavoua    
+IV58	Yamoussoukro    
+IZ	IRAQ    
+IZ01	Al Anbar   
+IZ02	Al Basrah   
+IZ03	Al Muthanna   
+IZ04	Al Qadisiyah   
+IZ05	As Sulaymaniyah   
+IZ06	Babil    
+IZ07	Baghdad    
+IZ08	Dahuk    
+IZ09	Dhi Qar   
+IZ10	Diyala    
+IZ11	Arbil    
+IZ12	Karbala'    
+IZ13	At Ta'mim
+IZ13	Kirkuk
+IZ14	Maysan    
+IZ15	Ninawa    
+IZ16	Wasit    
+IZ17	An Najaf   
+IZ18	Salah ad Din  
+JA	JAPAN    
+JA01	Aichi    
+JA02	Akita    
+JA03	Aomori    
+JA04	Chiba    
+JA05	Ehime    
+JA06	Fukui    
+JA07	Fukuoka    
+JA08	Fukushima    
+JA09	Gifu    
+JA10	Gumma    
+JA11	Hiroshima    
+JA12	Hokkaido    
+JA13	Hyogo    
+JA14	Ibaraki    
+JA15	Ishikawa    
+JA16	Iwate    
+JA17	Kagawa    
+JA18	Kagoshima    
+JA19	Kanagawa    
+JA20	Kochi    
+JA21	Kumamoto    
+JA22	Kyoto    
+JA23	Mie    
+JA24	Miyagi    
+JA25	Miyazaki    
+JA26	Nagano    
+JA27	Nagasaki    
+JA28	Nara    
+JA29	Niigata    
+JA30	Oita    
+JA31	Okayama    
+JA32	Osaka    
+JA33	Saga    
+JA34	Saitama    
+JA35	Shiga    
+JA36	Shimane    
+JA37	Shizuoka    
+JA38	Tochigi    
+JA39	Tokushima    
+JA40	Tokyo    
+JA41	Tottori    
+JA42	Toyama    
+JA43	Wakayama    
+JA44	Yamagata    
+JA45	Yamaguchi    
+JA46	Yamanashi    
+JA47	Okinawa    
+JE	JERSEY    
+JM	JAMAICA    
+JM01	Clarendon    
+JM02	Hanover    
+JM04	Manchester    
+JM07	Portland    
+JM08	Saint Andrew   
+JM09	Saint Ann   
+JM10	Saint Catherine   
+JM11	Saint Elizabeth   
+JM12	Saint James   
+JM13	Saint Mary   
+JM14	Saint Thomas   
+JM15	Trelawny    
+JM16	Westmoreland    
+JM17	Kingston    
+JN	JAN MAYEN   
+JO	JORDAN    
+JO02	Al Balqa'   
+JO07	Ma`an    
+JO09	Al Karak   
+JO10	Al Mafraq   
+JO11	`Amman    
+JO12	At Tafilah   
+JO13	Az Zarqa   
+JO14	Irbid    
+JQ	JOHNSTON ATOLL   
+JU	JUAN DE NOVA ISLAND 
+KE	KENYA    
+KE01	Central    
+KE02	Coast    
+KE03	Eastern    
+KE05	Nairobi Area   
+KE06	North-Eastern    
+KE07	Nyanza    
+KE08	Rift Valley   
+KE09	Western    
+KG	KYRGYZSTAN    
+KN	KOREA, DEMOCRATIC PEOPLE'S REPUBLIC OF
+KN01	Chagang-do    
+KN03	Hamgyong-namdo    
+KN06	Hwanghae-namdo    
+KN07	Hwanghae-bukto    
+KN08	Kaesong-si    
+KN09	Kangwon-do    
+KN11	P'yongan-bukto    
+KN12	P'yongyang-si    
+KN13	Yanggang-do    
+KN14	Namp'o-si    
+KN15	P'yongan-namdo    
+KN16	Hamgyong-bukto    
+KQ	KINGMAN REEF   
+KR	KIRIBATI    
+KR01	Gilbert Islands   
+KR02	Line Islands   
+KR03	Phoenix Islands   
+KS	KOREA, REPUBLIC OF  
+KS01	Cheju-do    
+KS03	Cholla-bukto    
+KS05	Ch'ungch'ong-bukto    
+KS06	Kangwon-do    
+KS08	Kyongsang-namdo    
+KS10	Pusan-jikhalsi    
+KS11	Soul-t'ukpyolsi    
+KS12	Inch'on-jikhalsi    
+KS13	Kyonggi-do    
+KS14	Kyongsang-bukto    
+KS15	Taegu-jikhalsi    
+KS16	Cholla-namdo    
+KS17	Ch'ungch'ong-namdo    
+KS18	Kwangju-jikhalsi    
+KS19	Taejon-jikhalsi    
+KT	CHRISTMAS ISLAND   
+KU	KUWAIT    
+KU01	Al Ahmadi   
+KU02	Al Kuwayt   
+KU03	Hawalli    
+KZ	KAZAKHSTAN    
+LA	LAOS    
+LA01	Attapu
+LA02	Champasak
+LA03	Houaphan
+LA04	Khammouan
+LA05	Louang Namtha
+LA06	Louangphrabang
+LA01	Attopeu 
+LA02	Champassak  
+LA03	Houa Phan 
+LA04	Khammouane  
+LA05	Houa Khong
+LA06	Luang Prabang
+LA07	Oudomxai    
+LA08	Phongsali
+LA09	Saravan
+LA08	Phong Saly
+LA09	Saravane
+LA10	Savannakhet    
+LA11	Vientiane    
+LA13	Xaignabouri
+LA14	Xiangkhoang
+LA13	Sayaboury
+LA14	Xieng Khouang
+LE	LEBANON    
+LE01	Al Biqa`   
+LE02	Al Janub   
+LE03	Ash Shamal   
+LE04	Bayrut    
+LE05	Jabal Lubnan   
+LG	LATVIA    
+LH	LITHUANIA    
+LI	LIBERIA    
+LI01	Bong    
+LI02	Grand Jide   
+LI03	Grand Bassa   
+LI04	Grand Cape Mount  
+LI05	Lofa    
+LI06	Maryland    
+LI07	Monrovia    
+LI08	Montserrado    
+LI09	Nimba    
+LI10	Sino    
+LO	SLOVAKIA    
+LQ	PALMYRA ATOLL   
+LS	LIECHTENSTEIN    
+LS01	Balzers    
+LS02	Eschen    
+LS03	Gamprin    
+LS04	Mauren    
+LS05	Planken    
+LS06	Ruggell    
+LS07	Schaan    
+LS08	Schellenberg    
+LS09	Triesen    
+LS10	Triesenberg    
+LS11	Vaduz    
+LT	LESOTHO    
+LT10	Berea    
+LT11	Butha-Buthe    
+LT12	Leribe    
+LT13	Mafeteng    
+LT14	Maseru    
+LT15	Mohales Hoek   
+LT16	Mokhotlong    
+LT17	Qachas Nek   
+LT18	Quthing    
+LT19	Thaba-Tseka    
+LU	LUXEMBOURG    
+LU01	Diekirch    
+LU02	Grevenmacher    
+LU03	Luxembourg    
+LY	LIBYA    
+LY03	Al `Aziziyah   
+LY05	Al Jufrah   
+LY08	Al Kufrah   
+LY13	Ash Shati'   
+LY30	Murzuq    
+LY34	Sabha    
+LY41	Tarhunah    
+LY42	Tubruq    
+LY45	Zlitan    
+LY47	Ajdabiya    
+LY48	Al Fatih   
+LY49	Al Jabal al Akhdar 
+LY50	Al Khums   
+LY51	An Nuqat al Khams 
+LY52	Awbari    
+LY53	Az Zawiyah   
+LY54	Banghazi    
+LY55	Darnah    
+LY56	Ghadamis    
+LY57	Gharyan    
+LY58	Misratah    
+LY59	Sawfajjin    
+LY60	Surt    
+LY61	Tarabulus    
+LY62	Yafran    
+MA	MADAGASCAR    
+MA01	Antsiranana    
+MA02	Fianarantsoa    
+MA03	Mahajanga    
+MA04	Toamasina    
+MA05	Antananarivo    
+MA06	Toliara    
+MB	MARTINIQUE    
+MC	MACAU    
+MC01	Ilhas    
+MC02	Macau
+MC02	Macao
+MD	MOLDOVA    
+MF	MAYOTTE    
+MG	MONGOLIA    
+MG01	Arhangay    
+MG02	Bayanhongor    
+MG03	Bayan-Olgiy    
+MG05	Darhan    
+MG06	Dornod    
+MG07	Dornogovi    
+MG08	Dundgovi    
+MG09	Dzavhan    
+MG10	Govi-Altay    
+MG11	Hentiy    
+MG12	Hovd    
+MG13	Hovsgol    
+MG14	Omnogovi    
+MG15	Ovorhangay    
+MG16	Selenge    
+MG17	Suhbaatar    
+MG18	Tov    
+MG19	Uvs    
+MG20	Ulaanbaatar    
+MG21	Bulgan    
+MG22	Erdenet    
+MH	MONTSERRAT    
+MH01	Saint Anthony   
+MH02	Saint Georges   
+MH03	Saint Peter   
+MI	MALAWI    
+MI02	Chikwawa    
+MI03	Chiradzulu    
+MI04	Chitipa    
+MI05	Thyolo    
+MI06	Dedza    
+MI07	Dowa    
+MI08	Karonga    
+MI09	Kasungu    
+MI10	Machinga
+MI10	Kasupe
+MI11	Lilongwe    
+MI12	Mangochi
+MI12	Fort Johnston
+MI13	Mchinji    
+MI14	Mulanje
+MI14	Mlange
+MI15	Mzimba    
+MI16	Ntcheu    
+MI17	Nkhata Bay   
+MI18	Nkhotakota    
+MI19	Nsanje    
+MI20	Ntchisi
+MI21	Rumphi
+MI20	Nchisi
+MI21	Rumpi
+MI22	Salima    
+MI23	Zomba    
+MI24	Blantyre    
+MI25	Mwanza    
+MK	MACEDONIA    
+ML	MALI    
+ML01	Bamako    
+ML02	Gao    
+ML03	Kayes    
+ML04	Mopti    
+ML05	Segou    
+ML06	Sikasso    
+ML07	Koulikoro    
+ML08	Tombouctou    
+MN	MONACO    
+MN01	La Condamine   
+MN02	Monaco    
+MN03	Monte-Carlo    
+MO	MOROCCO    
+MO01	Agadir    
+MO02	Al Hoceima   
+MO03	Azilal    
+MO04	Ben Slimane   
+MO05	Beni Mellal   
+MO06	Boulemane    
+MO07	Casablanca    
+MO08	Chaouen    
+MO09	El Jadida   
+MO10	El Kelaa des Srarhna 
+MO11	Er Rachidia   
+MO12	Essaouira    
+MO13	Fes    
+MO14	Figuig    
+MO15	Kenitra    
+MO16	Khemisset    
+MO17	Khenifra    
+MO18	Khouribga    
+MO19	Marrakech    
+MO20	Meknes    
+MO21	Nador    
+MO22	Ouarzazate    
+MO23	Oujda    
+MO24	Rabat-Sale
+MO24	Rabat
+MO25	Safi    
+MO26	Settat    
+MO27	Tanger    
+MO29	Tata    
+MO30	Taza    
+MO32	Tiznit    
+MO33	Guelmim    
+MO34	Ifrane    
+MO35	Laayoune    
+MO36	Tan-Tan    
+MO37	Taounate    
+MO38	Sidi Kacem   
+MO39	Taroudannt    
+MO40	Tetouan    
+MO41	Larache    
+MP	MAURITIUS    
+MP12	Black River   
+MP13	Flacq    
+MP14	Grand Port   
+MP15	Moka    
+MP16	Pamplemousses    
+MP17	Plaines Wilhems   
+MP18	Port Louis   
+MP19	Riviere du Rempart  
+MP20	Savanne    
+MP21	Agalega Islands   
+MP22	Cargados Carajos   
+MP23	Rodrigues    
+MQ	MIDWAY ISLANDS   
+MR	MAURITANIA    
+MR01	Hodh Ech Chargui
+MR02	Hodh El Gharbi
+MR03	Assaba
+MR04	Gorgol
+MR05	Brakna
+MR06	Trarza
+MR07	Adrar
+MR08	Dakhlet Nouadhibou
+MR09	Tagant 
+MR10	Guidimaka
+MR11	Tiris Zemmour
+MR12	Inchiri
+MR01	Premiere Region
+MR02	Deuxieme Region
+MR03	Troisieme Region
+MR04	Quatrieme Region
+MR05	Cinquieme Region
+MR06	Sixieme Region
+MR07	Septieme Region
+MR08	Huitieme Region
+MR09	Neuvieme Region
+MR10	Dixieme Region
+MR11	Onzieme Region
+MR12	Douzieme Region
+MT	MALTA    
+MU	OMAN    
+MV	MALDIVES    
+MV01	Seenu    
+MV02	Aliff    
+MV03	Laviyani    
+MV04	Waavu    
+MV05	Laamu    
+MV07	Haa Aliff   
+MV08	Thaa    
+MV12	Meemu    
+MV13	Raa    
+MV14	Faafu    
+MV17	Daalu    
+MV20	Baa    
+MV23	Haa Daalu   
+MV24	Shaviyani    
+MV25	Noonu    
+MV26	Kaafu    
+MV27	Gaafu Aliff   
+MV28	Gaafu Daalu   
+MV29	Naviyani    
+MW	MONTENEGRO    
+MX	MEXICO    
+MX01	Aguascalientes    
+MX02	Baja California   
+MX03	Baja California Sur  
+MX04	Campeche    
+MX05	Chiapas    
+MX06	Chihuahua    
+MX07	Coahuila de Zaragoza  
+MX08	Colima    
+MX09	Distrito Federal   
+MX10	Durango    
+MX11	Guanajuato    
+MX12	Guerrero    
+MX13	Hidalgo    
+MX14	Jalisco    
+MX15	Mexico    
+MX16	Michoacan de Ocampo  
+MX17	Morelos    
+MX18	Nayarit    
+MX19	Nuevo Leon   
+MX20	Oaxaca    
+MX21	Puebla    
+MX22	Queretaro de Arteaga  
+MX23	Quintana Roo   
+MX24	San Luis Potosi  
+MX25	Sinaloa    
+MX26	Sonora    
+MX27	Tabasco    
+MX28	Tamaulipas    
+MX29	Tlaxcala    
+MX30	Veracruz-Llave    
+MX31	Yucatan    
+MX32	Zacatecas    
+MY	MALAYSIA    
+MY01	Johor    
+MY02	Kedah    
+MY03	Kelantan    
+MY04	Melaka    
+MY05	Negeri Sembilan   
+MY06	Pahang    
+MY07	Perak    
+MY08	Perlis    
+MY09	Pulau Pinang   
+MY11	Sarawak    
+MY12	Selangor    
+MY13	Terengganu    
+MY14	Wilayah Persekutuan   
+MY15	Labuan    
+MY16	Sabah    
+MZ	MOZAMBIQUE    
+MZ01	Cabo Delgado   
+MZ02	Gaza    
+MZ03	Inhambane    
+MZ04	Maputo    
+MZ05	Sofala    
+MZ06	Nampula    
+MZ07	Niassa    
+MZ08	Tete    
+MZ09	Zambezia    
+MZ10	Manica    
+NC	NEW CALEDONIA   
+NE	NIUE    
+NF	NORFOLK ISLAND   
+NG	NIGER    
+NG01	Agadez    
+NG02	Diffa    
+NG03	Dosso    
+NG04	Maradi    
+NG05	Niamey    
+NG06	Tahoua    
+NG07	Zinder    
+NH	VANUATU    
+NH05	Ambrym    
+NH06	Aoba/Maewo    
+NH07	Banks/Torres    
+NH08	Efate    
+NH09	Epi    
+NH10	Malakula    
+NH11	Paama    
+NH12	Pentecote    
+NH13	Santo/Malo    
+NH14	Shepherd    
+NH15	Tafea    
+NI	NIGERIA    
+NI05	Lagos    
+NI06	Bauchi    
+NI10	Rivers    
+NI11	Abuja Capital Territory  
+NI16	Ogun    
+NI17	Ondo    
+NI19	Plateau    
+NI21	Akwa Ibom   
+NI22	Cross River   
+NI23	Kaduna    
+NI24	Katsina    
+NI25	Anambra    
+NI26	Benue    
+NI27	Borno    
+NI28	Imo    
+NI29	Kano    
+NI30	Kwara    
+NI31	Niger    
+NI32	Oyo    
+NI33	Sokoto    
+NI34	Abia    
+NI35	Adamawa    
+NI36	Delta    
+NI37	Edo    
+NI38	Enugu    
+NI39	Jigawa    
+NI40	Kebbi    
+NI41	Kogi    
+NI42	Osun    
+NI43	Taraba    
+NI44	Yobe    
+NL	NETHERLANDS    
+NL01	Drenthe    
+NL02	Friesland    
+NL03	Gelderland    
+NL04	Groningen    
+NL05	Limburg    
+NL06	Noord-Brabant    
+NL07	Noord-Holland    
+NL08	Overijssel    
+NL09	Utrecht    
+NL10	Zeeland    
+NL11	Zuid-Holland    
+NL12	Dronten    
+NL13	Zuidelijke IJsselmeerpolders   
+NL14	Lelystad    
+NO	NORWAY    
+NO01	Akershus    
+NO02	Aust-Agder    
+NO04	Buskerud    
+NO05	Finnmark    
+NO06	Hedmark    
+NO07	Hordaland    
+NO08	More og Romsdal  
+NO09	Nordland    
+NO10	Nord-Trondelag    
+NO11	Oppland    
+NO12	Oslo    
+NO13	Ostfold    
+NO14	Rogaland    
+NO15	Sogn og Fjordane  
+NO16	Sor-Trondelag    
+NO17	Telemark    
+NO18	Troms    
+NO19	Vest-Agder    
+NO20	Vestfold    
+NOTE:	ADM1 names have been taken
+NP	NEPAL    
+NP01	Bagmati    
+NP02	Bheri    
+NP03	Dhawalagiri    
+NP04	Gandaki    
+NP05	Janakpur    
+NP06	Karnali    
+NP07	Kosi    
+NP08	Lumbini    
+NP09	Mahakali    
+NP10	Mechi    
+NP11	Narayani    
+NP12	Rapti    
+NP13	Sagarmatha    
+NP14	Seti    
+NR	NAURU    
+NR01	Aiwo    
+NR02	Anabar    
+NR03	Anetan    
+NR04	Anibare    
+NR05	Baiti    
+NR06	Boe    
+NR07	Buada    
+NR08	Denigomodu    
+NR09	Ewa    
+NR10	Ijuw    
+NR11	Meneng    
+NR12	Nibok    
+NR13	Uaboe    
+NR14	Yaren    
+NS	SURINAME    
+NS10	Brokopondo    
+NS11	Commewijne    
+NS12	Coronie    
+NS13	Marowijne    
+NS14	Nickerie    
+NS15	Para    
+NS16	Paramaribo    
+NS17	Saramacca    
+NS18	Sipaliwini    
+NS19	Wanica    
+NT	NETHERLANDS ANTILLES   
+NU	NICARAGUA    
+NU01	Boaco    
+NU02	Carazo    
+NU03	Chinandega    
+NU04	Chontales    
+NU05	Esteli    
+NU06	Granada    
+NU07	Jinotega    
+NU08	Leon    
+NU09	Madriz    
+NU10	Managua    
+NU11	Masaya    
+NU12	Matagalpa    
+NU13	Nueva Segovia   
+NU14	Rio San Juan  
+NU15	Rivas    
+NU16	Zelaya    
+NZ	NEW ZEALAND   
+NZ01	Akaroa    
+NZ03	Amuri    
+NZ04	Ashburton    
+NZ07	Bay of Islands  
+NZ08	Bruce    
+NZ09	Buller    
+NZ10	Chatham Islands   
+NZ11	Cheviot    
+NZ12	Clifton    
+NZ13	Clutha    
+NZ14	Cook    
+NZ16	Dannevirke    
+NZ17	Egmont    
+NZ18	Eketahuna    
+NZ19	Ellesmere    
+NZ20	Eltham    
+NZ21	Eyre    
+NZ22	Featherston    
+NZ24	Franklin    
+NZ26	Golden Bay   
+NZ27	Great Barrier Island  
+NZ28	Grey    
+NZ29	Hauraki Plains   
+NZ30	Hawera    
+NZ31	Hawke's Bay   
+NZ32	Heathcote    
+NZ33	Hobson    
+NZ34	Hokianga    
+NZ35	Horowhenua    
+NZ36	Hutt    
+NZ37	Inangahua    
+NZ38	Inglewood    
+NZ39	Kaikoura    
+NZ40	Kairanga    
+NZ41	Kiwitea    
+NZ43	Lake    
+NZ45	Mackenzie    
+NZ46	Malvern    
+NZ47	Manawatu    
+NZ48	Mangonui    
+NZ49	Maniototo    
+NZ50	Marlborough    
+NZ51	Masterton    
+NZ52	Matamata    
+NZ53	Mount Herbert   
+NZ54	Ohinemuri    
+NZ55	Opotiki    
+NZ56	Oroua    
+NZ57	Otamatea    
+NZ58	Otorohanga    
+NZ59	Oxford    
+NZ60	Pahiatua    
+NZ61	Paparua    
+NZ63	Patea    
+NZ65	Piako    
+NZ66	Pohangina    
+NZ67	Raglan    
+NZ68	Rangiora    
+NZ69	Rangitikei    
+NZ70	Rodney    
+NZ71	Rotorua    
+NZ72	Southland    
+NZ73	Stewart Island   
+NZ74	Stratford    
+NZ76	Taranaki    
+NZ77	Taumarunui    
+NZ78	Taupo    
+NZ79	Tauranga    
+NZ81	Tuapeka    
+NZ82	Vincent    
+NZ83	Waiapu    
+NZ84	Waihemo    
+NZ85	Waikato    
+NZ86	Waikohu    
+NZ88	Waimairi    
+NZ89	Waimarino    
+NZ90	Waimate    
+NZ91	Waimate West   
+NZ92	Waimea    
+NZ93	Waipa    
+NZ95	Waipawa    
+NZ96	Waipukurau    
+NZ97	Wairarapa South   
+NZ98	Wairewa    
+NZ99	Wairoa    
+NZA1	Whangarei    
+NZA2	Whangaroa    
+NZA3	Woodville    
+NZA4	Waitaki    
+NZA6	Waitomo    
+NZA8	Waitotara    
+NZB2	Wanganui    
+NZB3	Westland    
+NZB4	Whakatane    
+NZD4	Hurunui    
+NZD5	Silverpeaks    
+NZD6	Strathallan    
+NZD8	Waiheke    
+NZD9	Hikurangi    
+NZE1	Manaia    
+NZE2	Runanga    
+NZE3	Saint Kilda   
+NZE4	Thames-Coromandel    
+NZE5	Waverley    
+NZE6	Wallace    
+on	Geographic Names.   
+PA	PARAGUAY    
+PA01	Alto Parana   
+PA02	Amambay    
+PA03	Boqueron    
+PA04	Caaguazu    
+PA05	Caazapa    
+PA06	Central    
+PA07	Concepcion    
+PA08	Cordillera    
+PA10	Guaira    
+PA11	Itapua    
+PA12	Misiones    
+PA13	Neembucu    
+PA15	Paraguari    
+PA16	Presidente Hayes   
+PA17	San Pedro   
+PA18	Alto Paraguay   
+PA19	Canindeyu    
+PA20	Chaco    
+PA21	Nueva Asuncion   
+PC	PITCAIRN ISLANDS   
+PE	PERU    
+PE01	Amazonas    
+PE02	Ancash    
+PE03	Apurimac    
+PE04	Arequipa    
+PE05	Ayacucho    
+PE06	Cajamarca    
+PE07	Callao    
+PE08	Cusco    
+PE09	Huancavelica    
+PE10	Huanuco    
+PE11	Ica    
+PE12	Junin    
+PE13	La Libertad   
+PE14	Lambayeque    
+PE15	Lima    
+PE16	Loreto    
+PE17	Madre de Dios  
+PE18	Moquegua    
+PE19	Pasco    
+PE20	Piura    
+PE21	Puno    
+PE22	San Martin   
+PE23	Tacna    
+PE24	Tumbes    
+PE25	Ucayali    
+PF	PARACEL ISLANDS   
+PG	SPRATLY ISLANDS   
+PK	PAKISTAN    
+PK01	Federally Administered Tribal Areas 
+PK02	Balochistan    
+PK03	North-West Frontier   
+PK04	Punjab    
+PK05	Sindh    
+PK06	Azad Kashmir   
+PK07	Northern Areas   
+PK08	Islamabad    
+PL	POLAND    
+PL23	Biala Podlaska   
+PL24	Bialystok    
+PL25	Bielsko    
+PL26	Bydgoszcz    
+PL27	Chelm    
+PL28	Ciechanow    
+PL29	Czestochowa    
+PL30	Elblag    
+PL31	Gdansk    
+PL32	Gorzow    
+PL33	Jelenia Gora   
+PL34	Kalisz    
+PL35	Katowice    
+PL36	Kielce    
+PL37	Konin    
+PL38	Koszalin    
+PL39	Krakow    
+PL40	Krosno    
+PL41	Legnica    
+PL42	Leszno    
+PL43	Lodz    
+PL44	Lomza    
+PL45	Lublin    
+PL46	Nowy Sacz   
+PL47	Olsztyn    
+PL48	Opole    
+PL49	Ostroleka    
+PL50	Pila    
+PL51	Piotrkow    
+PL52	Plock    
+PL53	Poznan    
+PL54	Przemysl    
+PL55	Radom    
+PL56	Rzeszow    
+PL57	Siedlce    
+PL58	Sieradz    
+PL59	Skierniewice    
+PL60	Slupsk    
+PL61	Suwalki    
+PL62	Szczecin    
+PL63	Tarnobrzeg    
+PL64	Tarnow    
+PL65	Torun    
+PL66	Walbrzych    
+PL67	Warszawa    
+PL68	Wloclawek    
+PL69	Wroclaw    
+PL70	Zamosc    
+PL71	Zielona Gora   
+PM	PANAMA    
+PM01	Bocas del Toro  
+PM02	Chiriqui    
+PM03	Cocle    
+PM04	Colon    
+PM05	Darien    
+PM06	Herrera    
+PM07	Los Santos   
+PM08	Panama    
+PM09	San Blas   
+PM10	Veraguas    
+PO	PORTUGAL    
+PO02	Aveiro    
+PO03	Beja    
+PO04	Braga    
+PO05	Braganca    
+PO06	Castelo Branco   
+PO07	Coimbra    
+PO08	Evora    
+PO09	Faro    
+PO10	Madeira    
+PO11	Guarda    
+PO13	Leiria    
+PO14	Lisboa    
+PO16	Portalegre    
+PO17	Porto    
+PO18	Santarem    
+PO19	Setubal    
+PO20	Viana do Castelo  
+PO21	Vila Real   
+PO22	Viseu    
+PO23	Azores    
+PP	PAPUA NEW GUINEA  
+PP01	Central    
+PP02	Gulf    
+PP03	Milne Bay   
+PP04	Northern    
+PP05	Southern Highlands   
+PP06	Western    
+PP07	North Solomons   
+PP08	Chimbu    
+PP09	Eastern Highlands   
+PP10	East New Britain  
+PP11	East Sepik   
+PP12	Madang    
+PP13	Manus    
+PP14	Morobe    
+PP15	New Ireland   
+PP16	Western Highlands   
+PP17	West New Britain  
+PP18	Sandaun    
+PP19	Enga    
+PP20	National Capital   
+PS	TRUST TERRITORY OF THE PACIFIC
+PU	GUINEA-BISSAU    
+PU01	Bafata    
+PU02	Quinara    
+PU04	Oio    
+PU05	Bolama    
+PU06	Cacheu    
+PU07	Tombali    
+PU10	Gabu    
+PU11	Bissau    
+PU12	Biombo    
+QA	QATAR    
+quarter	    
+RE	REUNION    
+region	    
+region	    
+region	    
+region	    
+region	    
+region/gobolka	    
+region/iqlim	    
+region/region	    
+region/region	    
+region/region	    
+region/region	    
+region/region	    
+region/region	    
+region/regione	    
+RM	MARSHALL ISLANDS   
+RO	ROMANIA    
+RO01	Alba    
+RO02	Arad    
+RO03	Arges    
+RO04	Bacau    
+RO05	Bihor    
+RO06	Bistrita-Nasaud    
+RO07	Botosani    
+RO08	Braila    
+RO09	Brasov    
+RO10	Bucuresti    
+RO11	Buzau    
+RO12	Caras-Severin    
+RO13	Cluj    
+RO14	Constanta    
+RO15	Covasna    
+RO16	Dimbovita    
+RO17	Dolj    
+RO18	Galati    
+RO19	Gorj    
+RO20	Harghita    
+RO21	Hunedoara    
+RO22	Ialomita    
+RO23	Iasi    
+RO25	Maramures    
+RO26	Mehedinti    
+RO27	Mures    
+RO28	Neamt    
+RO29	Olt    
+RO30	Prahova    
+RO31	Salaj    
+RO32	Satu Mare   
+RO33	Sibiu    
+RO34	Suceava    
+RO35	Teleorman    
+RO36	Timis    
+RO37	Tulcea    
+RO38	Vaslui    
+RO39	Vilcea    
+RO40	Vrancea    
+RO41	Calarasi    
+RO42	Giurgiu    
+RP	PHILIPPINES    
+RP01	Abra    
+RP02	Agusan del Norte  
+RP03	Agusan del Sur  
+RP04	Aklan    
+RP05	Albay    
+RP06	Antique    
+RP07	Bataan    
+RP08	Batanes    
+RP09	Batangas    
+RP10	Benguet    
+RP11	Bohol    
+RP12	Bukidnon    
+RP13	Bulacan    
+RP14	Cagayan    
+RP15	Camarines Norte   
+RP16	Camarines Sur   
+RP17	Camiguin    
+RP18	Capiz    
+RP19	Catanduanes    
+RP20	Cavite    
+RP21	Cebu    
+RP22	Basilan    
+RP23	Eastern Samar   
+RP24	Davao    
+RP25	Davao del Sur  
+RP26	Davao Oriental   
+RP27	Ifugao    
+RP28	Ilocos Norte   
+RP29	Ilocos Sur   
+RP30	Iloilo    
+RP31	Isabela    
+RP32	Kalinga-Apayao    
+RP33	Laguna    
+RP34	Lanao del Norte  
+RP35	Lanao del Sur  
+RP36	La Union   
+RP37	Leyte    
+RP38	Marinduque    
+RP39	Masbate    
+RP40	Mindoro Occidental   
+RP41	Mindoro Oriental   
+RP42	Misamis Occidental   
+RP43	Misamis Oriental   
+RP44	Mountain    
+RP46	Negros Oriental   
+RP47	Nueva Ecija   
+RP48	Nueva Vizcaya   
+RP49	Palawan    
+RP50	Pampanga    
+RP51	Pangasinan    
+RP53	Rizal    
+RP54	Romblon    
+RP55	Samar    
+RP56	Maguindanao    
+RP57	North Cotabato   
+RP58	Sorsogon    
+RP59	Southern Leyte   
+RP60	Sulu    
+RP61	Surigao del Norte  
+RP62	Surigao del Sur  
+RP63	Tarlac    
+RP64	Zambales    
+RP65	Zamboanga del Norte  
+RP66	Zamboanga del Sur  
+RP67	Northern Samar   
+RP68	Quirino    
+RP69	Siquijor    
+RP70	South Cotabato   
+RP71	Sultan Kudarat   
+RP72	Tawitawi    
+RPA1	Angeles    
+RPA2	Bacolod    
+RPA3	Bago    
+RPA4	Baguio    
+RPA5	Bais    
+RPA6	Basilan City   
+RPA7	Batangas City   
+RPA8	Butuan    
+RPA9	Cabanatuan    
+RPB1	Cadiz    
+RPB2	Cagayan de Oro  
+RPB3	Calbayog    
+RPB4	Caloocan    
+RPB5	Canlaon    
+RPB6	Cavite City   
+RPB7	Cebu City   
+RPB8	Cotabato    
+RPB9	Dagupan    
+RPC1	Danao    
+RPC2	Dapitan    
+RPC3	Davao City   
+RPC4	Dipolog    
+RPC5	Dumaguete    
+RPC6	General Santos   
+RPC7	Gingoog    
+RPC8	Iligan    
+RPC9	Iloilo City   
+RPD1	Iriga    
+RPD2	La Carlota   
+RPD3	Laoag    
+RPD4	Lapu-Lapu    
+RPD5	Legaspi    
+RPD6	Lipa    
+RPD7	Lucena    
+RPD8	Mandaue    
+RPD9	Manila    
+RPE1	Marawi    
+RPE2	Naga    
+RPE3	Olongapo    
+RPE4	Ormoc    
+RPE5	Oroquieta    
+RPE6	Ozamis    
+RPE7	Pagadian    
+RPE8	Palayan    
+RPE9	Pasay    
+RPF1	Puerto Princesa   
+RPF2	Quezon City   
+RPF3	Roxas    
+RPF4	San Carlos, Negros Occidental 
+RPF5	San Carlos, Pangasinan  
+RPF6	San Jose   
+RPF7	San Pablo   
+RPF8	Silay    
+RPF9	Surigao    
+RPG1	Tacloban    
+RPG2	Tagaytay    
+RPG3	Tagbilaran    
+RPG4	Tangub    
+RPG5	Toledo    
+RPG6	Trece Martires   
+RPG7	Zamboanga    
+RPG8	Aurora    
+RPH2	Quezon    
+RPH3	Negros Occidental   
+RQ	PUERTO RICO   
+RS	RUSSIA    
+RW	RWANDA    
+RW01	Butare    
+RW02	Byumba    
+RW03	Cyangugu    
+RW04	Gikongoro    
+RW05	Gisenyi    
+RW06	Gitarama    
+RW07	Kibungo    
+RW08	Kibuye    
+RW09	Kigali    
+RW10	Ruhengeri    
+SA	SAUDI ARABIA   
+SA02	Al Bahah   
+SA03	Al Jawf   
+SA05	Al Madinah   
+SA06	Ash Sharqiyah   
+SA08	Al Qasim   
+SA09	Al Qurayyat   
+SA10	Ar Riyad   
+SA11	`Asir    
+SA13	Ha'il    
+SA14	Makkah    
+SA15	Al Hudud ash Shamaliyah 
+SA16	Najran    
+SA17	Jizan    
+SA19	Tabuk    
+SB	ST. PIERRE AND MIQUELON 
+SC	ST. KITTS AND NEVIS 
+SC01	Christ Church Nichola Town 
+SC02	Saint Anne Sandy Point 
+SC03	Saint George Basseterre  
+SC04	Saint George Gingerland  
+SC05	Saint James Windward  
+SC06	Saint John Capisterre  
+SC07	Saint John Figtree  
+SC08	Saint Mary Cayon  
+SC09	Saint Paul Capisterre  
+SC10	Saint Paul Charlestown  
+SC11	Saint Peter Basseterre  
+SC12	Saint Thomas Lowland  
+SC13	Saint Thomas Middle Island 
+SC15	Trinity Palmetto Point  
+SE	SEYCHELLES    
+SE01	Anse aux Pins  
+SE02	Anse Boileau   
+SE03	Anse Etoile   
+SE04	Anse Louis   
+SE05	Anse Royale   
+SE06	Baie Lazare   
+SE07	Baie Sainte Anne  
+SE08	Beau Vallon   
+SE09	Bel Air   
+SE10	Bel Ombre   
+SE11	Cascade    
+SE12	Glacis    
+SE13	Grand' Anse (Mahe)  
+SE14	Grand' Anse (Praslin)  
+SE15	La Digue   
+SE16	La Riviere Anglaise  
+SE17	Mont Buxton   
+SE18	Mont Fleuri   
+SE19	Plaisance    
+SE20	Pointe La Rue  
+SE21	Port Glaud   
+SE22	Saint Louis   
+SE23	Takamaka    
+SF	SOUTH AFRICA   
+SF01	Cape Province   
+SF02	Natal    
+SF03	Orange Free State  
+SF04	Transvaal    
+SG	SENEGAL    
+SG01	Dakar    
+SG03	Diourbel    
+SG04	Saint-Louis    
+SG05	Tambacounda    
+SG07	Thies    
+SG08	Louga    
+SG09	Fatick    
+SG10	Kaolack    
+SG11	Kolda    
+SG12	Ziguinchor    
+SH	ST. HELENA   
+SH01	Ascension    
+SH02	Saint Helena   
+SH03	Tristan da Cunha  
+SI	SLOVENIA    
+SL	SIERRA LEONE   
+SL01	Eastern    
+SL02	Northern    
+SL03	Southern    
+SL04	Western Area   
+SM	SAN MARINO   
+SM01	Acquaviva    
+SM02	Chiesanuova    
+SM03	Domagnano    
+SM04	Faetano    
+SM05	Fiorentino    
+SM06	Borgo Maggiore   
+SM07	San Marino   
+SM08	Monte Giardino   
+SM09	Serravalle    
+SN	SINGAPORE    
+SO	SOMALIA    
+SO01	Bakool    
+SO02	Banaadir    
+SO03	Bari    
+SO04	Bay    
+SO05	Galguduud    
+SO06	Gedo    
+SO07	Hiiraan    
+SO08	Jubbada Dhexe   
+SO09	Jubbada Hoose   
+SO10	Mudug    
+SO11	Nugaal    
+SO12	Sanaag    
+SO13	Shabeellaha Dhexe   
+SO14	Shabeellaha Hoose   
+SO15	Togdheer    
+SO16	Woqooyi Galbeed   
+SP	SPAIN    
+SP07	Islas Baleares   
+SP27	La Rioja   
+SP29	Madrid    
+SP31	Murcia    
+SP32	Navarra    
+SP34	Asturias    
+SP39	Cantabria    
+SP51	Andalucia    
+SP52	Aragon    
+SP53	Canarias    
+SP54	Castilla-La Mancha   
+SP55	Castilla y Leon  
+SP56	Cataluna    
+SP57	Extremadura    
+SP58	Galicia    
+SP59	Pais Vasco   
+SP60	Valenciana    
+SR	SERBIA    
+ST	ST. LUCIA   
+ST01	Anse-la-Raye    
+ST02	Dauphin    
+ST03	Castries    
+ST04	Choiseul    
+ST05	Dennery    
+ST06	Gros-Islet    
+ST07	Laborie    
+ST08	Micoud    
+ST09	Soufriere    
+ST10	Vieux-Fort    
+ST11	Praslin    
+SU	SUDAN    
+SU26	A`ali an Nil  
+SU27	Al Wusta   
+SU28	Al Istiwa'iyah   
+SU29	Al Khartum   
+SU30	Ash Shamaliyah   
+SU31	Ash Sharqiyah   
+SU32	Bahr al Ghazal  
+SU33	Darfur    
+SU34	Kurdufan    
+SV	SVALBARD    
+SW	SWEDEN    
+SW01	Alvsborgs Lan   
+SW02	Blekinge Lan   
+SW03	Gavleborgs Lan   
+SW04	Goteborgs och Bohus Lan 
+SW05	Gotlands Lan   
+SW06	Hallands Lan   
+SW07	Jamtlands Lan   
+SW08	Jonkopings Lan   
+SW09	Kalmar Lan   
+SW10	Kopparbergs Lan   
+SW11	Kristianstads Lan   
+SW12	Kronobergs Lan   
+SW13	Malmohus Lan   
+SW14	Norrbottens Lan   
+SW15	Orebro Lan   
+SW16	Ostergotlands Lan   
+SW17	Skaraborgs Lan   
+SW18	Sodermanlands Lan   
+SW21	Uppsala Lan   
+SW22	Varmlands Lan   
+SW23	Vasterbottens Lan   
+SW24	Vasternorrlands Lan   
+SW25	Vastmanlands Lan   
+SW26	Stockholms Lan   
+SX	SOUTH GEORGIA AND THE SOUTH
+SY	SYRIA    
+SY01	Al Hasakah   
+SY02	Al Ladhiqiyah   
+SY03	Al Qunaytirah   
+SY04	Ar Raqqah   
+SY05	As Suwayda'   
+SY06	Dar`a    
+SY07	Dayr az Zawr  
+SY08	Rif Dimashq   
+SY09	Halab    
+SY10	Hamah    
+SY11	Hims    
+SY12	Idlib    
+SY13	Dimashq    
+SY14	Tartus    
+SZ	SWITZERLAND    
+SZ01	Aargau    
+SZ02	Ausser-Rhoden    
+SZ03	Basel-Landschaft    
+SZ04	Basel-Stadt    
+SZ05	Bern    
+SZ06	Fribourg    
+SZ07	Geneve    
+SZ08	Glarus    
+SZ09	Graubunden    
+SZ10	Inner-Rhoden    
+SZ11	Luzern    
+SZ12	Neuchatel    
+SZ13	Nidwalden    
+SZ14	Obwalden    
+SZ15	Sankt Gallen   
+SZ16	Schaffhausen    
+SZ17	Schwyz    
+SZ18	Solothurn    
+SZ19	Thurgau    
+SZ20	Ticino    
+SZ21	Uri    
+SZ22	Valais    
+SZ23	Vaud    
+SZ24	Zug    
+SZ25	Zurich    
+SZ26	Jura    
+TC	UNITED ARAB EMIRATES  
+TC01	Abu Zaby   
+TC02	`Ajman    
+TC03	Dubayy    
+TC04	Al Fujayrah   
+TC05	Ra's al Khaymah  
+TC06	Ash Shariqah   
+TC07	Umm al Qaywayn  
+TD	TRINIDAD AND TOBAGO  
+TD01	Arima    
+TD02	Caroni    
+TD03	Mayaro    
+TD04	Nariva    
+TD05	Port-of-Spain    
+TD06	Saint Andrew   
+TD07	Saint David   
+TD08	Saint George   
+TD09	Saint Patrick   
+TD10	San Fernando   
+TD11	Tobago    
+TD12	Victoria    
+TE	TROMELIN ISLAND   
+TH	THAILAND    
+TH01	Mae Hong Son  
+TH02	Chiang Mai   
+TH03	Chiang Rai   
+TH04	Nan    
+TH05	Lamphun    
+TH06	Lampang    
+TH07	Phrae    
+TH08	Tak    
+TH09	Sukhothai    
+TH10	Uttaradit    
+TH11	Kamphaeng Phet   
+TH12	Phitsanulok    
+TH13	Phichit    
+TH14	Phetchabun    
+TH15	Uthai Thani   
+TH16	Nakhon Sawan   
+TH17	Nong Khai   
+TH18	Loei    
+TH19	Udon Thani   
+TH20	Sakon Nakhon   
+TH21	Nakhon Phanom   
+TH22	Khon Kaen   
+TH23	Kalasin    
+TH24	Maha Sarakham   
+TH25	Roi Et   
+TH26	Chaiyaphum    
+TH27	Nakhon Ratchasima   
+TH28	Buriram    
+TH29	Surin    
+TH30	Sisaket    
+TH31	Narathiwat    
+TH32	Chai Nat   
+TH33	Sing Buri   
+TH34	Lop Buri   
+TH35	Ang Thong   
+TH36	Phra Nakhon Si Ayutthaya 
+TH37	Saraburi    
+TH38	Nonthaburi    
+TH39	Pathum Thani   
+TH40	Krung Thep   
+TH41	Phayao    
+TH42	Samut Prakan   
+TH43	Nakhon Nayok   
+TH44	Chachoengsao    
+TH45	Prachin Buri   
+TH46	Chon Buri   
+TH47	Rayong    
+TH48	Chanthaburi    
+TH49	Trat    
+TH50	Kanchanaburi    
+TH51	Suphan Buri   
+TH52	Ratchaburi    
+TH53	Nakhon Pathom   
+TH54	Samut Songkhram   
+TH55	Samut Sakhon   
+TH56	Phetchaburi    
+TH57	Prachuap Khiri Khan  
+TH58	Chumphon    
+TH59	Ranong    
+TH60	Surat Thani   
+TH61	Phangnga    
+TH62	Phuket    
+TH63	Krabi    
+TH64	Nakhon Si Thammarat  
+TH65	Trang    
+TH66	Phatthalung    
+TH67	Satun    
+TH68	Songkhla    
+TH69	Pattani    
+TH70	Yala    
+TH71	Ubon Ratchathani   
+TH72	Yasothon    
+TI	TAJIKISTAN    
+TK	TURKS AND CAICOS ISLANDS 
+TL	TOKELAU    
+TN	TONGA    
+TN01	Ha`apai    
+TN02	Tongatapu    
+TN03	Vava`u    
+TO	TOGO    
+TO01	Amlame    
+TO02	Aneho    
+TO03	Atakpame    
+TO04	Bafilo    
+TO05	Bassar    
+TO06	Dapaong    
+TO07	Kante    
+TO08	Klouto    
+TO09	Lama-Kara    
+TO10	Lome    
+TO11	Mango    
+TO12	Niamtougou    
+TO13	Notse    
+TO14	Kpagouda    
+TO15	Badou    
+TO16	Sotouboua    
+TO17	Tabligbo    
+TO18	Tsevie    
+TO19	Tchamba    
+TO20	Tchaoudjo    
+TO21	Vogan    
+TP	SAO TOME AND PRINCIPE 
+TP01	Principe    
+TP02	Sao Tome   
+TS	TUNISIA    
+TS02	Al Qasrayn   
+TS03	Al Qayrawan   
+TS06	Jundubah    
+TS10	Qafsah    
+TS14	Al Kaf   
+TS15	Al Mahdiyah   
+TS16	Al Munastir   
+TS17	Bajah    
+TS18	Banzart    
+TS19	Nabul    
+TS22	Silyanah    
+TS23	Susah    
+TS26	Aryanah    
+TS27	Bin `Arus   
+TS28	Madanin    
+TS29	Qabis    
+TS31	Qibili    
+TS32	Safaqis    
+TS33	Sidi Bu Zayd  
+TS34	Tatawin    
+TS35	Tawzar    
+TS36	Tunis    
+TS37	Zaghwan    
+TU	TURKEY    
+TU01	Adana    
+TU02	Adiyaman    
+TU03	Afyon    
+TU04	Agri    
+TU05	Amasya    
+TU07	Antalya    
+TU08	Artvin    
+TU09	Aydin    
+TU10	Balikesir    
+TU11	Bilecik    
+TU12	Bingol    
+TU13	Bitlis    
+TU14	Bolu    
+TU15	Burdur    
+TU16	Bursa    
+TU17	Canakkale    
+TU18	Cankiri    
+TU19	Corum    
+TU20	Denizli    
+TU21	Diyarbakir    
+TU22	Edirne    
+TU23	Elazig    
+TU24	Erzincan    
+TU25	Erzurum    
+TU26	Eskisehir    
+TU27	Gaziantep    
+TU28	Giresun    
+TU31	Hatay    
+TU32	Icel    
+TU33	Isparta    
+TU34	Istanbul    
+TU35	Izmir    
+TU36	Kars    
+TU37	Kastamonu    
+TU38	Kayseri    
+TU39	Kirklareli    
+TU40	Kirsehir    
+TU41	Kocaeli    
+TU43	Kutahya    
+TU44	Malatya    
+TU45	Manisa    
+TU46	Kahraman Maras   
+TU48	Mugla    
+TU49	Mus    
+TU50	Nevsehir    
+TU52	Ordu    
+TU53	Rize    
+TU54	Sakarya    
+TU55	Samsun    
+TU57	Sinop    
+TU58	Sivas    
+TU59	Tekirdag    
+TU60	Tokat    
+TU61	Trabzon    
+TU62	Tunceli    
+TU63	Urfa    
+TU64	Usak    
+TU65	Van    
+TU66	Yozgat    
+TU67	Zonguldak    
+TU68	Ankara    
+TU69	Gumushane    
+TU70	Hakkari    
+TU71	Konya    
+TU72	Mardin    
+TU73	Nigde    
+TU74	Siirt    
+TU75	Aksaray    
+TU76	Batman    
+TU77	Bayburt    
+TU78	Karaman    
+TU79	Kirikkale    
+TU80	Sirnak    
+TV	TUVALU    
+TW	TAIWAN    
+TW01	Fu-chien    
+TW02	Kao-hsiung    
+TW03	T'ai-pei    
+TW04	T'ai-wan    
+TX	TURKMENISTAN    
+TZ	TANZANIA    
+TZ01	Arusha    
+TZ02	Pwani    
+TZ03	Dodoma    
+TZ04	Iringa    
+TZ05	Kigoma    
+TZ06	Kilimanjaro    
+TZ07	Lindi    
+TZ08	Mara    
+TZ09	Mbeya    
+TZ10	Morogoro    
+TZ11	Mtwara    
+TZ12	Mwanza    
+TZ13	Pemba North   
+TZ14	Ruvuma    
+TZ15	Shinyanga    
+TZ16	Singida    
+TZ17	Tabora    
+TZ18	Tanga    
+TZ19	Ziwa Magharibi   
+TZ20	Pemba South   
+TZ21	Zanzibar Central/South   
+TZ22	Zanzibar North   
+TZ23	Dar es Salaam  
+TZ24	Rukwa    
+TZ25	Zanzibar Urban/West   
+UG	UGANDA    
+UG05	Busoga    
+UG08	Karamoja    
+UG12	South Buganda   
+UG18	Central    
+UG20	Eastern    
+UG21	Nile    
+UG22	North Buganda   
+UG23	Northern    
+UG24	Southern    
+UG25	Western    
+UK	UNITED KINGDOM   
+UK01	Avon    
+UK02	Bedford    
+UK03	Berkshire    
+UK04	Buckingham    
+UK05	Cambridge    
+UK06	Cheshire    
+UK07	Cleveland    
+UK08	Cornwall    
+UK09	Cumbria    
+UK10	Derby    
+UK11	Devon    
+UK12	Dorset    
+UK13	Durham    
+UK14	East Sussex   
+UK15	Essex    
+UK16	Gloucester    
+UK17	Greater London   
+UK18	Greater Manchester   
+UK19	Hampshire    
+UK20	Hereford and Worcester  
+UK21	Hertford    
+UK22	Humberside    
+UK23	Isle of Wight  
+UK24	Kent    
+UK25	Lancashire    
+UK26	Leicester    
+UK27	Lincoln    
+UK28	Merseyside    
+UK29	Norfolk    
+UK30	North Yorkshire   
+UK31	Northampton    
+UK32	Northumberland    
+UK33	Nottingham    
+UK34	Oxford    
+UK35	Shropshire    
+UK36	Somerset    
+UK37	South Yorkshire   
+UK38	Stafford    
+UK39	Suffolk    
+UK40	Surrey    
+UK41	Tyne and Wear  
+UK42	Warwick    
+UK43	West Midlands   
+UK44	West Sussex   
+UK45	West Yorkshire   
+UK46	Wiltshire    
+UK52	Antrim    
+UK53	Ards    
+UK54	Armagh    
+UK55	Ballymena    
+UK56	Ballymoney    
+UK57	Banbridge    
+UK58	Belfast    
+UK59	Carrickfergus    
+UK60	Castlereagh    
+UK61	Coleraine    
+UK62	Cookstown    
+UK63	Craigavon    
+UK64	Down    
+UK65	Dungannon    
+UK66	Fermanagh    
+UK67	Larne    
+UK68	Limavady    
+UK69	Lisburn    
+UK70	Londonderry    
+UK71	Magherafelt    
+UK72	Moyle    
+UK73	Newry and Mourne  
+UK74	Newtownabbey    
+UK75	North Down   
+UK76	Omagh    
+UK77	Strabane    
+UK78	Borders    
+UK79	Central    
+UK80	Dumfries and Galloway  
+UK81	Fife    
+UK82	Grampian    
+UK83	Highland    
+UK84	Lothian    
+UK85	Orkney    
+UK86	Shetland    
+UK87	Strathclyde    
+UK88	Tayside    
+UK89	Western Isles   
+UK90	Clwyd    
+UK91	Dyfed    
+UK92	Gwent    
+UK93	Gwynedd    
+UK94	Mid Glamorgan   
+UK95	Powys    
+UK96	South Glamorgan   
+UK97	West Glamorgan   
+UP	UKRAINE    
+UP01	Cherkas'ka Oblast'   
+UP02	Chernihivs'ka Oblast'   
+UP03	Chernivets'ka Oblast'   
+UP04	Dnipropetrovs'ka Oblast'   
+UP05	Donets'ka Oblast'   
+UP06	Ivano-Frankivs'ka Oblast'   
+UP07	Kharkivs'ka Oblast'   
+UP08	Khersons'ka Oblast'   
+UP09	Khmel'nyts'ka Oblast'   
+UP10	Kirovohrads'ka Oblast'   
+UP11	Krym, Respublika   
+UP12	Kyyiv, Misto   
+UP13	Kyyivs'ka Oblast'   
+UP14	Luhans'ka Oblast'   
+UP15	L'vivs'ka Oblast'   
+UP16	Mykolayivs'ka Oblast'   
+UP17	Odes'ka Oblast'   
+UP18	Poltavs'ka Oblast'   
+UP19	Rivnens'ka Oblast'   
+UP20	Sevastopol', Misto   
+UP21	Sums'ka Oblast'   
+UP22	Ternopil's'ka Oblast'   
+UP23	Vinnyts'ka Oblast'   
+UP24	Volyns'ka Oblast'   
+UP25	Zakarpats'ka Oblast'   
+UP26	Zaporiz'ka Oblast'   
+UP27	Zhytomyrs'ka Oblast'   
+US	UNITED STATES   
+US01	Alabama    
+US02	Alaska    
+US04	Arizona    
+US05	Arkansas    
+US06	California    
+US08	Colorado    
+US09	Connecticut    
+US10	Delaware    
+US11	District of Columbia  
+US12	Florida    
+US13	Georgia    
+US15	Hawaii    
+US16	Idaho    
+US17	Illinois    
+US18	Indiana    
+US19	Iowa    
+US20	Kansas    
+US21	Kentucky    
+US22	Louisiana    
+US23	Maine    
+US24	Maryland    
+US25	Massachusetts    
+US26	Michigan    
+US27	Minnesota    
+US28	Mississippi    
+US29	Missouri    
+US30	Montana    
+US31	Nebraska    
+US32	Nevada    
+US33	New Hampshire   
+US34	New Jersey   
+US35	New Mexico   
+US36	New York   
+US37	North Carolina   
+US38	North Dakota   
+US39	Ohio    
+US40	Oklahoma    
+US41	Oregon    
+US42	Pennsylvania    
+US44	Rhode Island   
+US45	South Carolina   
+US46	South Dakota   
+US47	Tennessee    
+US48	Texas    
+US49	Utah    
+US50	Vermont    
+US51	Virginia    
+US53	Washington    
+US54	West Virginia   
+US55	Wisconsin    
+US56	Wyoming    
+UV	BURKINA    
+UV15	Bam    
+UV16	Bazega    
+UV17	Bougouriba    
+UV18	Boulgou    
+UV19	Boulkiemde    
+UV20	Ganzourgou    
+UV21	Gnagna    
+UV22	Gourma    
+UV23	Houet    
+UV24	Kadiogo    
+UV25	Kenedougou    
+UV26	Komoe    
+UV27	Kossi    
+UV28	Kouritenga    
+UV29	Mouhoun    
+UV30	Namentenga    
+UV31	Naouri    
+UV32	Oubritenga    
+UV33	Oudalan    
+UV34	Passore    
+UV35	Poni    
+UV36	Sanguie    
+UV37	Sanmatenga    
+UV38	Seno    
+UV39	Sissili    
+UV40	Soum    
+UV41	Sourou    
+UV42	Tapoa    
+UV43	Yatenga    
+UV44	Zoundweogo    
+UY	URUGUAY    
+UY01	Artigas    
+UY02	Canelones    
+UY03	Cerro Largo   
+UY04	Colonia    
+UY05	Durazno    
+UY06	Flores    
+UY07	Florida    
+UY08	Lavalleja    
+UY09	Maldonado    
+UY10	Montevideo    
+UY11	Paysandu    
+UY12	Rio Negro   
+UY13	Rivera    
+UY14	Rocha    
+UY15	Salto    
+UY16	San Jose   
+UY17	Soriano    
+UY18	Tacuarembo    
+UY19	Treinta y Tres  
+UZ	UZBEKISTAN    
+VC	ST. VINCENT AND THE GRENADINES
+VC01	Charlotte    
+VC02	Saint Andrew   
+VC03	Saint David   
+VC04	Saint George   
+VC05	Saint Patrick   
+VC06	Grenadines    
+VE	VENEZUELA    
+VE01	Amazonas    
+VE02	Anzoategui    
+VE03	Apure    
+VE04	Aragua    
+VE05	Barinas    
+VE06	Bolivar    
+VE07	Carabobo    
+VE08	Cojedes    
+VE09	Delta Amacuro   
+VE10	Distrito Federal   
+VE11	Falcon    
+VE12	Guarico    
+VE13	Lara    
+VE14	Merida    
+VE15	Miranda    
+VE16	Monagas    
+VE17	Nueva Esparta   
+VE18	Portuguesa    
+VE19	Sucre    
+VE20	Tachira    
+VE21	Trujillo    
+VE22	Yaracuy    
+VE23	Zulia    
+VE24	Dependencias Federales   
+VI	BRITISH VIRGIN ISLANDS  
+VM	VIETNAM    
+VM01	An Giang   
+VM02	Bac Thai   
+VM03	Ben Tre   
+VM05	Cao Bang   
+VM07	Dac Lac   
+VM09	Dong Thap   
+VM11	Ha Bac   
+VM12	Hai Hung   
+VM13	Hai Phong   
+VM20	Ho Chi Minh  
+VM21	Kien Giang   
+VM22	Lai Chau   
+VM23	Lam Dong   
+VM24	Long An   
+VM25	Minh Hai   
+VM29	Quang Nam-Da Nang  
+VM30	Quang Ninh   
+VM31	Song Be   
+VM32	Son La   
+VM33	Tay Ninh   
+VM34	Thanh Hoa   
+VM35	Thai Binh   
+VM37	Tien Giang   
+VM38	Vinh Phu   
+VM39	Lang Son   
+VM43	Dong Nai   
+VM44	Ha Noi   
+VM45	Ba Ria-Vung Tau  
+VM46	Binh Dinh   
+VM47	Binh Thuan   
+VM48	Can Tho   
+VM49	Gia Lai   
+VM50	Ha Giang   
+VM51	Ha Tay   
+VM52	Ha Tinh   
+VM53	Hoa Binh   
+VM54	Khanh Hoa   
+VM55	Kon Tum   
+VM56	Lao Cai   
+VM57	Nam Ha   
+VM58	Nghe An   
+VM59	Ninh Binh   
+VM60	Ninh Thuan   
+VM61	Phu Yen   
+VM62	Quang Binh   
+VM63	Quang Ngai   
+VM64	Quang Tri   
+VM65	Soc Trang   
+VM66	Thua Thien   
+VM67	Tra Vinh   
+VM68	Tuyen Quang   
+VM69	Vinh Long   
+VM70	Yen Bai   
+VQ	VIRGIN ISLANDS   
+VT	VATICAN CITY   
+WA	NAMIBIA    
+WA01	Bethanien    
+WA02	Caprivi Oos   
+WA03	Boesmanland    
+WA04	Gobabis    
+WA05	Grootfontein    
+WA06	Kaokoland    
+WA07	Karibib    
+WA08	Keetmanshoop    
+WA09	Luderitz    
+WA10	Maltahohe    
+WA11	Okahandja    
+WA12	Omaruru    
+WA13	Otjiwarongo    
+WA14	Outjo    
+WA15	Owambo    
+WA16	Rehoboth    
+WA17	Swakopmund    
+WA18	Tsumeb    
+WA20	Karasburg    
+WA21	Windhoek    
+WA22	Damaraland    
+WA23	Hereroland Oos   
+WA24	Hereroland Wes   
+WA25	Kavango    
+WA26	Mariental    
+WA27	Namaland    
+WE	WEST BANK   
+WF	WALLIS AND FUTUNA  
+WI	WESTERN SAHARA   
+WQ	WAKE ISLAND   
+WS	WESTERN SAMOA   
+WS01	A`ana    
+WS02	Aiga-i-le-Tai    
+WS03	Atua    
+WS04	Fa`asaleleaga    
+WS05	Gaga`emauga    
+WS06	Va`a-o-Fonoti    
+WS07	Gagaifomauga    
+WS08	Palauli    
+WS09	Satupa`itea    
+WS10	Tuamasaga    
+WS11	Vaisigano    
+WZ	SWAZILAND    
+WZ01	Hhohho    
+WZ02	Lubombo    
+WZ03	Manzini    
+WZ04	Shiselweni    
+WZ05	Praslin    
+YM	YEMEN    
+YM01	Abyan    
+YM02	`Adan    
+YM03	Al Mahrah   
+YM04	Hadramawt    
+YM05	Shabwah    
+YM06	Lahij    
+YM07	Al Bayda'   
+YM08	Al Hudaydah   
+YM09	Al Jawf   
+YM10	Al Mahwit   
+YM11	Dhamar    
+YM12	Hajjah    
+YM13	Ibb    
+YM14	Ma'rib    
+YM15	Sa`dah    
+YM16	San`a'    
+YM17	Ta`izz    
+ZA	ZAMBIA    
+ZA01	Western    
+ZA02	Central    
+ZA03	Eastern    
+ZA04	Luapula    
+ZA05	Northern    
+ZA06	North-Western    
+ZA07	Southern    
+ZA08	Copperbelt    
+ZA09	Lusaka    
+ZI	ZIMBABWE    
+ZI01	Manicaland    
+ZI02	Midlands    
+ZI03	Mashonaland Central   
+ZI04	Mashonaland East   
+ZI05	Mashonaland West   
+ZI06	Matabeleland North   
+ZI07	Matabeleland South   
+ZI08	Masvingo

@@ -1,0 +1,294 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/directed>
+ 
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)wroteMusicFor(D,B)
+confidence: 0.28066283 support: 0.009349465 specialityRatio: 0.22201492
+N+(c): 577 E+(c): 619 N(c): 357 B(c): 1608 E+: 38184
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.3822145 support: 0.004425938 specialityRatio: 0.39578456
+N+(c): 191 E+(c): 180 N(c): 169 B(c): 427 E+: 38184
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_actors>)
+confidence: 0.3377265 support: 0.0033521894 specialityRatio: 0.19971469
+N+(c): 181 E+(c): 128 N(c): 140 B(c): 701 E+: 38184
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.3893355 support: 0.0036140792 specialityRatio: 0.38721138
+N+(c): 148 E+(c): 138 N(c): 218 B(c): 563 E+: 38184
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.3774181 support: 0.0036664573 specialityRatio: 0.2729045
+N+(c): 181 E+(c): 146 N(c): 140 B(c): 513 E+: 38184
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.47772643 support: 0.0032474336 specialityRatio: 0.31907514
+N+(c): 190 E+(c): 124 N(c): 276 B(c): 865 E+: 38184
+directed(A,B)<-wroteMusicFor(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Indian_film_directors>)
+confidence: 0.17713885 support: 0.001309449 specialityRatio: 0.22123894
+N+(c): 21 E+(c): 106 N(c): 50 B(c): 226 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.22411378 support: 0.008930442 specialityRatio: 0.6911596
+N+(c): 180 E+(c): 341 N(c): 602 B(c): 871 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.3066144 support: 0.0044521266 specialityRatio: 0.38389513
+N+(c): 142 E+(c): 170 N(c): 205 B(c): 534 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.28995615 support: 0.0033521894 specialityRatio: 0.33182845
+N+(c): 142 E+(c): 128 N(c): 147 B(c): 443 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.29096705 support: 0.0058663315 specialityRatio: 0.4909091
+N+(c): 169 E+(c): 224 N(c): 351 B(c): 715 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_English_film_directors>)
+confidence: 0.33139896 support: 0.0020951184 specialityRatio: 0.45491803
+N+(c): 124 E+(c): 80 N(c): 111 B(c): 244 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.36178264 support: 0.0036402682 specialityRatio: 0.42772278
+N+(c): 146 E+(c): 139 N(c): 216 B(c): 505 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.19705954 support: 0.0041640475 specialityRatio: 0.554007
+N+(c): 73 E+(c): 255 N(c): 159 B(c): 287 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.32516313 support: 0.0023046301 specialityRatio: 0.36065573
+N+(c): 71 E+(c): 153 N(c): 88 B(c): 244 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.31248158 support: 0.0010475592 specialityRatio: 0.3508772
+N+(c): 39 E+(c): 135 N(c): 40 B(c): 114 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.22383784 support: 0.0019379845 specialityRatio: 0.4713376
+N+(c): 42 E+(c): 144 N(c): 74 B(c): 157 E+: 38184
+directed(A,B)<-actedIn(A,C)wroteMusicFor(D,C)edited(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.4203264 support: 0.0012046931 specialityRatio: 0.42201835
+N+(c): 71 E+(c): 83 N(c): 46 B(c): 109 E+: 38184
+directed(A,B)<-actedIn(A,C)edited(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.5030653 support: 0.0019379845 specialityRatio: 0.32034633
+N+(c): 83 E+(c): 141 N(c): 74 B(c): 231 E+: 38184
+directed(A,B)<-actedIn(A,C)edited(D,C)actedIn(D,B)
+confidence: 0.22461803 support: 0.018279908 specialityRatio: 0.15412606
+N+(c): 857 E+(c): 698 N(c): 1186 B(c): 7695 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.29849935 support: 0.005080662 specialityRatio: 0.41900647
+N+(c): 191 E+(c): 388 N(c): 194 B(c): 463 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.29598093 support: 0.0019641735 specialityRatio: 0.20718232
+N+(c): 173 E+(c): 167 N(c): 75 B(c): 362 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.31982428 support: 0.0015975278 specialityRatio: 0.23461539
+N+(c): 125 E+(c): 160 N(c): 61 B(c): 260 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.32679003 support: 0.0036664573 specialityRatio: 0.3448276
+N+(c): 155 E+(c): 406 N(c): 140 B(c): 406 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.23747927 support: 0.0015451498 specialityRatio: 0.22014925
+N+(c): 177 E+(c): 159 N(c): 59 B(c): 268 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Living_people>)
+confidence: 0.12087128 support: 0.057091977 specialityRatio: 0.15472129
+N+(c): 2550 E+(c): 2180 N(c): 19230 B(c): 124288 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.25879258 support: 0.048685312 specialityRatio: 0.37605974
+N+(c): 3631 E+(c): 1859 N(c): 7452 B(c): 19816 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.21811269 support: 0.0190132 specialityRatio: 0.24687132
+N+(c): 2256 E+(c): 726 N(c): 2308 B(c): 9349 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.2522906 support: 0.021239262 specialityRatio: 0.27396408
+N+(c): 2258 E+(c): 811 N(c): 2638 B(c): 9629 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.2535513 support: 0.025769956 specialityRatio: 0.32104737
+N+(c): 4715 E+(c): 984 N(c): 8362 B(c): 26046 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_manufacturer_110292316>)
+confidence: 0.18306743 support: 0.01796564 specialityRatio: 0.3552308
+N+(c): 1118 E+(c): 686 N(c): 5348 B(c): 15055 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_French_film_directors>)
+confidence: 0.19063196 support: 0.005002095 specialityRatio: 0.41794312
+N+(c): 84 E+(c): 197 N(c): 191 B(c): 457 E+: 38184
+directed(A,B)<-actedIn(A,C)directed(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Horror_film_directors>)
+confidence: 0.16367036 support: 0.0032212446 specialityRatio: 0.72254336
+N+(c): 21 E+(c): 123 N(c): 125 B(c): 173 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.17509283 support: 0.006206788 specialityRatio: 0.7821782
+N+(c): 59 E+(c): 748 N(c): 237 B(c): 303 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.18192562 support: 0.002618898 specialityRatio: 0.5181347
+N+(c): 30 E+(c): 384 N(c): 100 B(c): 193 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.19579937 support: 0.0028022209 specialityRatio: 0.5169082
+N+(c): 34 E+(c): 391 N(c): 107 B(c): 207 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_film_actors>)
+confidence: 0.10987692 support: 0.013015923 specialityRatio: 0.15609297
+N+(c): 69 E+(c): 1090 N(c): 497 B(c): 3184 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.14369018 support: 0.0033260004 specialityRatio: 0.5695067
+N+(c): 28 E+(c): 493 N(c): 127 B(c): 223 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.10034891 support: 0.006494867 specialityRatio: 0.7447447
+N+(c): 32 E+(c): 621 N(c): 248 B(c): 333 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_manufacturer_110292316>)
+confidence: 0.101172775 support: 0.0045830715 specialityRatio: 0.50287354
+N+(c): 25 E+(c): 396 N(c): 175 B(c): 348 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.17555067 support: 0.0017022836 specialityRatio: 0.75581396
+N+(c): 19 E+(c): 200 N(c): 65 B(c): 86 E+: 38184
+directed(A,B)<-actedIn(A,B)produced(C,B)created(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.22201958 support: 0.001414205 specialityRatio: 0.45378152
+N+(c): 20 E+(c): 195 N(c): 54 B(c): 119 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.15107402 support: 0.01000419 specialityRatio: 0.16359743
+N+(c): 296 E+(c): 724 N(c): 382 B(c): 2335 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.25265113 support: 0.01665619 specialityRatio: 0.54592276
+N+(c): 482 E+(c): 1016 N(c): 636 B(c): 1165 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.37456694 support: 0.006390111 specialityRatio: 0.25523013
+N+(c): 405 E+(c): 535 N(c): 244 B(c): 956 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.32088777 support: 0.0061805993 specialityRatio: 0.38311687
+N+(c): 364 E+(c): 544 N(c): 236 B(c): 616 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.273848 support: 0.0067305677 specialityRatio: 0.69647694
+N+(c): 133 E+(c): 308 N(c): 257 B(c): 369 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Indian_film_directors>)
+confidence: 0.20940486 support: 0.003928347 specialityRatio: 0.4536741
+N+(c): 62 E+(c): 150 N(c): 284 B(c): 626 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_English_film_directors>)
+confidence: 0.3979543 support: 0.0023570082 specialityRatio: 0.5
+N+(c): 64 E+(c): 144 N(c): 90 B(c): 180 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.42346168 support: 0.0029855436 specialityRatio: 0.33827892
+N+(c): 158 E+(c): 176 N(c): 114 B(c): 337 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Western_(genre)_film_directors>)
+confidence: 0.5433876 support: 0.0015189608 specialityRatio: 0.19661017
+N+(c): 246 E+(c): 297 N(c): 58 B(c): 295 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.46359947 support: 0.0016237168 specialityRatio: 0.24409449
+N+(c): 144 E+(c): 161 N(c): 62 B(c): 254 E+: 38184
+directed(A,B)<-edited(A,C)created(D,C)produced(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Horror_film_directors>)
+confidence: 0.4931287 support: 0.0017546617 specialityRatio: 0.6633663
+N+(c): 42 E+(c): 146 N(c): 67 B(c): 101 E+: 38184
+directed(A,B)<-edited(A,C)wroteMusicFor(D,C)actedIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)
+confidence: 0.27732918 support: 0.0020689294 specialityRatio: 0.20308483
+N+(c): 42 E+(c): 117 N(c): 79 B(c): 389 E+: 38184
+directed(A,B)<-edited(A,C)actedIn(D,C)wroteMusicFor(D,B)
+confidence: 0.28632984 support: 0.0030902997 specialityRatio: 0.16737589
+N+(c): 89 E+(c): 295 N(c): 118 B(c): 705 E+: 38184
+directed(A,B)<-edited(A,B)
+confidence: 0.44988182 support: 0.035800334 specialityRatio: 0.2179528
+N+(c): 491 E+(c): 3469 N(c): 1367 B(c): 6272 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)produced(D,B)
+confidence: 0.101812325 support: 0.18065158 specialityRatio: 0.32693493
+N+(c): 2040 E+(c): 14016 N(c): 6898 B(c): 21099 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.18217094 support: 0.16095747 specialityRatio: 0.35964656
+N+(c): 2476 E+(c): 8662 N(c): 6146 B(c): 17089 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.14233087 support: 0.112979256 specialityRatio: 0.9097427
+N+(c): 1320 E+(c): 7432 N(c): 4314 B(c): 4742 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.15056203 support: 0.04936623 specialityRatio: 0.647989
+N+(c): 532 E+(c): 3064 N(c): 1885 B(c): 2909 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.15944739 support: 0.09401844 specialityRatio: 0.4430063
+N+(c): 804 E+(c): 3590 N(c): 4073 B(c): 9194 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_actors>)
+confidence: 0.13591725 support: 0.047847267 specialityRatio: 0.2533278
+N+(c): 497 E+(c): 2405 N(c): 1827 B(c): 7212 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.18657875 support: 0.055782527 specialityRatio: 0.60961646
+N+(c): 788 E+(c): 2852 N(c): 2130 B(c): 3494 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Indian_film_directors>)
+confidence: 0.36500424 support: 0.015032474 specialityRatio: 0.97619045
+N+(c): 359 E+(c): 928 N(c): 574 B(c): 588 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.20143886 support: 0.029279279 specialityRatio: 0.8299926
+N+(c): 372 E+(c): 1967 N(c): 1118 B(c): 1347 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_manufacturer_110292316>)
+confidence: 0.20345826 support: 0.025848523 specialityRatio: 0.3847953
+N+(c): 373 E+(c): 1889 N(c): 987 B(c): 2565 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_English_film_directors>)
+confidence: 0.22274446 support: 0.013251624 specialityRatio: 0.91007197
+N+(c): 213 E+(c): 1126 N(c): 506 B(c): 556 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_television_directors>)
+confidence: 0.108654596 support: 0.0159229 specialityRatio: 0.6565875
+N+(c): 132 E+(c): 835 N(c): 608 B(c): 926 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.12417154 support: 0.036036037 specialityRatio: 0.93476796
+N+(c): 365 E+(c): 1376 N(c): 1390 B(c): 1487 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_silent_film_actors>)
+confidence: 0.2874879 support: 0.006573434 specialityRatio: 0.70903957
+N+(c): 147 E+(c): 876 N(c): 251 B(c): 354 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_French_film_directors>)
+confidence: 0.3652663 support: 0.023701027 specialityRatio: 0.9762675
+N+(c): 626 E+(c): 1319 N(c): 905 B(c): 927 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Western_(genre)_film_directors>)
+confidence: 0.33290666 support: 0.0041640475 specialityRatio: 1.0
+N+(c): 97 E+(c): 902 N(c): 159 B(c): 159 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.16162576 support: 0.022234444 specialityRatio: 0.56713426
+N+(c): 269 E+(c): 1067 N(c): 849 B(c): 1497 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Horror_film_directors>)
+confidence: 0.3274343 support: 0.012884978 specialityRatio: 1.0
+N+(c): 268 E+(c): 920 N(c): 492 B(c): 492 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.22415277 support: 0.0018856066 specialityRatio: 0.4864865
+N+(c): 34 E+(c): 282 N(c): 72 B(c): 148 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.10001507 support: 0.0011261262 specialityRatio: 0.24855492
+N+(c): 11 E+(c): 130 N(c): 43 B(c): 173 E+: 38184
+directed(A,B)<-hasPreferredName(A,C)isCalled(D,C)edited(D,B)
+confidence: 0.17089416 support: 0.022941547 specialityRatio: 0.2301629
+N+(c): 315 E+(c): 2871 N(c): 876 B(c): 3806 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)produced(D,B)
+confidence: 0.1082329 support: 0.1803635 specialityRatio: 0.40303138
+N+(c): 2041 E+(c): 14002 N(c): 6887 B(c): 17088 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.1822841 support: 0.16100985 specialityRatio: 0.369849
+N+(c): 2476 E+(c): 8635 N(c): 6148 B(c): 16623 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_directors>)
+confidence: 0.1427036 support: 0.111957885 specialityRatio: 0.9162023
+N+(c): 1320 E+(c): 7403 N(c): 4275 B(c): 4666 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_producers>)
+confidence: 0.15056191 support: 0.04954955 specialityRatio: 0.6620014
+N+(c): 531 E+(c): 3062 N(c): 1892 B(c): 2858 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_screenwriters>)
+confidence: 0.16005205 support: 0.09401844 specialityRatio: 0.44549814
+N+(c): 804 E+(c): 3590 N(c): 4087 B(c): 9174 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_actors>)
+confidence: 0.13604699 support: 0.047559187 specialityRatio: 0.25649717
+N+(c): 497 E+(c): 2389 N(c): 1816 B(c): 7080 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.18827468 support: 0.055599205 specialityRatio: 0.605879
+N+(c): 788 E+(c): 2832 N(c): 2123 B(c): 3504 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Indian_film_directors>)
+confidence: 0.36507154 support: 0.01513723 specialityRatio: 0.9763514
+N+(c): 359 E+(c): 928 N(c): 578 B(c): 592 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.20224632 support: 0.029200712 specialityRatio: 0.835206
+N+(c): 372 E+(c): 1951 N(c): 1115 B(c): 1335 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_manufacturer_110292316>)
+confidence: 0.20294021 support: 0.02616279 specialityRatio: 0.3863109
+N+(c): 373 E+(c): 1891 N(c): 999 B(c): 2586 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_English_film_directors>)
+confidence: 0.2214854 support: 0.013382569 specialityRatio: 0.91413236
+N+(c): 213 E+(c): 1148 N(c): 511 B(c): 559 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_television_directors>)
+confidence: 0.10826232 support: 0.01566101 specialityRatio: 0.6629712
+N+(c): 131 E+(c): 830 N(c): 598 B(c): 902 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_director_110088200>)
+confidence: 0.12478735 support: 0.035800334 specialityRatio: 0.9322602
+N+(c): 365 E+(c): 1367 N(c): 1390 B(c): 1491 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_silent_film_actors>)
+confidence: 0.28511018 support: 0.006652001 specialityRatio: 0.75820893
+N+(c): 147 E+(c): 876 N(c): 254 B(c): 335 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_French_film_directors>)
+confidence: 0.36526647 support: 0.023701027 specialityRatio: 0.9762675
+N+(c): 626 E+(c): 1319 N(c): 905 B(c): 927 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Western_(genre)_film_directors>)
+confidence: 0.32455406 support: 0.0042688036 specialityRatio: 1.0
+N+(c): 97 E+(c): 902 N(c): 163 B(c): 163 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_film_maker_110088390>)
+confidence: 0.1635031 support: 0.022155877 specialityRatio: 0.5685484
+N+(c): 269 E+(c): 1058 N(c): 846 B(c): 1488 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)created(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Horror_film_directors>)
+confidence: 0.32875612 support: 0.012806411 specialityRatio: 1.0
+N+(c): 268 E+(c): 916 N(c): 489 B(c): 489 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_screenwriter_110564400>)
+confidence: 0.22415274 support: 0.0018856066 specialityRatio: 0.4864865
+N+(c): 34 E+(c): 282 N(c): 72 B(c): 148 E+: 38184
+directed(A,B)<-isCalled(A,C)hasPreferredName(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_director_110014939>)
+confidence: 0.19693236 support: 0.0010213702 specialityRatio: 0.90697676
+N+(c): 13 E+(c): 113 N(c): 39 B(c): 43 E+: 38184
+time elapsed for whole partition: 458071

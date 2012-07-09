@@ -1,0 +1,1256 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="absolute" 
+	width="610" 
+	height="230"
+	textAlign="center"
+	horizontalAlign="center" 
+	borderThicknessLeft="0"
+    borderThicknessTop="0"
+    borderThicknessBottom="0"
+    borderThicknessRight="0"
+    headerHeight="0"
+    title="UViz Query Panel"
+    headerColors="[#5F5751,white]"
+    borderStyle="solid"
+    borderThickness="2" 
+    creationComplete="onCreationComplete();" 
+    hideEffect="{HeightFoldAnimation}" 
+    showEffect="{HeightUnfoldAnimation}"
+	xmlns:query="uviface.ui.query.*"
+	xmlns:tooltip="uviface.ui.tooltip.*" 
+	cornerRadius="15" 
+	backgroundColor="#3F3F3F" 
+	borderColor="#7B7979" 
+	backgroundAlpha="1.0" 
+	alpha="1.0" 
+	fontFamily="Arial"
+	verticalAlign="middle" 
+	color="#000000" 
+    fontSize="15" verticalScrollPolicy="off">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import mx.events.ToolTipEvent;
+			import uviface.ui.tooltip.UStringToolTip;
+			import uviface.event.UCompareModeEvent;
+			import uviface.viz.UFlareVis;
+		    import mx.events.FlexEvent;
+			import urdf.api.URelation;
+			import util.UStringUtil;
+			import flare.query.StringUtil;
+			import mx.controls.CheckBox;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.containers.VBox;
+			import mx.containers.ControlBar;
+			import mx.controls.Button;
+			import mx.controls.Menu;
+			import mx.effects.easing.*;
+
+			import mx.events.MenuEvent;
+			import uviface.event.ULineageLeaveEvent;
+			import uviface.event.UQueryEvent;
+			import uviface.event.UKillSessionEvent;
+			import uviface.event.UPanelVisibilityEvent;
+			
+			import com.hillelcoren.components.AutoComplete;
+			import urdf.api.UQuery;
+			import urdf.api.ULiteral;
+			
+			import mx.controls.List;
+			
+			private var _query:UQuery;	
+			private var _queryLiterals:Array = new Array();
+			private var _literalCheckBoxes:Array = new Array();
+			private var _literalSelectButtons:Array = new Array();
+			private var _literalLabels:Array = new Array();
+			
+			// a flag to indicate if to use the pasers text field or the input of the literal inputs
+			private var _userQueryParserField:Boolean = false;
+			
+			private var _currentNumOfLiterals:int = 2;
+			
+			[Bindable]
+			private var _availableLiteralNumbers:ArrayCollection = new ArrayCollection(["1","2","3","4","5"]);
+			[Bindable]
+			private var _selectedLiteralIndex:int = 1;
+			
+			[Bindable]
+			private var _dropDown:ClassFactory;	
+			[Bindable]
+			private var _dropDownStringOnly:ClassFactory;
+			[Bindable]
+			private var _demoQueryStrings:ArrayCollection;	
+			
+			public static const SPARQL_STRING:String = "'<Woody_Allen,isMarriedTo,?X>.<Kevin_Bacon,isMarriedTo,?X>'";
+			public static const DATALOG_STRING:String = "'isMarriedTo(Woody_Allen,?X)+isMarriedTo(Kevin_Bacon,?X)'"; 
+			[Bindable]
+			private var _parserToolTip:String = "You can either use a query form where the literals are surrounded by '<' on the left and " + 
+					"'>' on the right side and concatenated by '.', e.g., " + UQueryPanel.SPARQL_STRING 
+		       + ". Or you can use a Datalog-like form where the '^' is replaced by '+' and the predicate" 
+		       + " is placed in front of the brackets, e.g., " + UQueryPanel.DATALOG_STRING + ".";
+		    
+		    // this variable is needed to use the most current (changing) height of the query panel
+		    [Bindable]
+		    private var _currentHeight:int = 235;
+		    
+		    //private static const QUERY00:Object = {label: 'Q-1 - What do Galway and Dublin have in common?', 
+			//	text: '?X(Galway,?Y)+?X(Dublin,?Y)'};
+		    private static const QUERY0:Object = {label: 'Q0 - Where does Bill Gates live, and where is this city located in?', 
+		                                    text: 'livesIn(Bill_Gates,?X)+locatedIn(?X,?Y)'};
+		    private static const QUERY1:Object = {label: 'Q1 - Which persons won the same prize as Max Planck, and to whom are they married?', 
+		                                    text: 'hasWonPrize(Max_Planck,?X)+hasWonPrize(?Y,?X)+isMarriedTo(?Y,?Z)'};
+		    private static const QUERY2:Object = {label: 'Q2 - What do Jeffrey Ullman and Christos Papadimitriou have in common?', 
+            	                            text: '?r(Jeffrey_Ullman,?X)+?r(Christos_Papadimitriou,?X)'};
+		    private static const QUERY3:Object = {label: 'Q3 - Where does Al Gore live?', text: 'livesIn(Al_Gore,?X)'};
+		    private static const QUERY4:Object = {label: 'Q4 - Where does Gerhard Weikum work?', text: 'worksAt(Gerhard_Weikum,?X)'};
+		    private static const QUERY5:Object = {label: 'Q5 - Who is Woody Allen married to?', text: 'isMarriedTo(Woody_Allen,?X)'};
+		    private static const QUERY6:Object = {label: 'Q6 - Where is Tim Robbins born?', text: 'bornIn(Tim_Robbins,?X)'};
+		    private static const QUERY7:Object = {label: 'Q7 - Who acted in Total Recall and lives in Thal, Austria?', 
+            	                            text: 'actedIn(?X,Total_Recall)+bornIn(?X,Thal,_Austria)'};
+		    private static const QUERY8:Object = {label: 'Q8 - Who acted in a movie together with Arnold Schwarzenegger, and where does this person live?', 
+            	                            text: 'actedIn(Arnold_Schwarzenegger,?X)+actedIn(?Y,?X)+bornIn(?Y,?Z)+notEquals(Arnold_Schwarzenegger,?Y)'};
+		    private static const QUERY9:Object = {label: 'Q9 - Which person was born in Oxford, has an academic advisor who graduated from Cambridge, and where did this advisor graduate from?',
+            	                           text: 'bornIn(?X,Oxford)+graduatedFrom(?X,?Y)+hasAcademicAdvisor(?X,?Z)+graduatedFrom(?Z,University_of_Cambridge)'};
+		    private static const QUERY10:Object = {label: 'Q10 - Who played in the movie Total Recall, and which are his birthplace, his birthdate, his current ' + 
+            			                  'place of living, and the name of his spouse ?', 
+            			                  text: 'bornIn(?GUY,?BIRTHPLACE)+livesIn(?GUY,?LIVESIN)+bornOnDate(?GUY,?BIRTHDATE)+isMarriedTo(?GUY,?SPOUSE)+actedIn(?GUY,Total_Recall)'};
+		    private static const QUERY11:Object = {label: 'Q11 - Which patent examiner was born before 1900 in Ulm and won the Nobel Prize for Physics?',
+            	                           text: 'hasWonPrize(?X,Nobel_Prize_in_Physics)+bornIn(?X,Ulm)+bornOnDate(?X,?Z)+yearBefore(?Z,1900)+type(?X,wikicategory_Patent_examiners)'};
+		    private static const QUERY12:Object = {label: 'Q12 - Who acted in a movie together with Emma Thompson and is now married to her?', 
+            	                           text: 'isMarriedTo(Emma_Thompson,?SPOUSE)+actedIn(Emma_Thompson,?MOVIE)+actedIn(?SPOUSE,?MOVIE)'};
+		    private static const QUERY13:Object = {label: 'Q13 - Which persons have acted in a movie directed by Martin Scorsese?', 
+            	                           text: 'directed(Martin_Scorsese,?MOVIE)+actedIn(?GUY1,?MOVIE)+actedIn(?GUY2,?MOVIE)+notEquals(?GUY1,?GUY2)+notEquals(?GUY1,Martin_Scorsese)+notEquals(?GUY2,Martin_Scorsese)'};
+		    private static const QUERY14:Object = {label: 'Q14 - Which cities in Saarland are located near Saarbrücken?', 
+            	                           text: 'gaz_hasName(?A,Saarbrucken)+gaz_isLocatedIn(?B,Saarland)+notEquals(?A,?B)+gaz_isClose(?A,?B,5)+gaz_hasName(?B,?D)'};
+		    private static const QUERY15:Object = {label: 'Q15 - Which persons born in German cities have won the Nobel Prize for Physics?', 
+            	                           text: 'hasWonPrize(?X,Nobel_Prize_in_Physics)+bornIn(?X,?Y)+gaz_hasName(?Z,?Y)+gaz_isLocatedIn(?Z,Germany)'};
+		    private static const QUERY16:Object = {label: 'Q16 - Which cities are at most 5 km away from Saarbrücken?', 
+            	                           text: 'isClose(Saarbrucken,?X,5)'};
+            private static const QUERY17:Object = {label: 'Q16 - Which cities are located in Liechtenstein, and which are the cities near them?', 
+            	                           text: 'gaz_isLocatedIn(?A,Liechtenstein)+gaz_hasName(?A,?B)+gaz_isClose(?A,?C,5)+gaz_hasName(?C,?D)'};
+			
+			private function dataTipProducer(value:Object):String{
+				return value.label;
+			}
+			
+			private function dataTipProducerStringOnly(value:Object):String{
+				return value as String;
+			}
+			
+			private function onCreationComplete():void {              
+                
+                // show initially only 2 literals
+            	//toggleInputMethod(2);
+                
+                _queryLiterals.push(DefaultQueryLiteral);
+                _queryLiterals.push(QueryLiteral2);
+                _queryLiterals.push(QueryLiteral3);
+                _queryLiterals.push(QueryLiteral4);
+                _queryLiterals.push(QueryLiteral5);
+                
+                Literal1CheckBox.setStyle("emphasized",true);
+				Literal1CheckBox.setStyle("borderColor",0xffff0000);
+				Literal2CheckBox.setStyle("emphasized",true);
+				Literal2CheckBox.setStyle("borderColor",0xffff0000);
+				Literal3CheckBox.setStyle("emphasized",true);
+				Literal3CheckBox.setStyle("borderColor",0xffff0000);
+				Literal4CheckBox.setStyle("emphasized",true);
+				Literal4CheckBox.setStyle("borderColor",0xffff0000);
+				Literal5CheckBox.setStyle("emphasized",true);
+				Literal5CheckBox.setStyle("borderColor",0xffff0000);
+                _literalCheckBoxes.push(Literal1CheckBox);
+                _literalCheckBoxes.push(Literal2CheckBox);
+                _literalCheckBoxes.push(Literal3CheckBox);
+                _literalCheckBoxes.push(Literal4CheckBox);
+                _literalCheckBoxes.push(Literal5CheckBox);                                          
+                
+                // add an event listener for the changes to the literals
+                this.addEventListener(UQueryEvent.QUERY_STRING_UPDATE_EVENT,buildQueryString,false,0,true);                       
+				
+				// fill the first Literal
+				//DefaultQueryLiteral.QueryLiteralArg1Input.text = "Max_Planck";
+                //DefaultQueryLiteral.QueryLiteralRelationInputAutoComplete.selectedItem = "hasWonPrize";
+                DefaultQueryLiteral.QueryLiteralArg1Input.text = "Galway";
+                DefaultQueryLiteral.QueryLiteralRelationInputAutoComplete.selectedItem = "?X";
+                DefaultQueryLiteral.QueryLiteralArg2Input.text = "?Y";
+                QueryLiteral2.QueryLiteralArg1Input.text = "Dublin";
+                QueryLiteral2.QueryLiteralRelationInputAutoComplete.selectedItem = "?X";
+                QueryLiteral2.QueryLiteralArg2Input.text = "?Y";
+               /*  QueryLiteral2.QueryLiteralArg1Input.text = "?Y";
+                QueryLiteral2.QueryLiteralRelationInputAutoComplete.selectedItem = "hasWonPrize";
+                QueryLiteral2.QueryLiteralArg2Input.text = "?X";
+                QueryLiteral3.QueryLiteralArg1Input.text = "?Y";
+                //DefaultQueryLiteral.QueryLiteralRelationInputAutoComplete.selectedItem = "hasAcademicAdvisor";
+                QueryLiteral3.QueryLiteralRelationInputAutoComplete.selectedItem = "isMarriedTo";
+                QueryLiteral3.QueryLiteralArg2Input.text = "?Z"; */
+                // build the query string
+                //this.buildQueryString(null);
+                
+                _dropDown = new ClassFactory(List);
+				_dropDown.properties = {showDataTips:true, dataTipFunction:dataTipProducer};
+				_dropDownStringOnly = new ClassFactory(List);
+				_dropDownStringOnly.properties = {showDataTips:true, dataTipFunction:dataTipProducerStringOnly}
+				
+				// build the demo query strings
+				_demoQueryStrings = new ArrayCollection();
+				_demoQueryStrings.source = [QUERY00, QUERY0,QUERY1,QUERY2,QUERY3,QUERY4,QUERY5,QUERY6,QUERY7,QUERY8,QUERY9,QUERY10,QUERY11
+            	                           ,QUERY12,QUERY13,QUERY14,QUERY15,QUERY16];
+            	                           
+            	// show initially only 2 literals
+            	//toggleInputMethod(2);
+            	/* AdjustSizeAnimation.fromValue = _currentHeight;
+		        AdjustSizeAnimation.toValue = 141;
+		        _currentHeight = 141; 
+		        LiteralPanel.height = 96;
+		        Literal3CheckBox.selected = true;
+		        Literal4CheckBox.selected = true;
+		        Literal5CheckBox.selected = true;
+		        onResetSelectedClicked();
+		        Literal1Canvas.visible = true;
+		        Literal2Canvas.visible = true;			    			        
+		        Literal3Canvas.visible = false;
+		        Literal4Canvas.visible = false;
+		        Literal5Canvas.visible = false;
+		        _currentNumOfLiterals = 2;
+		        //LiteralNumberLinkBar.selectedIndex = 1;
+		        _selectedLiteralIndex = 1;
+		        AdjustSizeAnimation.play([this]); */
+            }
+            
+            /** 
+             * Delivers the internally managed UQuery object.
+             * 
+             * @return the internally managed UQuery object. 
+             * */
+            public function get query():UQuery {
+            	return _query;
+            }
+		    
+		    private function onResetSelectedClicked():void {
+		       // restrict the number of query literals to 7
+			   for(var i:int = 0; i<_literalCheckBoxes.length; i++) {
+				  // check the checkboxes, if they are set
+				  var checkBox:CheckBox = (CheckBox)(_literalCheckBoxes[i]);
+					
+				  if(checkBox.selected) {
+				  	 var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[i]);
+					 // seems to be a bug, I don`t know why the literal isnt`t already deleted at the first function call
+					 //literal.onClearButtonClick();
+					 literal.onClearButtonClick();
+					 // set the status of the respective button to active 
+		    	     checkBox.setStyle("emphasized",true);
+				     checkBox.setStyle("borderColor",0xffff0000);
+				     //checkBox.setStyle("highlight3D ",[0xffff0000]);
+				  }	
+				  
+				  // visually disable the checkbox again
+				  checkBox.selected = false;   
+			   }
+			   
+			   // construct the current query string
+			   buildQueryString();
+		    }
+		      
+		    private function onResetAllClicked(clearParserText:Boolean = true):void {
+		     
+		       for(var i:int = 0; i<_literalCheckBoxes.length; i++) {
+		       	  var checkBox:CheckBox = (CheckBox)(_literalCheckBoxes[i]);
+		       	  checkBox.selected = false;
+		       	  // set the status of the respective button to active 
+		    	  checkBox.setStyle("emphasized",true);
+				  checkBox.setStyle("borderColor",0xffff0000);
+				  //checkBox.setStyle("highlight3D ",[0xffff0000]);
+		       	  var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		       	  literal.onClearButtonClick();
+		       }
+	           // delete the previous query string
+	           //buildQueryString();
+		       if(clearParserText)
+		          QueryLiteralsConjunctionText.text = "";
+		    }
+		    
+		    /* private function hideSelectedLiterals(startPosition:int = 1, endPosition:int = 4):void {
+		    	
+		    	var literal:UQueryLiteralBuilder;
+		    	var checkBox:CheckBox;
+		    	for(var i:int = startPosition; i<=endPosition; i++) {
+				    literal = (UQueryLiteralBuilder)(_queryLiterals[i]);
+				    checkBox = (CheckBox)(_literalCheckBoxes[i]);
+		       	    checkBox.selected = true;
+				    if(i == selectedLiteral) { 
+				       literal.includeInLayout = true;
+				       literal.visible = true;
+				       literalLabel.includeInLayout = true;
+				       literalLabel.visible = true;
+				       var literalButton:ULiteralSelectionButton = (ULiteralSelectionButton)(_literalSelectButtons[selectedLiteral]);
+				       //literalButton.setStyle("emphasized",true);
+				       literalButton.emphasized = true;
+				       //literalButton.setStyle("textSelectedColor",0xff00ff00);
+				       literalButton.setStyle("color",0xff00ff00);
+				    }
+				    else {
+				       literal.includeInLayout = false;
+				       literal.visible = false;
+				       literalLabel.includeInLayout = false;
+				       literalLabel.visible = false;
+				    }
+		        }
+		    } */
+		    
+		    private function updateStatus(changedLiteral:int):void {
+		    	var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[changedLiteral]);
+		    	 var checkBox:CheckBox = (CheckBox)(_literalCheckBoxes[changedLiteral]);
+		    	if(literal.firstArgument != "") {
+		    		// set the status of the respective button to active 
+		    		checkBox.setStyle("emphasized",true);
+				    checkBox.setStyle("borderColor",0xff00ff00);
+				    //checkBox.setStyle("highlight3D ",[0xff00ff00]);
+				    
+				    // construct the current query string
+				    buildQueryString();
+		       	    return;
+		        }
+		        if(literal.relation != null && literal.relation != "") {
+		    		// set the status of the respective button to active 
+		    		checkBox.setStyle("emphasized",true);
+				    checkBox.setStyle("borderColor",0xff00ff00);
+				    //checkBox.setStyle("highlight3D ",[0xff00ff00]);
+				    
+				    // construct the current query string
+				    buildQueryString();
+		       	    return;
+		        }
+		        if(literal.secondArgument != "") {
+		    		// set the status of the respective button to active 
+		    		checkBox.setStyle("emphasized",true);
+				    checkBox.setStyle("borderColor",0xff00ff00);
+				    //checkBox.setStyle("highlight3D ",[0xff00ff00]);
+				    
+				    // construct the current query string
+				    buildQueryString();
+		       	    return;
+		        }
+		    }
+		    
+		    private function buildQueryString(event:UQueryEvent = null):void {
+		    	
+		    	// delete the previous query string
+		    	//this.toolTip = "";//QueryLiteralsConjunctionText.text = "";
+		    	//this.QueryStringToolTip.toolTipText = "";
+		    	//this.QueryStringToolTip.text = "";
+		    	//this.dispatchEvent(new UToolTipEvent(UToolTipEvent.TOOLTIP_SHOW_EVENT,true));
+		    	
+		    	QueryLiteralsConjunctionText.text = "";
+		    	
+		    	for (var i:int = 0; i<_queryLiterals.length; i++) {
+		    		var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		    		if(!literal.isEmpty()) {
+		    			
+		    			if(QueryLiteralsConjunctionText.text == "")
+		    			   QueryLiteralsConjunctionText.text = literal.buildLiteralStringSPARQL();//literal.literalString();
+		    			else
+		    			   QueryLiteralsConjunctionText.text += "." + literal.buildLiteralStringSPARQL();//literal.literalString();
+		    			
+		    			//if(this.QueryStringToolTip.toolTipText == "")
+		    			//if(this.QueryStringToolTip.text == "")
+		    			  // this.QueryStringToolTip.toolTipText = literal.buildLiteralStringSPARQL();//literal.literalString();
+		    			   //this.QueryStringToolTip.text = literal.buildLiteralStringSPARQL();//literal.literalString();
+		    			//else
+		    			   //this.QueryStringToolTip.toolTipText += " . " + literal.buildLiteralStringSPARQL();//literal.literalString();
+		    			   //this.QueryStringToolTip.text += " . " + literal.buildLiteralStringSPARQL();//literal.literalStrin
+		    			
+		    		}
+		    	}
+		    	
+		    	//adjustQueryToolTipPosition();
+		    	
+		    }
+		    
+		    /*
+		    private function updateQueryStringFromTextField():void {
+		    	
+		    	// set the flag to true
+		    	_userQueryParserField = true;
+		    	
+		    	//QueryStringToolTip.toolTipText = "";
+		    	QueryStringToolTip.text = ""
+		    	//QueryStringToolTip.toolTipText += QueryLiteralsConjunctionText.text;
+		    	QueryStringToolTip.text += QueryLiteralsConjunctionText.text;
+		    	adjustQueryToolTipPosition();
+		    }
+		    */
+		    
+		    private function parseQueryString():Boolean {
+		    	
+		    	var literal:UQueryLiteralBuilder;
+		    	
+		    	// clear all literals
+		    	//for each (literal in _queryLiterals) {
+		    		// clear the current literal
+		    		//literal.onClearButtonClick();
+		    	//}
+		    	
+		    	// copy the query string
+		    	var tempQueryString:String = new String(QueryLiteralsConjunctionText.text);
+		    	// split the query string according to the dot notation for SPARQL join patterns
+		    	var literalArray:Array = (tempQueryString.lastIndexOf("+") < 0) 
+		    	                         ? tempQueryString.split(".") : tempQueryString.split("+");
+		    	
+		    	// the temporary literal string
+		    	var literalString:String = "";
+		    	
+		    	if(literalArray.length > 5) {
+		    	  mx.core.Application.application.UVizErrorPanel.writeTooManyLiteralsError();
+		    	  mx.core.Application.application.UVizErrorPanel.show();
+		    	  //Alert.show("Too many literals specified! We allow only 8 literal patterns for the query.", "Literal Number Error!");
+		    	  return false;
+		    	}
+		    	
+		    	// iterate over all literals
+		    	for (var i:int = 0; i<literalArray.length; i++) {
+		    		// get the current literal
+		    		//var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		    		literal = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		    		// clear the literal
+		    		literal.onClearButtonClick();
+		    		
+		    		// parse the literal string
+		    		literalString = literalArray[i] as String;
+		    		
+		    		if(literalString.lastIndexOf("<") < 0) {
+			    		if(!literal.parseLiteralStringDatalog(literalString)) {
+			    		   mx.core.Application.application.UVizErrorPanel.writeLiteralError(i);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+			    		   //Alert.show("There occurred an error in literal " + (i+1) + " !", "Query String Error!");
+			    		   // clear the literal
+			    		   //literal.onClearButtonClick();
+			    		   return false;
+			    		}
+		    		}
+		    		else {
+			    		if(!literal.parseLiteralStringSPARQL(literalString)) {
+			    		   mx.core.Application.application.UVizErrorPanel.writeLiteralError(i);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+			    		   //Alert.show("There occurred an error in literal " + (i+1) + " !", "Query String Error!");
+			    		   // clear the literal
+			    		   //literal.onClearButtonClick();
+			    		   return false;
+			    		}
+		    		}
+		    		
+		    		// update the literal status
+		    		updateStatus(i);
+		    	}
+		    	
+		    	buildQueryString();
+		    	return true;
+		    	
+		    }
+			
+			private function checkQueryConditions():Boolean {
+				
+				var atLeastOneConstant:Boolean = false;
+				
+				for each (var literal:UQueryLiteralBuilder in _queryLiterals) {
+					if(!util.UStringUtil.startsWith(literal.firstArgument,"?") 
+					     && literal.firstArgument != null && literal.firstArgument != "") 
+					    atLeastOneConstant = true;
+					if(!util.UStringUtil.startsWith(literal.relation,"?") 
+					     && literal.relation != null && literal.relation != "")
+					    atLeastOneConstant = true;
+					if(!util.UStringUtil.startsWith(literal.secondArgument,"?") 
+					     && literal.secondArgument != null && literal.secondArgument != "")
+					    atLeastOneConstant = true;  
+				}
+				    
+				//if(atLeastOneConstant)
+				  // return true;
+				//else
+				  // return false;
+				return atLeastOneConstant;
+			}
+			
+			/** Clears all the labels of the literals within this panel. */
+			private function onClearLiteralsButtonClick():void {
+				for each (var literal:UQueryLiteralBuilder in _queryLiterals) {
+					literal.onClearButtonClick();
+				}
+			}
+			
+			public function buildQuery(event:UQueryEvent = null):Boolean {
+				
+				// if we activated parsing before -> parse the query text
+				if(_userQueryParserField) {
+				   // first, reset all literals, but not the parser field
+				   this.onResetAllClicked(false);
+				   // now, try to parse the literal string
+				   if(!this.parseQueryString())
+				      return false;
+				}
+				
+				// reset the flag to false   
+				_userQueryParserField = false;
+				
+				
+				/* if(checkQueryConditions() == false) {
+					// we need the number 0 to show the suitable text in the popup window
+					mx.core.Application.application.UVizErrorPanel.writeLiteralConstantError();
+		    	    mx.core.Application.application.UVizErrorPanel.show();
+					return false;
+				} */
+				
+				//else {
+					
+				var literalArray:Array = new Array();
+				var numOfMissingEntries:int = 0;
+				//trace("-------------- new query -------------------");
+				for each(var literal:UQueryLiteralBuilder in _queryLiterals) {
+					
+					// adjust the arguments of the literal -> means add underscores to connect composite words
+					literal.adjustArguments();
+					
+					var arg1:String = literal.firstArgument;
+					if(arg1 == null || arg1 == ""){
+					   //continue; // we skip this literal, in case there is a undefined value
+					   //Alert.show("A specified literal is missing a valid subject!", "Literal Subject Error!");
+					   //return;
+					   numOfMissingEntries++;
+					}
+					//trace("arg1 is : " + arg1);
+					var rel:String = literal.relation;
+					if(rel == null || rel == "") {
+					   //if(rel == null)
+					     // trace("relation is : null");
+					   //else
+					     // trace("relation is : " + rel.toString());
+					   //continue; // we skip this literal, in case there is a undefined value
+					   //Alert.show("A specified literal is missing a valid predicate!", "Literal Predicate Error!");
+					   //return;
+					   numOfMissingEntries++;
+					}
+					//if(rel != null)
+					  //  trace("relation is : " + rel.toString());
+					var arg2:String = literal.secondArgument;
+					if(arg2 == null || arg2 == "") {
+					   //continue; // we skip this literal, in case there is a undefined value
+					   //Alert.show("A specified literal is missing a valid object!", "Literal Object Error!");
+					   //return;
+					   numOfMissingEntries++;
+					}
+					//trace("arg2 is : " + arg2);
+					 
+					// --------------------------------------------------------------- 
+					// check if none entry exists in the literal -> skip literal 
+					// or all three -> build the literal,
+					// -> otherwise show an error
+					// ---------------------------------------------------------------
+					
+					// all entries are missing -> skip this literal
+					if(numOfMissingEntries == 3) {
+						// reset the missing entry counter
+					    numOfMissingEntries = 0;
+					   continue;
+					}
+					if(numOfMissingEntries == 1 || numOfMissingEntries == 2) {
+						// reset the missing entry counter
+					    numOfMissingEntries = 0;
+						mx.core.Application.application.UVizErrorPanel.writeLiteralError();
+	    	            mx.core.Application.application.UVizErrorPanel.show();
+						//Alert.show("A specified literal is missing a valid entry!", "Illegal Literal Entry Error!");
+						return false;
+					}
+					   
+					// ok, everything is ok
+					   
+					//no empty values -> build the query literal
+					var tempLiteral:ULiteral = new ULiteral();
+					//var tempLiteral:ULiteral = new ULiteral(URelation.valueOfRelation(rel),arg1,arg2);
+					if(!literal.checkCompareValue()) 
+					    tempLiteral.initLiteralFull(URelation.valueOfRelation(rel),arg1,arg2);
+					else
+					    tempLiteral.initLiteralFullCompare(URelation.valueOfRelation(rel),arg1,arg2,literal.compareValue);
+					//tempLiteral.initLiteralFull(URelation.LIVESIN,"Woody_Allen","?x");
+					// add this literal to the query
+					literalArray.push(tempLiteral);
+					
+					// reset the missing entry counter
+					numOfMissingEntries = 0;
+					
+					//trace("arg1 : " + arg1 + " , rel : " + rel + " , arg2 : " + arg2);
+				}
+				
+				if(literalArray.length == 0) {
+				   // we need the number 1 to show the suitable text in the popup window
+				   //createQueryErrorPopUp(VALUE);
+				   mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+	    	       mx.core.Application.application.UVizErrorPanel.show();
+				   return false;
+				}
+				
+				this._query = new UQuery();
+				
+				try {
+				  this._query.initQuery("current query","Q",literalArray);
+				}
+				catch(error:Error) {
+				   if(error.errorID == 0){
+				     mx.core.Application.application.UVizErrorPanel.writeLiteralConstantError();
+	    	         mx.core.Application.application.UVizErrorPanel.show();
+	    	         return false;
+				   }
+				   else {
+				   	 mx.core.Application.application.UVizErrorPanel.writeInproperChainingError();
+	    	         mx.core.Application.application.UVizErrorPanel.show();
+	    	         return false;
+				   }
+				}
+				   
+				this.dispatchEvent(new FlexEvent(FlexEvent.VALUE_COMMIT));
+				// rebuild the query string
+				buildQueryString();
+				
+				//QueryLiteralsConjunctionText.text = QueryStringToolTip.toolTipText; 
+				//QueryLiteralsConjunctionText.text = QueryStringToolTip.text;
+				
+				// reset the parser flag again
+				_userQueryParserField = false;
+				
+				return true;
+				//}
+				
+			}
+			
+			public function handleKeyboardAction(event:KeyboardEvent):void {
+				// see website : http://www.adobe.com/livedocs/flash/9.0/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00001136.html
+				if(event.keyCode == 13) {
+				   // if the visualization is in lineage mode
+				   // leave the lineage mode and return
+				   if(UFlareVis.lineageMode) {
+				      //this.dispatchEvent(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));
+				   // otherwise build the query
+				     mx.core.Application.application.leaveLineageMode(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));				      
+				      if(!buildQuery())
+				        QueryLiteralsConjunctionText.text.concat("Error");// hide();
+				         //buildQuery();
+				   }
+				   else {
+				      if(!buildQuery())
+				        QueryLiteralsConjunctionText.text.concat("Error");// hide();
+				        //buildQuery();
+				   }
+				}
+				else
+				   return;
+			}
+			
+			private function submitQuery():void {
+				// if the visualization is in lineage mode
+				// leave the lineage mode and return
+				if(UFlareVis.lineageMode) {
+				      //this.dispatchEvent(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));
+				      mx.core.Application.application.leaveLineageMode(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));				      
+				      if(!buildQuery())
+				        QueryLiteralsConjunctionText.text.concat("Error");// hide();
+				         //buildQuery();
+			    }
+				// otherwise build the query
+			    else {
+			       if(!buildQuery())
+				     QueryLiteralsConjunctionText.text.concat("Error");// hide();
+				      //buildQuery();
+			    }
+			}
+			
+			public function hide():Boolean {
+				if(HeightFoldAnimation.isPlaying || HeightUnfoldAnimation.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function show():Boolean {
+				if(HeightFoldAnimation.isPlaying || HeightUnfoldAnimation.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function hideButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function showButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function parseQueryURL(queryString:String):void {
+
+				//var urlParams:Dictionary = new Dictionary();
+				
+				//var paramsArray:Array = queryString.split(".");
+				//var params:String = urlString.split("?")[1];
+				//if (paramsArray != null)
+				//{
+					
+					QueryLiteralsConjunctionText.text = queryString;
+					this.parseQueryString();
+					
+					//var params:Array = paramStr.split("");
+					/*
+					for (var i:int=0; i < params.length; i++)
+					{
+					var kv:Array = params[i].split('=');
+					urlParams[kv[0]] = kv[1];
+					}
+					}
+					}
+					else
+					
+				   {
+				   urlParams = Application.application.parameters;
+				   }
+				   */
+				//}
+				//return urlParams;
+			}
+			
+			public function parseURLString(literalArray:Array):void {
+		    	
+		    	var literal:UQueryLiteralBuilder;
+		    	
+		    	// clear all literals
+		    	for each (literal in _queryLiterals) {
+		    		// clear the current literal
+		    		literal.onClearButtonClick();
+		    	}
+		    	
+		    	if(literalArray.length < 1) {
+		    	  mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+		    	  mx.core.Application.application.UVizErrorPanel.show();
+		    	  //Alert.show("Too many literals specified! We allow only 8 literal patterns for the query.", "Literal Number Error!");
+		    	  return;
+		    	}
+		    	
+		    	if(literalArray.length > 5) {
+		    	  mx.core.Application.application.UVizErrorPanel.writeTooManyLiteralsError();
+		    	  mx.core.Application.application.UVizErrorPanel.show();
+		    	  //Alert.show("Too many literals specified! We allow only 8 literal patterns for the query.", "Literal Number Error!");
+		    	  return;
+		    	}
+		    	
+		    	// iterate over all literals
+		    	for (var i:int = 0; i<literalArray.length; i++) {
+		    		// get the current literal
+		    		//var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		    		literal = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		    		
+		    		// parse the array that represents the current literal
+		    		if(!literal.parseLiteralFromURL(literalArray[i] as Array)) {
+			    		   mx.core.Application.application.UVizErrorPanel.writeLiteralError(i);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+			    		   //Alert.show("There occurred an error in literal " + (i+1) + " !", "Query String Error!");
+			    		   // clear the literal
+			    		   literal.onClearButtonClick();
+			    		   return;
+			    	}
+		    		
+		    		// update the literal status
+		    		updateStatus(i);
+		    	}
+		    	
+		    	buildQueryString();
+		    	buildQuery();	
+		    }
+		    
+		    private function handleDemoQueryStringClick():void {
+		    	QueryLiteralsConjunctionText.text = "";
+		    	QueryLiteralsConjunctionText.text = DemoQueriesComboBox.selectedItem.text as String;
+		    	// activate the parser field
+		    	_userQueryParserField = true;
+		    	//buildQuery();
+		    	submitQuery();
+		    }
+		    
+		    private function toggleInputMethod(literalNumber:int = 0):void {
+		    	
+		    	if(AdjustSizeAnimation.isPlaying)
+		    	   return;
+		    	
+		    	if(literalNumber > 0) {
+		    		// a hack
+		    		if(_currentHeight == 110)
+		    		   return;
+		    		
+		    		this.includeInLayout = false;
+		    		switch(LiteralNumberLinkBar.selectedIndex) {
+		    			case 0: AdjustSizeAnimation.fromValue = _currentHeight;
+		    			        AdjustSizeAnimation.toValue = 113;
+		    			        _currentHeight = 113; 
+		    			        LiteralPanel.height = 68;
+		    			        Literal2CheckBox.selected = true;
+		    			        Literal3CheckBox.selected = true;
+		    			        Literal4CheckBox.selected = true;
+		    			        Literal5CheckBox.selected = true;
+		    			        onResetSelectedClicked();
+		    			        Literal1Canvas.visible = true;
+		    			        Literal2Canvas.visible = false;
+		    			        Literal3Canvas.visible = false;
+		    			        Literal4Canvas.visible = false;
+		    			        Literal5Canvas.visible = false;
+		    			        _currentNumOfLiterals = 1;
+		    			        //LiteralNumberLinkBar.selectedIndex = 0;
+		    			        _selectedLiteralIndex = 0;
+		    			        break;
+		    			case 1: AdjustSizeAnimation.fromValue = _currentHeight;
+		    			        AdjustSizeAnimation.toValue = 141;
+		    			        _currentHeight = 141; 
+		    			        LiteralPanel.height = 96;
+		    			        Literal3CheckBox.selected = true;
+		    			        Literal4CheckBox.selected = true;
+		    			        Literal5CheckBox.selected = true;
+		    			        onResetSelectedClicked();
+		    			        Literal1Canvas.visible = true;
+		    			        Literal2Canvas.visible = true;			    			        
+		    			        Literal3Canvas.visible = false;
+		    			        Literal4Canvas.visible = false;
+		    			        Literal5Canvas.visible = false;
+		    			        _currentNumOfLiterals = 2;
+		    			        //LiteralNumberLinkBar.selectedIndex = 1;
+		    			        _selectedLiteralIndex = 1;
+		    			        break;
+		    			case 2: AdjustSizeAnimation.fromValue = _currentHeight;
+		    			        AdjustSizeAnimation.toValue = 169;
+		    			        _currentHeight = 169; 
+		    			        LiteralPanel.height = 124;			    			        
+		    			        Literal4CheckBox.selected = true;
+		    			        Literal5CheckBox.selected = true;
+		    			        onResetSelectedClicked();
+		    			        Literal1Canvas.visible = true;
+		    			        Literal2Canvas.visible = true;			    			        
+		    			        Literal3Canvas.visible = true;			    			        
+		    			        Literal4Canvas.visible = false;
+		    			        Literal5Canvas.visible = false;
+		    			        _currentNumOfLiterals = 3;
+		    			        //LiteralNumberLinkBar.selectedIndex = 2;
+		    			        _selectedLiteralIndex = 2;
+		    			        break;
+		    			case 3: AdjustSizeAnimation.fromValue = _currentHeight;
+		    			        AdjustSizeAnimation.toValue = 197;
+		    			        _currentHeight = 197;
+		    			        LiteralPanel.height = 152;			    			        
+		    			        Literal5CheckBox.selected = true;
+		    			        onResetSelectedClicked();
+		    			        Literal1Canvas.visible = true;
+		    			        Literal2Canvas.visible = true;
+		    			        Literal3Canvas.visible = true;
+		    			        Literal4Canvas.visible = true;
+		    			        Literal5Canvas.visible = false; 
+		    			        _currentNumOfLiterals = 4;
+		    			        //LiteralNumberLinkBar.selectedIndex = 3;
+		    			        _selectedLiteralIndex = 3;
+		    			        break;
+		    			case 4: AdjustSizeAnimation.fromValue = _currentHeight;
+		    			        AdjustSizeAnimation.toValue = 235;
+		    			        _currentHeight = 235; 
+		    			        LiteralPanel.height = 183;
+		    			        onResetSelectedClicked();
+		    			        Literal1Canvas.visible = true;
+		    			        Literal2Canvas.visible = true;
+		    			        Literal3Canvas.visible = true;
+		    			        Literal4Canvas.visible = true;
+		    			        Literal5Canvas.visible = true;
+		    			        _currentNumOfLiterals = 5;
+		    			        //LiteralNumberLinkBar.selectedIndex = 4;
+		    			        _selectedLiteralIndex = 4;
+		    			        break;
+		    		}
+		    		
+		    		//Button(LiteralNumberLinkBar.getChildAt(LiteralNumberLinkBar.selectedIndex)).enabled = false;
+		    		AdjustSizeAnimation.play([this]);
+		    		
+		    		return;    	
+		    	}
+		    	else {
+		    		
+		    	  if(InputMethodSelectionButton.label == "SPARQL Input") {
+		    		
+			    		//if(literalNumber == 0) {
+			    		
+			    		this.includeInLayout = false;
+			    		// the current height has changed
+			    		_currentHeight = 110;
+			    		AdjustSizeAnimation.toValue = 110;
+			    		AdjustSizeAnimation.play([this]);
+			    		
+			    		this.LiteralPanel.includeInLayout = false;
+			    		this.LiteralPanel.visible = false;
+			    		this.ParserPanel.includeInLayout = true;
+			    		this.ParserPanel.visible = true;
+			    		this.InputMethodSelectionButton.label = "SPO Input";
+		    		
+		    		    return;
+			    		//}
+		    	  }
+		    	  else {
+		    		
+		    		this.includeInLayout = false;
+		    		
+		    		switch(_currentNumOfLiterals) {
+		    			case 1: _currentHeight = 113;
+		    			        AdjustSizeAnimation.toValue = 113;
+		    			        break;
+		    			case 2: _currentHeight = 141;
+		    			        AdjustSizeAnimation.toValue = 141;
+		    			        break;
+		    			case 3: _currentHeight = 169;
+		    			        AdjustSizeAnimation.toValue = 169;
+		    			        break;
+		    			case 4: _currentHeight = 197;
+		    			        AdjustSizeAnimation.toValue = 197;
+		    			        break
+		    			case 5: _currentHeight = 235;
+		    			        AdjustSizeAnimation.toValue = 235;
+		    			        break;
+		    		}
+		    		
+		    		AdjustSizeAnimation.play([this]);
+		    		
+		    		this.ParserPanel.includeInLayout = false;
+		    		this.ParserPanel.visible = false;
+		    		this.LiteralPanel.includeInLayout = true;
+		    		this.LiteralPanel.visible = true;
+		    		this.InputMethodSelectionButton.label = "SPARQL Input";
+		    		return;
+		    	  }
+		    	}
+		    }
+		    
+		    private function updatePanelSize():void {
+		    	
+		    }
+		    
+		    /* private function onKillButtonClick():void {
+		    	KillRequestButton.dispatchEvent(new UKillSessionEvent(UKillSessionEvent.KILL_SESSION_EVENT,true));
+		    } */
+		    
+		    /*
+		    private function panelClosed():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_CLOSED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    
+		    private function panelOpened():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_OPENED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    */
+			
+		]]> 
+	</mx:Script>
+	
+	<mx:XML id="ResetMenu">
+	   <xmlRoot label="Reset Menu">
+       <menuitem label="Reset Selected Literals"/>
+       <menuitem label="Reset All Literals"/>
+       </xmlRoot>
+    </mx:XML>
+    
+    <mx:Style>
+		
+		.myComboBox {
+			color: #FFFFFF;
+		}
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Panel left="5" right="5" y="5" height="183" id="LiteralPanel" headerHeight="0" 
+		paddingBottom="2" paddingLeft="0" paddingRight="0" paddingTop="2" backgroundAlpha="1.0" borderStyle="solid" 
+		borderThickness="0" cornerRadius="10" backgroundColor="#767675" roundedBottomCorners="true" 
+		horizontalAlign="center" verticalAlign="middle" horizontalGap="1" verticalGap="2"
+		hideEffect="ZoomOut" showEffect="ZoomIn" visible="true" horizontalScrollPolicy="off" verticalScrollPolicy="off">
+		
+		<mx:Canvas width="100%" height="25" backgroundColor="#767675" backgroundAlpha="0.0" 
+			borderStyle="none" cornerRadius="10" borderThickness="0">				
+		<mx:Label x="83" y="2" text="Subject" id="SubjectLabel" fontSize="12" fontWeight="bold" color="#FFFFFF"/>
+		<mx:Label x="236" y="2" text="Predicate" id="PredicateLabel" fontSize="12" fontWeight="bold" color="#FFFFFF"/>
+		<mx:Label x="400" y="2" text="Object" id="ObjectLabel" fontSize="12" fontWeight="bold" color="#FFFFFF"/>
+		<mx:Button 
+		      id="ClearLiteral1Button" 
+		      label="CS" 
+		      toolTip="Clear the selected literals."
+		      height="19" 
+		      fontSize="9" 
+		      paddingBottom="2" 
+		      paddingTop="0" 
+		      paddingLeft="0" 
+		      paddingRight="0"
+		      click="onResetSelectedClicked();" 
+		      color="#FFFFFF"  
+		      themeColor="#18FF00"
+		      cornerRadius="5" 
+		      fillAlphas="[1.0, 1.0, 1.0, 1.0]" 
+		      fillColors="[#3F3F3F, #3F3F3F, #6CFE00, #6CFE00]" 
+		      borderColor="#FCFDFD" 
+		      labelPlacement="bottom" fontFamily="Verdana" x="2" y="3" width="35"/>
+		<mx:Button 
+		      id="ClearAllButton" 
+		      label="CA" 
+		      toolTip="Clear all literals."
+		      height="19" 
+		      width="35" 
+		      fontSize="9" 
+		      paddingBottom="2" 
+		      paddingTop="0" 
+		      paddingLeft="0" 
+		      paddingRight="0"
+		      click="onResetAllClicked();" 
+		      color="#FDFDFD" 
+		      themeColor="#18FF00"
+		      enabled="true"
+		      cornerRadius="5" 
+		      fillAlphas="[1.0, 1.0, 1.0, 1.0]" 
+		      fillColors="[#3F3F3F, #3F3F3F, #6CFE00, #6CFE00]" 
+		      borderColor="#FCFDFD"  
+		      labelPlacement="bottom" fontFamily="Verdana" x="40" y="3"/>
+		<mx:Label x="510" y="2" text="Value" fontSize="12" fontWeight="bold" color="#FFFFFF" id="CompareValueLabel" toolTip="Specify a numeric compare value here."/>
+		</mx:Canvas>
+		
+		<mx:Canvas id="Literal1Canvas" width="100%" height="27" backgroundColor="#767675" backgroundAlpha="0.0" 
+			borderStyle="none" cornerRadius="10" borderThickness="0">				
+		<mx:Label id="Literal1Label" text="L1:" fontSize="12" fontWeight="bold" y="3" x="0" color="#FEFEFE" fontStyle="italic"/>
+		<query:UQueryLiteralBuilder id="DefaultQueryLiteral" right="20" y="1" mouseOut="updateStatus(0);" width="527" fontSize="10" borderStyle="none"/>
+		<mx:CheckBox id="Literal1CheckBox" height="15" width="15" fontSize="10" paddingBottom="2" paddingTop="0" 
+			paddingLeft="0" paddingRight="0" borderColor="0xff000000" y="6" right="2"/>
+		</mx:Canvas>
+		
+		<mx:Canvas id="Literal2Canvas" width="100%" height="27" backgroundColor="#767675" backgroundAlpha="0.0" 
+			borderStyle="none" cornerRadius="10" borderThickness="0">	
+	    <mx:Label id="Literal2Label" text="L2:" fontSize="12" fontWeight="bold" y="3" x="0" color="#FEFEFE" fontStyle="italic"/>
+		<query:UQueryLiteralBuilder id="QueryLiteral2" right="20" y="1" mouseOut="updateStatus(1);" width="527" fontSize="10"/>
+		<mx:CheckBox id="Literal2CheckBox" height="15" width="15" fontSize="10" paddingBottom="2" paddingTop="0" 
+			paddingLeft="0" paddingRight="0" borderColor="0xff000000" y="6" right="2"/>
+		</mx:Canvas>
+		
+		<mx:Canvas id="Literal3Canvas" width="100%" height="27" backgroundColor="#767675" backgroundAlpha="0.0" 
+			borderStyle="none" cornerRadius="10" borderThickness="0">	
+		<mx:Label id="Literal3Label" text="L3:" fontSize="12" fontWeight="bold" y="3" x="0" color="#FEFEFE" fontStyle="italic"/>
+		<query:UQueryLiteralBuilder id="QueryLiteral3" right="20" y="1" mouseOut="updateStatus(2);" width="527" fontSize="10"/>
+		<mx:CheckBox id="Literal3CheckBox" height="15" width="15" fontSize="10" paddingBottom="2" paddingTop="0" 
+			paddingLeft="0" paddingRight="0" borderColor="0xff000000" y="6" right="2"/>
+		</mx:Canvas>
+		
+		<mx:Canvas id="Literal4Canvas" width="100%" height="27" backgroundColor="#767675" backgroundAlpha="0.0" 
+			borderStyle="none" cornerRadius="10" borderThickness="0">	
+		<mx:Label id="Literal4Label" text="L4:" fontSize="12" fontWeight="bold" y="3" x="0" color="#FEFEFE" fontStyle="italic"/>
+		<query:UQueryLiteralBuilder id="QueryLiteral4" right="20" y="1" mouseOut="updateStatus(3);" width="527" fontSize="10"/>
+		<mx:CheckBox id="Literal4CheckBox" height="15" width="15" fontSize="10" paddingBottom="2" paddingTop="0" 
+			paddingLeft="0" paddingRight="0" borderColor="0xff000000" y="6" right="2"/>
+		</mx:Canvas>
+		
+		<mx:Canvas id="Literal5Canvas" width="100%" height="27" backgroundColor="#767675" backgroundAlpha="0.0" 
+			borderStyle="none" cornerRadius="10" borderThickness="0">		
+		<mx:Label id="Literal5Label" text="L5:" fontSize="12" fontWeight="bold" y="3" x="0" color="#FEFEFE" fontStyle="italic"/>
+		<query:UQueryLiteralBuilder id="QueryLiteral5" right="20" y="1" mouseOut="updateStatus(4);" width="527" fontSize="10"/>
+		<mx:CheckBox id="Literal5CheckBox" height="15" width="15" fontSize="10" paddingBottom="2" paddingTop="0" 
+			paddingLeft="0" paddingRight="0" borderColor="0xff000000" y="6" right="2"/>
+		</mx:Canvas>
+	
+	</mx:Panel>
+	
+	<mx:Canvas height="65" id="ParserPanel"
+		paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0" backgroundAlpha="1.0" borderStyle="solid" 
+		borderThickness="0" cornerRadius="10" backgroundColor="#767675"
+		hideEffect="ZoomOut" showEffect="ZoomIn" visible="false" horizontalScrollPolicy="off" 
+		verticalScrollPolicy="off" y="5" left="5" right="5">
+		
+		<mx:TextArea 
+			id="QueryLiteralsConjunctionText" 
+			height="55" 
+		    left="6"
+		    right="6"
+			borderThickness="0" 
+			color="#030303" 
+			backgroundColor="#FEFDFD"  
+			backgroundAlpha="1.0"
+			editable="true"
+			alpha="1.0"
+			enabled="true" 
+			cornerRadius="10" 
+			fontSize="12" 
+			fontFamily="Verdana" 
+			borderColor="#010101" 
+			fontWeight="bold" 
+			textAlign="center"
+		    paddingLeft="2" 
+		    paddingRight="2"
+		    wordWrap="true"
+		    toolTip="{_parserToolTip}"
+		    change="{_userQueryParserField = true}" y="5">
+			
+	        </mx:TextArea> 
+		
+	</mx:Canvas>
+	
+	<!--
+	<tooltip:UStringToolTip 
+		id="QueryStringToolTip" 
+		includeInLayout="false" 
+		visible="false" 
+		title="Current Query String" top="{ButtonControlBar.y + 25}"/>
+	
+	<mx:TextArea 
+		id="QueryStringToolTip" 
+		includeInLayout="false" 
+		visible="false" 
+		text="Current Query String" top="{ButtonControlBar.y + 25}" wordWrap="true" editable="false" 
+		enabled="true" borderStyle="solid" borderThickness="2" cornerRadius="10" borderColor="#000000" 
+		fontSize="12" width="{this.width}" height="65"/>
+	-->
+	<mx:ControlBar id="ButtonControlBar" label="MenuBar" cornerRadius="20" verticalCenter="true"
+		 paddingBottom="1" paddingLeft="5" paddingRight="1" paddingTop="1" verticalAlign="middle" horizontalAlign="left" 
+		 horizontalGap="5" width="90%" height="35" alpha="1.0" color="#DAD8D6">
+		<mx:HBox width="80" borderStyle="solid" 
+			cornerRadius="5" backgroundColor="#787777" 
+			horizontalGap="0" horizontalAlign="center" 
+			verticalAlign="middle" fontSize="10" height="20"
+		 toolTip="Click to set the number of literals to show and use (minimum = 1 and maximum = 5).">
+			<!--<mx:HSlider 
+      	 	  	  id="LiteralNumberSlider"
+      	 	  	  minimum="1"
+          	 	  maximum="5"
+          	 	  value="2" 
+          	 	  tickInterval="1"
+          	 	  liveDragging="true"
+          	 	  showDataTip="true"
+          	 	  showTrackHighlight="true"
+          	 	  dataTipPlacement="top"
+          	 	  allowTrackClick="true"
+          	 	  dataTipPrecision="0"
+          	 	  thumbCount="1"
+          	 	  labels="[1,2,3,4,5]"
+          	 	  snapInterval="1"
+          	 	  toolTip="This slider specifies the number of literals to show and use (minimum = 1 and maximum = 5)."
+          	 	  tickColor="white"
+          	 	  trackColors="white"
+          	 	  borderColor="#FEFEFE" 
+          	 	  fillAlphas="[1.0, 1.0]" 
+          	 	  fillColors="[#030000, #030000]" 
+          	 	  labelStyleName="MySliderLabel" 
+                  tickOffset="0" labelOffset="0"
+                  change="toggleInputMethod(LiteralNumberSlider.value);" width="60" enabled="true"/>
+             -->
+             <mx:LinkBar 
+			  	  	id="LiteralNumberLinkBar" 	
+			  	  	dataProvider="{_availableLiteralNumbers}" fontSize="9" fontWeight="normal"
+			  	  	itemClick="toggleInputMethod(1);" height="18" width="70" 
+                    verticalAlign="middle" verticalGap="0" horizontalAlign="center" 
+			  	  	horizontalGap="0" paddingLeft="1" paddingRight="1" selectionColor="#67FF02" separatorWidth="1"/>
+		</mx:HBox>
+		<!--
+		<mx:Button label="Reset DB Connection" cornerRadius="10" fontSize="10" id="KillRequestButton" 
+			fillAlphas="[0.0, 0.0, 1.0, 1.0]" fillColors="[#767675, #767675, #FE0202, #FE0202]" 
+			color="#FF0101" width="115" height="19" click="onKillButtonClick();" paddingLeft="1" paddingRight="1" enabled="false"/>
+		-->
+		<mx:Button label="SPARQL Input" id="InputMethodSelectionButton"
+			fillAlphas="[1.0, 1.0]" fillColors="[#767675, #767675, #4EFF00, #4EFF00]" enabled="true" paddingBottom="0" 
+			paddingLeft="0" paddingRight="0" paddingTop="0" color="#FFFFFF"  fontSize="10" cornerRadius="10" 
+			width="75" height="18" click="toggleInputMethod();" toolTip="If you press this button you can choose between a panel to 
+			parse a query string and a panel to directly input up to 8 query literals." fontFamily="Arial">
+			
+		</mx:Button>
+		
+		<mx:Label x="5" y="57" text="Demo Queries:" id="DemoQueriesLabel" fontSize="10" color="#FFFFFF" fontWeight="bold"/>
+	    <mx:ComboBox x="97" y="56" id="DemoQueriesComboBox" dataProvider="{_demoQueryStrings}" 
+		change="handleDemoQueryStringClick()" width="260" editable="false" enabled="true" selectedIndex="-1"
+		rowCount="10" dropdownFactory="{_dropDown}" fontSize="12" labelField="label" 
+		fillAlphas="[0.4, 1.0, 0.4, 0.4]" fillColors="[#3F3F3F, #3F3F3F]" textInputStyleName="myComboBox" 
+		iconColor="#FFFEFE" cornerRadius="10" color="#020202"/>
+		
+		<mx:Button 
+			height="25" 
+			click="submitQuery();" 
+			fontSize="18" 
+			id="QuerySubmitButton" 
+			width="80" 
+			fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+			fillColors="[#767675, #5F5751, #39FD05, #39FD05]" 
+			enabled="true" 
+			label="Submit" fontFamily="Arial"
+		    paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" color="#FFFBFB" cornerRadius="10"/>
+	
+	</mx:ControlBar>
+	
+	<mx:WipeUp id="wipeToTopIn" duration="250"/>
+	<mx:WipeDown id="wipeToBottomOut" duration="250"/>
+	
+	<mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="1000"/>
+        
+    <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="1000"/>
+        
+    <!--<mx:AnimateProperty
+        id="HeightReduceAnimation"
+        property="height"
+        fromValue="235"
+        toValue="105"
+        duration="1000"/>
+        
+     <mx:AnimateProperty
+        id="HeightGrowAnimation"
+        property="height"
+        fromValue="105"
+        toValue="235"
+        duration="1000"/>
+      -->  
+      <mx:AnimateProperty
+        id="AdjustSizeAnimation"
+        property="height"
+        fromValue="235"
+        toValue="110"
+        duration="1000"/>
+        
+      <mx:AnimateProperty
+        id="HeightFoldAnimation"
+        property="height"
+        fromValue="{_currentHeight}"
+        toValue="0"
+        duration="1000" target="this"/>
+        
+     <mx:AnimateProperty
+        id="HeightUnfoldAnimation"
+        property="height" 
+        fromValue="0"
+        toValue="{_currentHeight}"
+        duration="1000" target="this"/>
+	
+</mx:Panel>

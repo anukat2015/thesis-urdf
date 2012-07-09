@@ -1,0 +1,3 @@
+isPoliticianOf(?A,?B,1)<=isLeaderOf(?A,?C,1);isPoliticianOf(?C,?B,1);notEquals(?C,?A,1);[1.0]
+isPoliticianOf(?A,?B,1)<=livesIn(?A,?C,1);hasCapital(?B,?C,1);type(?A,?D,1);equals(?D,wikicategory_American_Roman_Catholic_politicians,1);[0.5]
+isPoliticianOf(?A,?B,1)<=livesIn(?A,?B,1);type(?A,?C,1);equals(?C,wikicategory_Governors_of_Delaware,1);[0.48591548]

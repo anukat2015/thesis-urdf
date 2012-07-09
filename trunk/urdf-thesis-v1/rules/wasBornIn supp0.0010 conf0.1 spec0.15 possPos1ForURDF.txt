@@ -1,0 +1,6 @@
+<http://yago-knowledge.org/resource/wasBornIn>(?A,?B,1)<=<http://yago-knowledge.org/resource/diedIn>(?A,?B,1);[0.1972065]
+<http://yago-knowledge.org/resource/wasBornIn>(?A,?B,1)<=<http://yago-knowledge.org/resource/hasAcademicAdvisor>(?A,?C,1);<http://yago-knowledge.org/resource/diedIn>(?C,?B,1);[0.11624157]
+<http://yago-knowledge.org/resource/wasBornIn>(?A,?B,1)<=<http://yago-knowledge.org/resource/hasChild>(?A,?C,1);<http://yago-knowledge.org/resource/diedIn>(?C,?B,1);[0.10381795]
+<http://yago-knowledge.org/resource/wasBornIn>(?A,?B,1)<=<http://yago-knowledge.org/resource/livesIn>(?A,?B,1);[0.119524695]
+<http://yago-knowledge.org/resource/wasBornIn>(?A,?B,1)<=<http://yago-knowledge.org/resource/isMarriedTo>(?A,?C,1);<http://yago-knowledge.org/resource/diedIn>(?C,?B,1);[0.1294557]
+<http://yago-knowledge.org/resource/wasBornIn>(?A,?B,1)<=<http://yago-knowledge.org/resource/isMarriedTo>(?C,?A,1);<http://yago-knowledge.org/resource/diedIn>(?C,?B,1);[0.1294557]

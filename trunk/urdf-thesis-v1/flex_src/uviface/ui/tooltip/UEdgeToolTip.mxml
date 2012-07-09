@@ -1,0 +1,80 @@
+<?xml version="1.0"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+    implements="mx.core.IToolTip" 
+    alpha="1.0" 
+    borderThickness="3"
+    backgroundColor="#FFFC00"
+    dropShadowEnabled="true" 
+    borderColor="#8F8E8E"
+    borderStyle="solid"
+    roundedBottomCorners="true"
+    cornerRadius="20"
+    horizontalAlign="center"
+    verticalAlign="middle" 
+    title="Edge Name:" 
+    headerColors="[#000000,#000000]"
+    fontSize="15" 
+    fontWeight="bold" 
+    backgroundAlpha="1.0"
+    textAlign="center" 
+    layout="absolute" 
+    horizontalScrollPolicy="off" color="#000000" fontFamily="Arial" width="250" height="250"  creationPolicy="all">
+    
+    <mx:Script><![CDATA[
+    	
+    	import flare.vis.data.EdgeSprite;
+    
+        public var _text:String;
+
+        //[Bindable]
+        public function get text():String { 
+            return _text; 
+        } 
+        public function set text(value:String):void {
+        }
+        
+        public function setEdgeProperties(edge:EdgeSprite):void {
+        	
+        	this.width = 250;
+        	
+        	title = edge.data.label;
+        	FactText.text = edge.data.factName;
+        	if(FactText.x + FactText.width + 40 > this.width)
+        	   this.width = FactText.x + FactText.width + 40;
+        	SubjectText.text = edge.source.data.tooltip;
+        	if(SubjectText.x + SubjectText.width + 40 > this.width)
+        	   this.width = SubjectText.x + SubjectText.width + 40;
+        	PredicateText.text = title;
+        	if(PredicateText.x + PredicateText.width + 40 > this.width)
+        	   this.width = PredicateText.x + PredicateText.width + 40;
+        	ObjectText.text = edge.target.data.tooltip;
+        	if(ObjectText.x + ObjectText.width + 40 > this.width)
+        	   this.width = ObjectText.x + ObjectText.width + 40;
+        	TruthText.text = edge.data.truthValue;
+        	ConfidenceText.text = edge.data.confidence;
+		    
+		    //this.invalidateProperties();
+		    //this.invalidateSize(); 
+		    //this.validateNow();
+        	//this.width = this.getExplicitOrMeasuredWidth() + 40;
+		    
+        } 
+        
+    ]]></mx:Script>
+
+    <mx:Text id="FactText" text="..." x="88" y="32" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="32" text="Fact:" id="FactLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="SubjectText" text="..." x="88" y="60" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="60" text="Subject:" id="SubjectLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="PredicateText" text="..." x="88" y="88" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="88" text="Predicate:" id="PredicateLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="ObjectText" text="..." x="88" y="116" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="116" text="Object:" id="ObjectLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="TruthText" text="..." x="88" y="144" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="144" text="Truth Value:" id="TruthLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Text id="ConfidenceText" text="..." x="88" y="172" fontFamily="Verdana" color="#020202" fontSize="12" fontWeight="normal" fontStyle="italic"/>
+    <mx:Label x="0" y="172" text="Confidence:" id="ConfidenceLabel" color="#000000" fontSize="12" fontFamily="Verdana"/>
+    <mx:Label y="0" text="Represented Fact Values" id="FactDescriptionLabel" fontSize="12" fontStyle="italic" textDecoration="underline" width="100%"/>
+    
+</mx:Panel>

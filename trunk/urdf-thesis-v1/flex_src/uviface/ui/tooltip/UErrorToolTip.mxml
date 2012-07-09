@@ -1,0 +1,331 @@
+<?xml version="1.0"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+    implements="mx.core.IToolTip" 
+    alpha="1.0" 
+    borderThickness="2"
+    backgroundColor="#FE0101"
+    dropShadowEnabled="true" 
+    borderColor="black"
+    borderStyle="solid"
+    roundedBottomCorners="true"
+    cornerRadius="20"
+    horizontalAlign="center"
+    verticalAlign="middle" 
+    title="Error!" 
+    headerColors="[#898787,#898787]"
+    fontSize="15" 
+    fontWeight="normal" 
+    backgroundAlpha="1.0"
+    textAlign="center" 
+    layout="absolute" 
+    horizontalScrollPolicy="off" 
+    color="#010101" 
+    fontFamily="Verdana"
+    hideEffect="{ErrorPanelZoomOut}" 
+    showEffect="{ErrorPanelZoomIn}"
+    verticalScrollPolicy="off">
+    
+    <mx:Script><![CDATA[
+    
+        public var _text:String;
+
+        //[Bindable]
+        public function get text():String { 
+            return _text; 
+        } 
+        
+        public function set text(value:String):void {
+        }
+        
+        public function get errorText():String {
+        	return ErrorText.text;
+        } 
+        
+        public function set errorText(errorText:String):void {
+        	ErrorText.text = "";
+        	ErrorText.text = errorText;
+        	if(this.title.length < ErrorText.text.length)
+        	     this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        }
+        
+        public function handleKeyboardAction(event:KeyboardEvent):void {
+			// see website : http://www.adobe.com/livedocs/flash/9.0/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00001136.html
+			if((this.visible == true )&& event.keyCode == 13)
+			   hide();
+			else
+			   return;
+	    }
+        
+        public function writePredicateError():void {
+        	title="Predicate Error!"; 
+        	ErrorText.text = "";
+        	ErrorText.text = "You have to select a predefined relation or type-in a variable" + 
+        	   		"\n" + "(a '?', followed by a sequence of chars) !";
+        	if(this.title.length < ErrorText.text.length) {
+        		 ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	}
+        } 
+        
+        public function writeLiteralError(literalNumber:int = -1):void {
+        	title="Literal Error!"; 
+        	ErrorText.text = "";
+        	if(literalNumber == -1)
+        	   ErrorText.text = "There occurred an error in one of the specified literals !";
+        	else
+        	   ErrorText.text = "There occurred an error in literal " + (literalNumber+1) + " !";
+        	if(this.title.length < ErrorText.text.length)
+        	     this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        } 
+        
+         public function writeLiteralCompareValueError():void {
+        	title="Literal Compare Value Error!"; 
+        	ErrorText.text = "";
+        	ErrorText.text = "You have to type in an integer value between 0 and 10000!";
+        	if(this.title.length < ErrorText.text.length)
+        	     this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        } 
+        
+        public function writeTooManyLiteralsError():void {
+        	title="Literal Number Error!"; 
+        	ErrorText.text = "";
+        	ErrorText.text = "Too many literals specified! We allow only 5 literal patterns for the query.";
+        	if(this.title.length < ErrorText.text.length)
+        	     this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        } 
+        
+        public function writeNoValidLiteralError():void {
+        	title="No Valid Query Literal Error!"; 
+        	ErrorText.text = "";
+        	ErrorText.text = "There should be at least one valid query literal! " + 
+        			"\n" + "Please check for missing or/and wrong literal entries.";
+        	if(this.title.length < ErrorText.text.length) {
+        	     //this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        	     ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	     //this.width = ErrorText.measuredWidth + 40;
+        	     //this.height = ErrorText.measuredHeight;
+        	}
+        } 
+        
+        public function writeLiteralConstantError():void {
+        	title="Missing Query Literal Entity Error!"; 
+        	ErrorText.text = "";
+        	ErrorText.text = "There should be at least one entity specified in one of the query literals. " + 
+        			"\n" + "Please speficy a valid entity (multiple words concatenated by an underscore '_').";
+        	if(this.title.length < ErrorText.text.length) {
+        	     //this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        	     ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	     //this.width = ErrorText.measuredWidth + 40;
+        	     //this.height = ErrorText.measuredHeight;
+        	}
+        }
+        
+        public function writeHardRuleLiteralError(hardRuleName:String = null):void {
+        	title="Missing Hard-Rule Literal Entry Error!"; 
+        	ErrorText.text = "";
+        	if(hardRuleName == null)
+        	   ErrorText.text = "There is a value missing in one of the hard rules! " + 
+        	   		"\n" + "Please check for missing or/and wrong literal entries.";
+        	else
+        	   ErrorText.text = "There is a value missing in the literal of hard rule " + hardRuleName + " !" + 
+        			"\n" + "Please check for missing or/and wrong literal entries.";
+        	if(this.title.length < ErrorText.text.length) {
+        	     //this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        	     ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	     //this.width = ErrorText.measuredWidth + 40;
+        	     //this.height = ErrorText.measuredHeight;
+        	}
+        }
+        
+        public function writeSoftRuleHeadLiteralError(literalComponent:int = 0, softRuleName:String = null):void {
+        	
+        	title="Missing Soft-Rule Literal Entry Error!"; 
+        	ErrorText.text = "";
+        	
+        	if(softRuleName == null) {
+        	   switch(literalComponent) {
+        	   	  case 0: {ErrorText.text = "The 'Subject' of a head literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	
+        	   	  }
+        	   	  case 1: {ErrorText.text = "The 'Predicate' of a head literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Predicate' of a literal with either a 'variable' (a string starting with a '?'), " + 
+        	   		"\n" + "or a constant in form of a predefined predicate (relation).";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   	  case 2: {ErrorText.text = "The 'Object' of a head literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Object' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	 	
+        	   	  }
+        	   	  default: {ErrorText.text = "The 'Subject' of a head literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   }
+        	}
+        	else {
+        	   switch(literalComponent) {
+        	   	  case 0: {ErrorText.text = "The 'Subject' of the head literal of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";	
+        	   		break;     	   	  	
+        	   	  }
+        	   	  case 1: {ErrorText.text = "The 'Predicate' of the head literal of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Predicate' of a literal with either a 'variable' (a string starting with a '?'), " + 
+        	   		"\n" + "or a constant in form of a predefined predicate (relation).";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   	  case 2: {ErrorText.text = "The 'Object' of the head literal of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Object' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	 	
+        	   	  }
+        	   	  default: {ErrorText.text = "The 'Subject' of the head literal of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   }
+        	}
+        	
+        	if(this.title.length < ErrorText.text.length) {
+        	     //this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        	     ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	     //this.width = ErrorText.measuredWidth + 40;
+        	     //this.height = ErrorText.measuredHeight;
+        	}
+        }
+        
+        public function writeSoftRuleBodyLiteralError(literalComponent:int = 0, literalNumber:int = 0, softRuleName:String = null):void {
+        	
+        	title="Missing Soft-Rule Literal Entry Error!"; 
+        	ErrorText.text = "";
+        	
+        	if(softRuleName == null) {
+        	   switch(literalComponent) {
+        	   	  case 0: {ErrorText.text = "The 'Subject' of a body literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	
+        	   	  }
+        	   	  case 1: {ErrorText.text = "The 'Predicate' of a body literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Predicate' of a literal with either a 'variable' (a string starting with a '?'), " + 
+        	   		"\n" + "or a constant in form of a predefined predicate (relation).";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   	  case 2: {ErrorText.text = "The 'Object' of a body literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Object' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	 	
+        	   	  }
+        	   	  default: {ErrorText.text = "The 'Subject' of a body literal of one of the soft rules is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   }
+        	}
+        	else {
+        	   switch(literalComponent) {
+        	   	  case 0: {ErrorText.text = "The 'Subject' of the body literal " + (literalNumber + 1) + " of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	
+        	   	  }
+        	   	  case 1: {ErrorText.text = "The 'Predicate' of the body literal " + (literalNumber + 1) + " of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Predicate' of a literal with either a 'variable' (a string starting with a '?'), " + 
+        	   		"\n" + "or a constant in form of a predefined predicate (relation).";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   	  case 2: {ErrorText.text = "The 'Object' of the body literal " + (literalNumber + 1) + " of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Object' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	 	
+        	   	  }
+        	   	  default: {ErrorText.text = "The 'Subject' of the body literal " + (literalNumber + 1) + " of soft rule " +  softRuleName + " is missing! " + 
+        	   		"\n" + "Please make sure to fill every 'Subject' of a literal with a 'variable' (a string starting with a '?').";
+        	   		break;     	   	  	  	  	
+        	   	  }
+        	   }
+        	}
+        	
+        	if(this.title.length < ErrorText.text.length) {
+        	     //this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        	     ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	     //this.width = ErrorText.measuredWidth + 40;
+        	     //this.height = ErrorText.measuredHeight;
+        	}
+        }
+        
+        public function writeSoftRuleHeadBindingsError(softRuleName:String = null):void {
+        	title="Head Variables and Constants Occurrence Error!"; 
+        	ErrorText.text = "";
+        	if(softRuleName == null)
+        	   ErrorText.text = "One of the head variables or constants of a soft rule does not occur in the body literals of the respective soft rule! " + 
+        	   		"\n" + "Please check that every variable and constant of a soft rule head literal does also occur in at least" + 
+        	   		"\n." + "one of the body literals of the respective soft rule.";
+        	else
+        	   ErrorText.text = "One of the head variables or constants of soft rule " + softRuleName +  
+        	   		"\n" + " does not occur in the body literals of this soft rule! " + 
+        	   		"\n" + "Please check that every variable and constant of a soft rule head literal does also occur in at least" + 
+        	   		"\n." + "one of the body literals of the respective soft rule.";
+        	if(this.title.length < ErrorText.text.length) {
+        	     //this.width = ErrorText.measureText(ErrorText.text).width + 40;
+        	     ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	     //this.width = ErrorText.measuredWidth + 40;
+        	     //this.height = ErrorText.measuredHeight;
+        	}
+        }
+        
+        public function writeInproperChainingError():void {
+        	title="Query Literal Chaining Error!"; 
+        	ErrorText.text = "";
+        	ErrorText.text = "Query literals are not properly chained! You have to make sure that the" + 
+        			" \n query literals form a connected graph because of the used variables and constants.";
+        	if(this.title.length < ErrorText.text.length) {
+        		 ErrorText.invalidateProperties();
+        	     ErrorText.validateNow();
+        	     this.width = ErrorText.getExplicitOrMeasuredWidth() + 40;
+        	}
+        } 
+        
+        public function hide():void {
+			mx.core.Application.application.unblurUViz();
+			this.visible = false;
+			this.includeInLayout = false;
+		}
+		
+		public function show():void {
+			mx.core.Application.application.blurUViz();
+			this.filters = null;
+			this.visible = true;
+		}
+        
+    ]]></mx:Script>
+
+    <mx:Text id="ErrorText" text="Error String goes here !" x="0" y="0" textAlign="left"/>
+    <mx:ControlBar horizontalAlign="center" verticalAlign="middle" cornerRadius="20" id="ErrorControlPanel">
+        <mx:Button label="OK!" id="OKButton" cornerRadius="10" click="hide();" enabled="true" fillAlphas="[1.0, 1.0]" fillColors="[#020000, #020000, #73FF01, #73FF01]" color="#FF0000"/>
+    </mx:ControlBar>
+    
+    <mx:Zoom 
+		id="ErrorPanelZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0"/>
+        
+    <mx:Zoom 
+		id="ErrorPanelZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0"/>
+    
+</mx:Panel>

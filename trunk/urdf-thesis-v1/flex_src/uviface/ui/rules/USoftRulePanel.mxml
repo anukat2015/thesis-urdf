@@ -1,0 +1,1055 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Canvas 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	width="765" 
+	height="265" 
+	xmlns:ac="com.hillelcoren.components.*"
+    borderStyle="none"
+    backgroundColor="#3F3F3F" 
+    fontFamily="Arial"
+    xmlns:rules="uviface.ui.rules.*" 
+    xmlns:query="uviface.ui.query.*"
+    xmlns:tooltip="uviface.ui.tooltip.*"
+    creationComplete="onCreationComplete();" 
+    fontWeight="normal"
+    paddingBottom="0" paddingLeft="0" paddingRight="0" paddingTop="0">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.core.Application;
+			import urdf.api.USoftRule;
+			import urdf.api.ULiteral;
+			import urdf.api.USoftRule;
+			import urdf.api.URelation;
+			import mx.events.ListEvent;
+			import mx.events.ItemClickEvent;
+			import mx.collections.ArrayCollection;
+			import mx.collections.SortField;
+            import mx.collections.Sort;
+            
+            import uviface.event.*;
+	        import uviface.ui.tooltip.UStringToolTip;
+	        
+	        import mx.controls.Alert;  
+	        
+	        // a flag to determine if the soft rule cache on the server should be cleared
+	        // and a new list of soft rules should be used
+	        private var _softRulesChanged:Boolean = false;
+	        
+	        [Bindable]
+			private var _filters:Array = [new BlurFilter()];
+	        
+	        [Bindable]
+			private var _relations:ArrayCollection = URelation.getRelations();
+	        
+	        [Bindable]
+	        private var _softRuleBody:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _availableSoftRules:ArrayCollection = new ArrayCollection();
+			[Bindable]
+			private var _selectedSoftRules:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			private var _availableRulesButtonLabels:Array = ["NEW","DELETE","SELECT","SELECT ALL"];
+			[Bindable]
+			private var _selectedRulesButtonLabels:Array = ["DESELECT","DESELECT ALL"];
+			[Bindable]
+			private var _LiteralConfigButtonLabels:Array = ["ADD","DELETE"];
+			
+			private var _currentActiveSoftRules:Array = new Array();
+			
+			[Bindable]
+			private var _dropDown:ClassFactory;	
+			[Bindable]
+			private var _dropDownStringOnly:ClassFactory;		
+			
+			private function onCreationComplete():void {
+				// add the event listener for the string change event
+				SoftRuleHeadGrid.addEventListener(UStringChangeEvent.STRING_CHANGE_EVENT,handleHeadLiteralChange,false,0,true);
+				SoftRuleBodyGrid.addEventListener(UStringChangeEvent.STRING_CHANGE_EVENT,handleBodyLiteralChange,false,0,true);
+				_dropDown = new ClassFactory(List);
+				_dropDown.properties = {showDataTips:true, dataTipFunction:dataTipProducer};
+				_dropDownStringOnly = new ClassFactory(List);
+				_dropDownStringOnly.properties = {showDataTips:true, dataTipFunction:dataTipProducerStringOnly}
+				//adjustSoftRuleToolTipPosition();
+			}
+			
+			private function dataTipProducer(value:Object):String{
+				return produceRuleString(value);//value.label;
+			}
+			
+			private function dataTipProducerStringOnly(value:Object):String{
+				return value as String;
+			}
+			
+			/*
+			private function adjustSoftRuleToolTipPosition(event:MouseEvent):void {
+				SoftRuleStringToolTip.x = this.contentMouseX;//event.localX;//this.contentMouseX;
+				SoftRuleStringToolTip.y = this.contentMouseY + 20;//event.localY;//this.contentMouseY + 20;
+				SoftRuleStringToolTip.visible = true;
+			}
+			*/
+			/*
+			private function adjustSoftRuleToolTipPosition():void {
+				SoftRuleStringToolTip.x = this.parent.x + (0.5 * this.parent.width) - (0.5 * SoftRuleStringToolTip.width);// contentMouseX;//event.localX;//this.contentMouseX;
+				SoftRuleStringToolTip.y = this.parent.y - 85 - SoftRuleStringToolTip.height;// - 50;//this.contentMouseY + 20;//event.localY;//this.contentMouseY + 20;
+				//SoftRuleStringToolTip.visible = true;
+			}
+			*/
+			/*
+			private function hideSoftRuleStringToolTip():void {
+				SoftRuleStringToolTip.visible = false;
+			}
+			*/
+			
+			public function set softRules(softRules:Array):void {
+
+                // we take the received default soft rules from the server
+                // as our current soft rules to use
+                _currentActiveSoftRules = softRules;
+
+                // remove all available and selected soft rules 
+                // and used literals first
+                _availableSoftRules.removeAll();
+                _selectedSoftRules.removeAll();
+                _softRuleBody.removeAll();
+                
+                var softRule:USoftRule;
+                var literal:ULiteral;
+                var softRuleObject:Object;
+                //var literalObject:Object;
+                //var index:int = 0;
+                var literals:Array;
+                //var literalsObjectArray:Array;//  = new Array();;
+				
+				/*
+				for(var index:int = 0; index<softRules.length; index++) {
+					trace("softRule : " + softRules[index].toString());
+				}
+				*/
+				if(softRules != null && softRules.length > 0) {
+					
+					for each (softRule in softRules) {
+						//trace("softRule : " + softRule.toString());
+						softRuleObject = new Object();
+						// set the name of the soft rule
+						softRuleObject.Name = softRule.getName();
+						// set the label of the hard rule
+						softRuleObject.label = softRule.getName() + " - " + softRule.getHead().toString();
+						// an array of literal objects
+						//while(literalsObjectArray.length > 0)
+						
+						// now set the head literal
+						literal = softRule.getHead();
+						var headObject:Object = new Object();
+						headObject.Subject = literal.getFirstArgumentName();
+						headObject.Predicate = literal.getRelationName();
+						headObject.Object = literal.getSecondArgumentName();
+						softRuleObject.Head = headObject;
+						
+						// the rule weight
+						softRuleObject.Weight = softRule.getWeight().toFixed(2);
+						
+						//literalsObjectArray.pop();
+						var literalsObjectArray:Array = new Array();
+						// get the literals from the soft rule
+						literals = softRule.getLiterals();
+						
+						for each (literal in literals) {
+						   var literalObject:Object = new Object();
+						   literalObject.Subject = literal.getFirstArgumentName();
+						   literalObject.Predicate = literal.getRelationName();
+						   literalObject.Object = literal.getSecondArgumentName();
+						   // add the current literal object to the soft rule literal objects array
+						   literalsObjectArray.push(literalObject);
+						   //trace("literal : " + literalObject.Subject + " , " +  literalObject.Predicate + " , " + literalObject.Object);
+						}
+						// add the literals to the current soft rule object
+						softRuleObject.Literals = literalsObjectArray;
+						// add this soft rule object to the internal list of default soft rules
+						_availableSoftRules.addItem(softRuleObject);
+					}
+				}
+				
+				// indicate that all soft rulesa are used per default
+				handleRuleSelectAllButtonClick();
+			}
+			
+			public function get softRules():Array {
+				return _currentActiveSoftRules;
+			}
+			
+			private function produceRuleString(softRuleObject:Object):String {
+				// first of all, the name of the soft rule
+				var ruleString:String = softRuleObject.Name + ": ";
+				
+				var literalObject:Object = softRuleObject.Head;
+				
+				// now the head literal
+				ruleString += literalObject.Predicate + " (" + literalObject.Subject + " , " + literalObject.Object + ")";	
+				
+				// the derivation sign
+				ruleString += "  <=  ";
+				
+				for each (literalObject in softRuleObject.Literals) {
+				   ruleString += literalObject.Predicate + " (" + literalObject.Subject + " , " + literalObject.Object + ") ^ ";		
+				}
+				
+				ruleString = ruleString.substring(0,ruleString.lastIndexOf("^"));
+				ruleString += " [" + 
+				       parseFloat((Math.floor(Number(softRuleObject.Weight)*100)/100).toFixed(2)) + "]";
+				
+				return ruleString;// + " [" + softRuleObject.Weight.toString() + "]";
+				
+			}
+			
+			private function handleAvailableSoftRuleListClick():void {
+			    var softRuleObject:Object = AvailableRulesList.selectedItem;//SoftRuleComboBox.selectedItem;//_softRules[index];
+			
+			    // set the soft rule name
+			    SoftRuleNameLabel.text = softRuleObject.Name;
+			    // set the soft rule head
+			    SoftRuleHeadGrid.dataProvider = softRuleObject.Head;
+			    //SoftRuleNameLabel.text = softRuleObject.Head;
+			    
+			    if(softRuleObject.Literals is Array)
+			       _softRuleBody.source = softRuleObject.Literals;
+			    else 
+			       if(softRuleObject.Literals is ArrayCollection)
+			          _softRuleBody = softRuleObject.Literals;
+			          
+			    //trace("literals are: " + _softRuleBody.toString());
+			    
+			    // the weight
+			    WeightSlider.value = parseFloat((Math.floor(Number(softRuleObject.Weight)*100)/100).toFixed(2));
+			   
+			    // update rule text
+			    //SoftRuleStringToolTip.toolTipText = produceRuleString(softRuleObject);
+			    //adjustSoftRuleToolTipPosition();
+			   
+			}
+			
+			private function handleAvailableRulesButtonClick():void {
+				var index:int = AvailableRulesButtonBar.selectedIndex;
+				switch(index) {
+					case 0: handleRuleNewButtonClick();break;
+					case 1: handleRuleDeleteButtonClick();break;
+					case 2: handleRuleSelectButtonClick();break;
+					case 3: handleRuleSelectAllButtonClick();break;
+				}
+			}
+			
+			private function handleRuleNewButtonClick():void {
+				var softRuleObject:Object = new Object();
+				// set the name of the soft rule
+				softRuleObject.Name = "S" + (_availableSoftRules.length + 1).toString();
+				// add a new head
+				softRuleObject.Head = new Object();
+				// we set default values
+				softRuleObject.Head.Subject = "?X";//"?x";
+				softRuleObject.Head.Predicate = "hasAcademicAdvisor";
+				softRuleObject.Head.Object = "?Y";//"?y";
+				
+				// set the label of the hard rule
+				softRuleObject.label = softRuleObject.Name + " - " + softRuleObject.Head.Predicate + "(" + softRuleObject.Head.Subject
+				                     + ", " + softRuleObject.Head.Object + ")";
+				
+				//softRuleObject.Head = headObject;
+				// add the literals to the current soft rule object
+				softRuleObject.Literals = new Array();
+				
+				var bodyLiteral:Object = new Object();
+				// we set default values
+				bodyLiteral.Subject = "?X";
+				bodyLiteral.Predicate = "isMarriedTo";
+				bodyLiteral.Object = "?Y";
+				
+				// add this literal as default body literal
+				(softRuleObject.Literals as Array).push(bodyLiteral);
+				
+				//_softRuleBody.addItem(literalObject);
+				
+				// set a default weight value
+				softRuleObject.Weight = 0.5;
+				
+				_availableSoftRules.addItem(softRuleObject);	
+				
+				// select the new rule
+				AvailableRulesList.selectedItem = softRuleObject;
+				
+				// select the new rule directly
+				handleAvailableSoftRuleListClick();
+				
+				// we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleRuleDeleteButtonClick():void {
+				var availableIndex:int = AvailableRulesList.selectedIndex;
+				if(availableIndex < 0)
+				   return;
+				var selectedIndex:int = _selectedSoftRules.getItemIndex(AvailableRulesList.selectedItem);
+				if(selectedIndex >= 0)
+				   _selectedSoftRules.removeItemAt(selectedIndex);
+				_availableSoftRules.removeItemAt(availableIndex);
+				
+				// we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleRuleSelectButtonClick():void {
+				var index:int = AvailableRulesList.selectedIndex;
+				//var softRuleObject:Object = _availableSoftRules.getItemAt(index);
+				if(_selectedSoftRules.contains(AvailableRulesList.selectedItem))
+				   return;
+				_selectedSoftRules.addItem(AvailableRulesList.selectedItem);
+				//_selectedSoftRules.refresh();
+				
+				// we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleRuleSelectAllButtonClick(softRulesChanged:Boolean = true):void {
+				// clear the selected hard rules
+				_selectedSoftRules.removeAll();
+				var softRuleObject:Object;
+				for each (softRuleObject in _availableSoftRules) {
+					_selectedSoftRules.addItem(softRuleObject);
+				}
+				// we potentially changed a soft rule 
+				if(softRulesChanged)
+				   _softRulesChanged = true;
+			}
+			
+			private function handleSelectedRulesButtonClick():void {
+				
+				var index:int = SelectedRulesButtonBar.selectedIndex;
+				switch(index) {
+					case 0: handleRuleDeselectButtonClick();break;
+					case 1: handleRuleDeselectAllButtonClick();break;
+				}
+			}
+			
+			private function handleRuleDeselectButtonClick():void {
+				var selectedIndex:int = _selectedSoftRules.getItemIndex(SelectedRulesList.selectedItem);
+				if(selectedIndex < 0)
+				   return;
+				_selectedSoftRules.removeItemAt(selectedIndex);
+				// we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleRuleDeselectAllButtonClick():void {
+				_selectedSoftRules.removeAll();
+				// we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			/*
+			private function handleHeadLiteralClicked():void {
+				var index:int = SoftRuleHeadGrid.selectedIndex;
+				if(index < 0)
+				   return;
+			    
+			    // set the values of the literals
+			    //SoftRuleBodyGrid.dataProvider = softRuleObject.Literals;
+			    LiteralEditor.firstArgument = SoftRuleHeadGrid.selectedItem.Subject;
+			    LiteralEditor.relation = SoftRuleHeadGrid.selectedItem.Predicate;
+			    LiteralEditor.secondArgument = SoftRuleHeadGrid.selectedItem.Object;	
+			    
+			    // no body literal selected
+			    //SoftRuleBodyGrid.selectedIndex = -1;
+			    HeadLiteralButtonBox.enabled = true;
+			    HeadLiteralButtonBox.filters = null;
+			    BodyLiteralsButtonBox.enabled = false;
+			    BodyLiteralsButtonBox.filters = _filters;
+			}
+			*/
+			
+			/*
+			private function handleBodyLiteralsClicked():void {
+				var index:int = SoftRuleBodyGrid.selectedIndex;
+				if(index < 0)
+				   return;
+			    var literalObject:Object = _softRuleBody.getItemAt(index);//SoftRuleBodyGrid.selectedItem;//SoftRuleComboBox.selectedItem;//_softRules[index];
+			    //trace("index = " + index);
+			   // var literalObject:Object;
+			    //var literalString:String;
+			    // set the soft rule name
+			    //SoftRuleNameLabel.text = softRuleObject.Name;
+			    
+			    // set the values of the literals
+			    //SoftRuleBodyGrid.dataProvider = softRuleObject.Literals;
+			    LiteralEditor.firstArgument = literalObject.Subject;
+			    //trace("literalObject.Predicate = " + literalObject.Predicate);
+			    LiteralEditor.relation = literalObject.Predicate;
+			    LiteralEditor.secondArgument = literalObject.Object; 
+			    
+			    // no head literal selected
+			    //SoftRuleHeadGrid.selectedIndex = -1;	
+			    HeadLiteralButtonBox.enabled = false;
+			    HeadLiteralButtonBox.filters = _filters;
+			    BodyLiteralsButtonBox.enabled = true;
+			    BodyLiteralsButtonBox.filters = null;
+			}
+			*/
+			
+			private function updateWeight():void  {
+			   
+			   var index:int = AvailableRulesList.selectedIndex;
+			    
+			   if(index < 0)
+			      return;
+			      
+			   var rule:Object = _availableSoftRules.getItemAt(index);
+			   
+			   // update the rule weight as well
+			   rule.Weight = WeightSlider.value;
+			   
+			   // update the current soft rule
+			   _availableSoftRules.itemUpdated(rule);
+			   //update the soft ruel if it is selected
+			   _selectedSoftRules.itemUpdated(rule);
+				
+			   // update rule text
+			   //SoftRuleStringToolTip.toolTipText = produceRuleString(rule);
+			   //adjustSoftRuleToolTipPosition();
+			   //handleHeadLiteralChange();
+			   
+			   // we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleHeadLiteralChange(event:UStringChangeEvent = null):void {
+				
+				var index:int = AvailableRulesList.selectedIndex;
+			    
+			    if(index < 0)
+			       return;
+				
+				// first, try to make sure we have a conform literal
+				/*
+				if(!LiteralEditor.validateSoftRuleLiteral()) {
+				   Alert.show("Change literal to match the default schema: subject = single '?' + x-chars " + 
+				 		", predicate = item selected from list or single '?' + x-chars and object = single '??' + x-chars."
+				 		, "Literal Schema Mismatch Error", 4, LiteralEditor); 
+				   return;
+				}
+			    */
+			    
+			    // update the head values in the gui
+			   // SoftRuleHeadGrid.selectedItem.Subject = LiteralEditor.firstArgument;
+			   // SoftRuleHeadGrid.selectedItem.Predicate = LiteralEditor.relation;
+			   // SoftRuleHeadGrid.selectedItem.Object = LiteralEditor.secondArgument;
+			    //SoftRuleHeadGrid.invalidateList();
+			    //SoftRuleHeadGrid.invalidateDisplayList();
+			    //_softRuleHead = literalObject; 
+			    
+			    // get the currently selected soft rule
+			    var rule:Object = _availableSoftRules.getItemAt(index);
+				// get the appropriate head literal 
+				var headObject:Object = rule.Head;
+				
+				if(event != null) { 
+					switch(event.componentToChange) {
+					 	case UStringChangeEvent.SUBJECT: {headObject.Subject = event.changedString; break;}
+					 	case UStringChangeEvent.PREDICATE: {headObject.Predicate = event.changedString; break;}
+					 	case UStringChangeEvent.OBJECT: {headObject.Object = event.changedString; break;}
+					 	default : {headObject.Predicate = event.changedString; break;}
+					}
+				}
+				 
+			    // update the head of the soft rule
+			    //rule.Head.Subject = SoftRuleHeadGrid.selectedItem.Subject;
+			    //rule.Head.Predicate = SoftRuleHeadGrid.selectedItem.Predicate;
+			    //rule.Head.Object = SoftRuleHeadGrid.selectedItem.Object;
+				
+				// update the rule weight as well
+				rule.Weight = WeightSlider.value;
+				
+				// set the label of the soft rule
+				rule.label = rule.Name + " - " + rule.Head.Predicate 
+				           + "(" + rule.Head.Subject + ", " + rule.Head.Object + ")";
+				
+				// update the current soft rule
+				_availableSoftRules.itemUpdated(rule);
+				//update the soft ruel if it is selected
+				_selectedSoftRules.itemUpdated(rule);
+				
+				// update rule text
+			    //SoftRuleStringToolTip.toolTipText = produceRuleString(rule);
+				//adjustSoftRuleToolTipPosition(); 
+				
+				// we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleLiteralsConfigClick():void {
+				var index:int = LiteralsConfigButtonBar.selectedIndex;
+				switch(index) {
+					case 0: handleLiteralAddButtonClick();break;
+					case 1: handleLiteralDeleteButtonClick();break;
+				}
+			}
+			
+			private function handleLiteralAddButtonClick():void {
+				 
+				 var index:int = AvailableRulesList.selectedIndex;
+			    
+			     if(index < 0)
+			       return;
+				 
+				 // first, try to make sure we have a conform literal
+				 /*
+				 if(!LiteralEditor.validateSoftRuleLiteral()) {
+				 	Alert.show("Change literal to match the default schema: subject = single '?' + x-chars " + 
+				 			", predicate = item selected from list or single '?' + x-chars and object = single '??' + x-chars."
+				 			, "Literal Schema Mismatch Error", 4, LiteralEditor); 
+				    return;
+				 }
+				 */
+				 
+				 var literalObject:Object = new Object();
+				 literalObject.Subject = "?X";//LiteralEditor.firstArgument;
+				 literalObject.Predicate = "hasAcademicAdvisor";//LiteralEditor.relation;
+				 literalObject.Object = "?Y";//LiteralEditor.secondArgument;
+				 // add the current literal object to the soft rule literal objects array
+				 //var addPosition:int = _softRuleBody.length;
+				 //trace("literalObject.Subject = " + literalObject.Subject);
+				 //trace("literalObject.Predicate = " + literalObject.Predicate);
+				 //trace("literalObject.Object = " + literalObject.Object);
+				 //trace("_softRuleBody.length = " + _softRuleBody.length);
+				 _softRuleBody.addItem(literalObject);
+				 //trace("_softRuleBody.length = " + _softRuleBody.length);
+				 
+				 var rule:Object = _availableSoftRules.getItemAt(index);
+				
+				 // update the rule weight as well
+				 rule.Weight = WeightSlider.value;
+				 
+				 // update the rule weight as well
+				 rule.Literals = _softRuleBody.source;
+				 
+				 // update the current soft rule
+				 _availableSoftRules.itemUpdated(rule);
+				 //update the soft ruel if it is selected
+				 _selectedSoftRules.itemUpdated(rule);
+				 
+				 // update rule text
+			     //SoftRuleStringToolTip.toolTipText = produceRuleString(AvailableRulesList.selectedItem);
+			     //adjustSoftRuleToolTipPosition();
+			     
+			     // we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleBodyLiteralChange(event:UStringChangeEvent = null):void {
+				
+				 var index:int = AvailableRulesList.selectedIndex;
+			    
+			     if(index < 0)
+			       return;
+				
+				 /*
+				 // first, try to make sure we have a conform literal
+				 if(!LiteralEditor.validateSoftRuleLiteral()) {
+				 	Alert.show("Change literal to match the default schema: subject = single '?' + x-chars " + 
+				 			", predicate = item selected from list or single '?' + x-chars and object = single '??' + x-chars."
+				 			, "Literal Schema Mismatch Error", 4, LiteralEditor); 
+				    return;
+				 }
+				*/
+				
+				 var indexBody:int;// = SoftRuleBodyGrid.selectedIndex;
+				 var bodyLiteralObject:Object;// = _softRuleBody.getItemAt(index);
+				 
+			 	 indexBody = SoftRuleBodyGrid.selectedIndex;
+			 	 
+			 	 if(indexBody < 0)
+			        return;
+			     
+			     // get the currently selected body literal   
+			     bodyLiteralObject = _softRuleBody.getItemAt(indexBody);
+				 
+				 if(event != null) { 
+					 switch(event.componentToChange) {
+					 	case UStringChangeEvent.SUBJECT: {bodyLiteralObject.Subject = event.changedString; break;}
+					 	case UStringChangeEvent.PREDICATE: {bodyLiteralObject.Predicate = event.changedString; break;}
+					 	case UStringChangeEvent.OBJECT: {bodyLiteralObject.Object = event.changedString; break;}
+					 	default : {bodyLiteralObject.Predicate = event.changedString; break;}
+					 }
+				 }
+			    
+			     //literalObject.Subject = LiteralEditor.firstArgument;
+			     //literalObject.Predicate = LiteralEditor.relation;
+			     //literalObject.Object = LiteralEditor.secondArgument;
+			    
+			     // signalize that the item was updated
+			     _softRuleBody.itemUpdated(bodyLiteralObject);
+			     
+			     var rule:Object = _availableSoftRules.getItemAt(index);
+				
+				 // update the rule weight as well
+				 rule.Weight = WeightSlider.value;
+				 
+				 // update the rule weight as well
+				 rule.Literals = _softRuleBody.source;
+				 
+				 // update the current soft rule
+				 _availableSoftRules.itemUpdated(rule);
+				 //update the soft ruel if it is selected
+				 _selectedSoftRules.itemUpdated(rule);
+				 
+				 // update rule text
+			     //SoftRuleStringToolTip.toolTipText = produceRuleString(rule);
+			     //adjustSoftRuleToolTipPosition();
+			     
+			     // we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function handleLiteralDeleteButtonClick():void {
+				 
+				 var index:int = AvailableRulesList.selectedIndex;
+			    
+			     if(index < 0)
+			       return;
+				 
+				 var indexBody:int = SoftRuleBodyGrid.selectedIndex;
+				 // we have no literals left or have not selected anything
+				 if(indexBody < 0)
+				   return;
+				 // one body literal should always be present  
+				 if(_softRuleBody.length < 2)
+				   return;
+				   
+				 _softRuleBody.removeItemAt(indexBody);
+				 //trace("_softRuleBody.length = " + _softRuleBody.length);
+				 //trace("_softRuleBody.length = " + _softRuleBody.length);
+				 
+				 var rule:Object = _availableSoftRules.getItemAt(index);
+				
+				 // update the rule weight as well
+				 rule.Weight = WeightSlider.value;
+				 
+				 // update the rule weight as well
+				 rule.Literals = _softRuleBody.source;
+				 
+				 // update the current soft rule
+				 _availableSoftRules.itemUpdated(rule);
+				 //update the soft ruel if it is selected
+				 _selectedSoftRules.itemUpdated(rule);
+				 
+				 // update rule text
+			     //SoftRuleStringToolTip.toolTipText = produceRuleString(rule);
+			     //adjustSoftRuleToolTipPosition();
+			     
+			     // we potentially changed a soft rule 
+				_softRulesChanged = true;
+			}
+			
+			private function buildSoftRule(softRuleObject:Object):Boolean {
+				/*
+				if(checkQueryConditions() == false) {
+					// we need the number 0 to show the suitable text in the popup window
+					createQueryErrorPopUp(CONSTANT);
+					return;
+				}
+				*/
+				//else {
+					
+					// ----------------------------------------------------------------
+					// first, the head literal
+					// ----------------------------------------------------------------
+					//var literalObject:Object = softRuleObject.Head;
+					
+					var subject:String = softRuleObject.Head.Subject;
+					//trace("subject : " + subject);
+					if(subject == null || subject == "") {
+					   mx.core.Application.application.UVizErrorPanel.writeSoftRuleHeadLiteralError(0,softRuleObject.Name as String);
+		    	       mx.core.Application.application.UVizErrorPanel.show();
+					   //Alert.show("There is avalue missing in one of the literal components!", "Literal Value Missing Error", 4, AvailableRulesList);
+					   return false;
+					}
+					var predicate:String = softRuleObject.Head.Predicate;
+					//trace("predicate : " + predicate);
+					if(predicate == null || predicate == "") {
+						mx.core.Application.application.UVizErrorPanel.writeSoftRuleHeadLiteralError(1,softRuleObject.Name as String);
+		    	        mx.core.Application.application.UVizErrorPanel.show();
+						//Alert.show("There is avalue missing in one of the literal components!", "Literal Value Missing Error", 4, AvailableRulesList);
+					   return false;
+					}
+					var object:String = softRuleObject.Head.Object;
+					//trace("object : " + object);
+					if(object == null || object == "") {
+						mx.core.Application.application.UVizErrorPanel.writeSoftRuleHeadLiteralError(2,softRuleObject.Name as String);
+		    	        mx.core.Application.application.UVizErrorPanel.show();
+						//Alert.show("There is avalue missing in one of the literal components!", "Literal Value Missing Error", 4, AvailableRulesList);
+					   return false;
+					}
+					
+					var headLiteral:ULiteral = new ULiteral();
+					headLiteral.initLiteralFull(URelation.valueOfRelation(predicate),subject,object);
+					//trace("headLiteral.toString() : " + headLiteral.toString());
+					
+					// ----------------------------------------------------------------
+					// now, the body literals
+					// ----------------------------------------------------------------
+					
+					var literalArray:Array = new Array();
+					var literals:Array = softRuleObject.Literals as Array;
+					var literal:Object;
+					
+					if(literals.length == 0) {
+					   mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+		    	       mx.core.Application.application.UVizErrorPanel.show();
+					   return false;
+					}
+					
+					//for each(var literal:Object in softRuleObject.Literals) {
+				    for (var literalNumber:int = 0; literalNumber<literals.length; literalNumber++) {
+						
+						//literal.adjustArguments();
+						literal = literals[literalNumber];
+						
+						subject = literal.Subject;
+						//trace("subject : " + subject);
+						if(subject == null || subject == "") {
+						   mx.core.Application.application.UVizErrorPanel.writeSoftRuleBodyLiteralError(0,literalNumber,softRuleObject.Name as String);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+						   return false;
+						   //continue; // we skip this literal, in case there is a undefined value
+						}
+						
+						predicate = literal.Predicate;
+						//trace("predicate : " + predicate);
+						if(predicate == null || predicate == "") {
+						   mx.core.Application.application.UVizErrorPanel.writeSoftRuleBodyLiteralError(1,literalNumber,softRuleObject.Name as String);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+						   return false;
+						   //continue; // we skip this literal, in case there is a undefined value
+						}
+						
+						object = literal.Object;
+						//trace("object : " + object);
+						if(object == null || object == "") {
+						   mx.core.Application.application.UVizErrorPanel.writeSoftRuleBodyLiteralError(2,literalNumber,softRuleObject.Name as String);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+						   return false;
+						   //continue; // we skip this literal, in case there is a undefined value
+						}
+						   
+						//no empty values -> build the query literal
+						var tempLiteral:ULiteral = new ULiteral();
+						tempLiteral.initLiteralFull(URelation.valueOfRelation(predicate),subject,object);
+						// add this literal to the query
+						literalArray.push(tempLiteral);
+						
+					}
+					
+					if(literalArray.length == 0) {
+					   mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+		    	       mx.core.Application.application.UVizErrorPanel.show();
+					   //Alert.show("There is a value missing in one of the literal components!", "Literal Value Missing Error", 4, AvailableRulesList);
+					   return false;
+					}
+					
+					//this._query = new UQuery();
+					//var softRule:USoftRule = new USoftRule();
+					//trace("softRule.toString() : " + softRule.toString());
+					// we have only one entry in the soft rule so far
+					// could change later ??
+					try {
+					   var softRule:USoftRule = new USoftRule();
+					   softRule.initSoftRuleFull(softRuleObject.Name,softRuleObject.Name,headLiteral,
+					      WeightSlider.value = parseFloat((Math.floor(Number(softRuleObject.Weight)*100)/100).toFixed(2))
+					      ,literalArray);
+					   _currentActiveSoftRules.push(softRule);
+					   return true;
+					}
+					catch (err:Error) {
+						mx.core.Application.application.UVizErrorPanel.writeSoftRuleHeadBindingsError(softRuleObject.Name as String);
+		    	        mx.core.Application.application.UVizErrorPanel.show();
+						return false;
+						//Alert.show("The variables and constants of the head literal have to occur in at least one of the body literals as well!", "Head and Body Variables and Constants Error", 4, AvailableRulesList);
+						//return false;
+					} 
+					//trace("softRule.toString() : " + softRule.toString());
+					//this.dispatchEvent(new FlexEvent(FlexEvent.VALUE_COMMIT));
+					// rebuild the query string
+					//buildQueryString();
+				//}
+				   
+				
+				//createQueryPopUp();
+				return false;
+			}
+			
+			public function buildSoftRuleList():void {
+				
+				// first, clear the current hard rule list
+				while(_currentActiveSoftRules.length > 0) {
+					_currentActiveSoftRules.pop();
+				}
+				
+				var softRuleObject:Object;
+				for each (softRuleObject in _selectedSoftRules) {
+					if(!buildSoftRule(softRuleObject))
+					   return;
+				}
+				
+				//var changeRulesEvent:UQueryEvent = new UQueryEvent(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY,null,true);
+				//this.dispatchEvent(new UQueryEvent(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY,null,true));
+				//changeRulesEvent.softRulesChanged = _softRulesChanged;
+				//this.dispatchEvent(changeRulesEvent,null,true));
+				
+				// reset the flag
+				//_softRulesChanged = false;
+			}
+			
+			public function get softRulesChanged():Boolean {
+				var tempChange:Boolean = _softRulesChanged;
+				_softRulesChanged = false;
+				return tempChange;
+			}
+			
+			public function resetSoftRules():void {
+				// we pass a 2 as second parameter, because 2 means update soft rules only
+				this.dispatchEvent(new URuleUpdateEvent(URuleUpdateEvent.UPDATE_RULES, URuleUpdateEvent.SOFT_ONLY, true));
+			}
+			
+			/*
+			public function show():void {
+				ZoomIn.play([this]);
+			}
+			
+			public function hide():void {
+				ZoomOut.play([this]);
+			}
+			*/
+			
+		]]>
+	</mx:Script>
+				
+			  <mx:Panel 
+			  	id="AvailableRulesPanel" 
+			  	width="260" 
+			  	height="210" 
+			  	horizontalAlign="center" 
+			  	backgroundColor="#FEFDFD" 
+			  	borderColor="#B7BABC" 
+			  	cornerRadius="15" 
+		        borderStyle="solid" 
+		        borderThickness="1" 
+			  	verticalAlign="middle"
+			  	roundedBottomCorners="true" headerHeight="0" x="5" y="27">
+			  	  <mx:Label text="Available Soft Rules" fontWeight="bold" fontSize="12"/>
+			  	
+			  	  <mx:List  
+				    	id="AvailableRulesList"  
+				    	cornerRadius="5" 
+				    	borderStyle="solid" 
+				    	borderThickness="1" 
+				    	rowCount="10" 
+				    	dataProvider="{_availableSoftRules}" 
+			            selectedIndex="-1" 
+			            enabled="true"  
+				    	backgroundColor="#FEFDFD"
+				        labelField="label"
+				        width="220" 
+				        height="125"
+				        itemClick="handleAvailableSoftRuleListClick();"
+				        showDataTips="true"
+				        dataTipFunction="dataTipProducer"/>
+			  	  
+			  	  <mx:LinkBar 
+			  	  	id="AvailableRulesButtonBar" 	
+			  	  	dataProvider="{_availableRulesButtonLabels}" fontSize="10" fontWeight="bold"
+			  	  	itemClick="handleAvailableRulesButtonClick();"/>
+			  	
+			  </mx:Panel>  
+			  
+			  <mx:Panel 
+			  	id="SelectedRulesPanel" 
+			  	width="205" 
+			  	height="210"  
+			  	horizontalAlign="center" 
+			  	backgroundColor="#FEFDFD" 
+			  	borderColor="#B7BABC" 
+			  	cornerRadius="15" 
+		        borderStyle="solid" 
+		        borderThickness="1" 
+			  	verticalAlign="middle"
+			  	roundedBottomCorners="true" headerHeight="0" x="270" y="27">
+			  	<mx:Label text="Selected Soft Rules" fontSize="12" fontWeight="bold"/>
+			  	
+			  	<mx:List  
+			    	id="SelectedRulesList"  
+			    	cornerRadius="5" 
+			    	borderStyle="solid" 
+			    	borderThickness="1" 
+			    	rowCount="10" 
+			    	selectedIndex="-1"
+			    	enabled="true"  
+			    	dataProvider="{_selectedSoftRules}" 
+			    	backgroundColor="#FEFEFE"
+			    	labelField="label" width="170" height="125"
+			    	showDataTips="true"
+			    	dataTipFunction="dataTipProducer"/>
+			  	
+			  	<mx:LinkBar 
+			  	  	id="SelectedRulesButtonBar" 	
+			  	  	dataProvider="{_selectedRulesButtonLabels}" fontSize="10" fontWeight="bold" 
+			  	  	itemClick="handleSelectedRulesButtonClick();"/>
+			  	
+			  </mx:Panel>
+		    
+		<mx:VBox id="SoftRuleDetailVBox" 
+			cornerRadius="15" 
+			borderStyle="solid" 
+			borderThickness="1" 
+			horizontalAlign="center" 
+			verticalGap="2" 
+			backgroundColor="#FDFBFB" 
+			height="250" 
+			width="280" verticalAlign="middle" x="480" y="7">
+		    
+	        <mx:Spacer height="5%"/>
+	    
+	        <mx:HBox horizontalAlign="center" verticalAlign="middle" horizontalGap="5" width="257" paddingRight="0" paddingLeft="0">
+	        	<mx:Label id="SoftRuleName" text="Name:"/>
+	        	<mx:TextInput id="SoftRuleNameLabel" fontWeight="bold" color="#000000" fontSize="10" width="30" editable="false"/>
+	        	<mx:VRule height="30"/>
+	        	<mx:Label id="SoftRuleWeight" text="Weight:"/>
+	        	<mx:HSlider 
+			   	  	 id="WeightSlider" 
+			   	  	 minimum="0"
+					 maximum="1"
+					 liveDragging="true"
+					 showDataTip="true"
+					 tickInterval="0.01"
+					 showTrackHighlight="true"
+					 dataTipPlacement="top"
+					 allowTrackClick="true"
+					 dataTipPrecision="2"
+					 thumbCount="1"
+					 labels="[0,0.25,0.5,0.75,1]"
+					 toolTip="{(Math.floor(WeightSlider.value*100)/100).toFixed(2)}"
+					 tickColor="white"
+					 trackColors="black" 
+					 width="100" 
+					 height="34" 
+					 change="updateWeight();" 
+					 labelOffset="-5" 
+					 verticalCenter="middle"/>
+	        </mx:HBox>
+		      
+		    <mx:DataGrid  
+		    	id="SoftRuleHeadGrid"  
+		    	cornerRadius="0" 
+		    	borderStyle="solid" 
+		    	borderThickness="2" 
+		    	rowCount="1" 
+		    	width="260" 
+		    	height="45" 
+		    	editable="true" 
+		    	enabled="true" textAlign="center">
+		    	
+				<mx:columns>
+					<mx:DataGridColumn 
+						id="HeadSubjectColumn" 
+						headerText="Subject" 
+						dataField="Subject" 
+						itemEditor="uviface.ui.rules.ULiteralSubjectTextInput"/>
+					<mx:DataGridColumn 
+						id="HeadPredicateColumn" 
+						headerText="Predicate" 
+						dataField="Predicate"
+						editable="true"
+						itemEditor="uviface.ui.rules.URelationChooser" 
+						editorUsesEnterKey="true"/>
+					<mx:DataGridColumn 
+						id="HeadObjectColumn" 
+						headerText="Object" 
+						dataField="Object"
+						itemEditor="uviface.ui.rules.ULiteralObjectTextInput"/>
+				</mx:columns> 
+				
+		    </mx:DataGrid>
+		 
+			    <mx:Label text="Head Literal" fontWeight="bold"/>
+		    
+		    <mx:DataGrid  
+		    	id="SoftRuleBodyGrid"  
+		    	cornerRadius="0" 
+		    	borderStyle="solid" 
+		    	borderThickness="2" 
+		    	rowCount="3" 
+		    	dataProvider="{_softRuleBody}" 
+		    	width="260" 
+		    	height="98" 
+		    	editable="true" 
+		    	enabled="true"
+		        showHeaders="true" textAlign="center">
+		    	
+				<mx:columns>
+					<mx:DataGridColumn 
+						id="BodySubjectColumn" 
+						headerText="Subject" 
+						dataField="Subject"
+						itemEditor="uviface.ui.rules.ULiteralSubjectTextInput"/>
+					<mx:DataGridColumn 
+						id="BodyPredicateColumn" 
+						headerText="Predicate" 
+						dataField="Predicate"
+						editable="true"
+						itemEditor="uviface.ui.rules.URelationChooser" 
+						/>
+					<mx:DataGridColumn 
+						id="BodyObjectColumn" 
+						headerText="Object" 
+						dataField="Object"
+						itemEditor="uviface.ui.rules.ULiteralObjectTextInput"/>
+				</mx:columns> 
+				
+		    </mx:DataGrid>
+		    
+		    <mx:HBox id="BodyLiteralsButtonBox" horizontalAlign="center" verticalAlign="middle">
+		    	
+			    <mx:Label text="Body Literals" fontWeight="bold"/>
+			    <mx:ButtonBar id="LiteralsConfigButtonBar" dataProvider="{_LiteralConfigButtonLabels}" itemClick="handleLiteralsConfigClick();"/>
+				    
+			</mx:HBox>
+			    
+		</mx:VBox> 
+	
+	<!--
+	<tooltip:UStringToolTip 
+		id="SoftRuleStringToolTip" 
+		includeInLayout="false" 
+		visible="false" 
+		title="Currently Selected Soft Rule"
+	    creationComplete="{SoftRuleStringToolTip.toolTipText='Soft Rule text goes here!';}"/>
+	
+	
+	<mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" 
+        duration="1000"
+        originX="{this.x + this.width/2}"
+        originY="{this.y + this.height/2}" startDelay="250"/>
+        
+    <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" 
+        duration="750"
+        originX="{this.x + this.width/2}"
+        originY="{this.y + this.height/2}"/> 
+	-->
+</mx:Canvas>

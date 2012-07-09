@@ -1,0 +1,3 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/isMarriedTo>
+ 
+time elapsed for whole partition: 5152

@@ -1,0 +1,1733 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<mx:Application 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	xmlns:ns1="viz.ui.query.*" 
+	xmlns:ns2="flare.flex.*" 
+	xmlns:ns3="uviface.viz.*" 
+	xmlns:ns4="uviface.ui.visualization.*" 
+	xmlns:ns5="uviface.ui.query.*"
+    xmlns:application="uviface.ui.application.*"
+    initialize="init();" 
+    applicationComplete="onCreationComplete();"
+    width="100%"
+    height="100%"
+    frameRate="24" 
+    paddingBottom="0" 
+    paddingLeft="0"  
+    paddingRight="0" 
+    paddingTop="0" 
+    horizontalAlign="center" 
+    resize="onResize(event);" 
+    xmlns:tooltip="uviface.ui.tooltip.*" xmlns:help="uviface.ui.help.*">
+	 	 
+	<mx:Script>    
+		<![CDATA[
+			import flare.analytics.optimization.AspectRatioBanker;
+			import uviface.ui.statistics.UVisualizationStatistics;
+			import uviface.ui.options.UOptionsMenu;
+			import uviface.viz.util.UStringConstants;
+			import uviface.viz.display.UNode;
+			import uviface.viz.display.UEdge;
+			import uviface.viz.util.UColors;
+			import flare.vis.data.NodeSprite;
+		    import uviface.ui.options.UGraphDataAccessPanel;
+			import urdf.api.URuleStore;
+			import uviface.ui.rules.URuleStoreMenu;
+			import mx.controls.Image;
+			import mx.events.ListEvent;
+			import mx.controls.Menu;
+			import mx.events.ResizeEvent;
+			import mx.events.MenuEvent;
+			import uviface.ui.statistics.UVisualizationStatistics;
+			import mx.events.FlexEvent;
+			import flash.events.KeyboardEvent;
+			import uviface.ui.query.UQueryPanel;
+			import mx.events.ToolTipEvent;
+			import mx.managers.ToolTipManager;
+			import mx.core.IToolTip;
+			import flare.vis.Visualization;
+			import flare.display.DirtySprite;
+			import flare.flex.FlareVis;
+			import flash.utils.getTimer;
+			import urdf.api.UObject;
+			import urdf.api.UDomain;
+			import urdf.api.UArgument;
+			import urdf.api.UBinding;
+			import urdf.api.UBindingSet;
+			import urdf.api.UEntity;
+			import urdf.api.UTriplet;
+			import urdf.api.URelation;
+			import urdf.api.ULiteral;
+			import urdf.api.UStatistics; 
+			import urdf.api.URule; 
+			import urdf.api.UQuery; 
+			import urdf.api.USoftRule;
+			import urdf.api.UHardRule; 
+			import urdf.api.UOptions;
+			import urdf.api.ULineage;
+			import urdf.api.UFact;
+			import urdf.api.UFactSet;
+			import urdf.api.UGroundedSoftRule;
+			import urdf.api.UGroundedHardRule; 
+			import urdf.api.UQueryResult;
+			import urdf.api.URuleStore;
+			
+			import util.UQueryURLString;
+			import util.UStringUtil;
+			
+			import uviface.event.*;
+			import uviface.viz.UFlareVis; 
+			import uviface.ui.options.UOptionsMenu;
+			
+			import mx.rpc.events.ResultEvent;
+   		    import mx.rpc.events.FaultEvent; 
+   		    import mx.controls.Alert;    
+   		    import mx.collections.ArrayCollection;
+   		    
+   		    import flash.display.StageDisplayState;
+
+   		    // -----------------------------------------
+   		    // -----------------------------------------
+   		    // the private attributes
+   		    // -----------------------------------------
+   		    // -----------------------------------------
+   		    
+   		    // somehow needed here
+   		    private var bindings:UBindingSet;
+   		    private var entity:UEntity;
+   		    
+   		    /** The rule store that is used to transmit lists of soft and hard rules 
+   		    * between the client and the server back and forth.*/
+   		    private var _ruleStore:URuleStore = new URuleStore();
+   		    
+   		    /** The query panel to submit queries. */
+   		    [Bindable]
+   		    private var _queryPanel:UQueryPanel;
+   		    /** The options panel to configure the visualization. */
+   		    private var _optionsPanel:UOptionsMenu;
+   		    /** The statistics panel to show server-side processing statistics and visualization-related statistics. */
+   		    private var _statisticsPanel:UVisualizationStatistics;
+   		    /** The rule panel to configure the soft and hard rules used by URDF. */
+   		    private var _rulesPanel:URuleStoreMenu;
+   		    
+   		    /** The UQueryResult object to temporarily store the incoming query results. */
+   		    private var _queryResult:UQueryResult = new UQueryResult();
+			
+			/** The execution time counter for the queries processed. */
+   		    private var execTime:int = 0;
+   		    
+   		    /** The timer to call the flare render method manually at a given rate. 
+   		     * This method is needed, because the Flash Player has a bug which 
+   		     * prevents it from redrawing sprites, when it is overbooked. 
+   		     * See http://goosebumps4all.net/34all/bb/showthread.php?tid=358&pid=1009#pid1009.  */
+   		    private var _visRenderTimer:Timer;
+   		    /** The number of ticks occurred between the last update of the memory statistics. */
+   		    private var _tickNumber:int = 0;
+   		    /** Flag to indicate if we have already processed at least one query. */
+   		    private var _firstQueryProcessed:Boolean = false;
+   		    
+   		    /** A flag to indicate which rules to update with the default values. 
+   		    * Start with all. */
+   		    private var _ruleUpdateType:int = URuleUpdateEvent.ALL;
+   		    
+   		    /** Flag that indicates if the comparison mode is active. */
+   		    private var _compareModeActive:Boolean = false;
+   		    /** Flag that indicates if the glow mode is active. */
+   		    //private var _glowModeActive:Boolean = false;
+   		    
+   		    private var _dataLoadNode:NodeSprite;
+   		    
+   		    private var _queryString:String;
+   		    
+   		    private var _ruleChangedQuery:Boolean = false;
+   		    
+   		    private var _quickAccessMenuOnly:Boolean = false;
+   		    
+   		    private var _useAllResults:Boolean = false;
+   		    
+   		    private var _currentEvent:Event;
+   		    
+   		    private var _numOfReturnedFacts:int = 100;
+   		    
+   		    // the variable to store the topmost y-coordinate below the ApplicationControlBar
+   		    [Bindable]
+   		    private var _applicationTopY:int = 0;
+   		    // the variable to store the height of the application without the ApplicationControlBar
+   		    [Bindable]
+   		    private var _applicationHeight:int = 0;
+   		    /** The flag to indiacte that the main control bar is currently shown. */
+   		    private var _controlBarShown:Boolean = true;
+   		    
+   		    // the query string extracted from the url, in case the url contains a query extension
+   		    private var _urlExtracedQueryString:UQueryURLString;
+   		    
+   		    public static const FOCUS_NODES_CHANGE_TEXT:String = "The Focus Nodes (straight corners) have " + 
+   		    		"changed! Graph visibility distance (visible graph path length) is determined by these nodes.";
+   		    
+   		    //private var _panelsAllowedToClose:Boolean = true;
+   		    //private var _panelsAllowedToOpen:Boolean = true;
+   		    //[Bindable]
+   		    //private var _panelsBusy:Boolean = false;
+			
+			private function init():void {
+				
+				this.invalidateSize();
+				this.invalidateDisplayList();
+				
+				// set the topmost y-coordinate to use for the panels
+				_applicationTopY = UVizApplicationControlBar.height;
+				_applicationHeight = this.height - UVizApplicationControlBar.height;
+				
+				//FlareVis.y = _applicationTopY;
+				FlareVis.height = this.height;
+				FlareVis.width = this.width;
+			    var visBounds:Rectangle = new Rectangle(FlareVis.x,FlareVis.y,FlareVis.width,FlareVis.height);
+				FlareVis.resize(visBounds);
+				FlareVis.invalidateSize();
+			    FlareVis.invalidateDisplayList();
+			   
+			    //FlareVis.setStyle("backgroundColor",UColors.grey(3));
+			    FlareVis.setStyle("backgroundColor","#3f3f3f");
+				
+				// -----------------------------------------------------------------------------------------
+				// properties of the options panel
+				// -----------------------------------------------------------------------------------------
+				_optionsPanel = new UOptionsMenu();
+				
+				// adjust the height of the options panel
+				if(_applicationHeight <= 405)
+				   _optionsPanel.height = 0.75 * _applicationHeight;
+				else
+				   _optionsPanel.height = 405;
+				
+				_optionsPanel.setConstraintValue("top",_applicationTopY + _applicationHeight/2 - _optionsPanel.height/2);
+				this.addChild(_optionsPanel);
+				_optionsPanel.includeInLayout = false;
+				_optionsPanel.visible = false;
+				//_optionsPanel.hide();
+				
+				// -----------------------------------------------------------------------------------------
+				// properties of the statistics panel
+				// -----------------------------------------------------------------------------------------
+				_statisticsPanel = new UVisualizationStatistics();
+				_statisticsPanel.setConstraintValue("top",_applicationTopY + _applicationHeight/2 - _statisticsPanel.height/2);
+				_statisticsPanel.setConstraintValue("right",0);
+				this.addChild(_statisticsPanel);
+				//_statisticsPanel.hide();
+				_statisticsPanel.includeInLayout = false;
+				_statisticsPanel.visible = false;
+				
+				// -----------------------------------------------------------------------------------------
+				// properties of the rule panel
+				// -----------------------------------------------------------------------------------------
+				_rulesPanel = new URuleStoreMenu();
+				_rulesPanel.setConstraintValue("bottom",0);
+				_rulesPanel.setConstraintValue("left",this.width/2 - _rulesPanel.width/2);
+				this.addChild(_rulesPanel);
+				//_rulesPanel.hide();
+				_rulesPanel.includeInLayout = false;
+				_rulesPanel.visible = false;
+				
+				
+				// -----------------------------------------------------------------------------------------
+				// properties of the query panel
+				// -----------------------------------------------------------------------------------------
+				
+				_queryPanel = new UQueryPanel();
+				_queryPanel.setConstraintValue("top",_applicationTopY);  
+				_queryPanel.setConstraintValue("left",this.width/2 - _queryPanel.width/2);  
+				this.addChild(_queryPanel);	
+				//_queryPanel.show();
+				_queryPanel.includeInLayout = false;
+				_queryPanel.visible = true;
+				// adjust the query string tooltip position
+				//_queryPanel.QueryStringToolTip.y = _queryPanel.getConstraintValue("top") + _queryPanel.getExplicitOrMeasuredHeight();
+				
+				// change positions of the children to guarantee overdrawing
+				this.setChildIndex(UVizErrorPanel,this.numChildren-1);
+				UVizErrorPanel.setConstraintValue("left",0.5 * this.width - 0.5 * UVizErrorPanel.width);
+				UVizErrorPanel.setConstraintValue("top",0.5 * this.height - 0.5 * UVizErrorPanel.height);
+				
+				// first, hide the control bar
+				toggleControlBarVisibility();
+				
+				// at first, remove the tooltips from the children index list again
+				//this.removeChild(this.LineageToolTip);
+				//this.removeChild(this.NodeToolTip);
+				//this.removeChild(this.EdgeToolTip);
+				
+				// ----------------------------------------
+				// initialize the visualization render timer
+				// which is needed to update the edges of the visualization
+				// on a regular basis, because Flash has a bug.
+				// this bug prevents the redrawing of edges (sprites), if
+				// the flash runtime is overbooked
+				// see http://goosebumps4all.net/34all/bb/showthread.php?tid=358&pid=1009#pid1009
+				// ----------------------------------------
+				startVisRenderTimer(_visRenderTimer);
+					  
+			}
+			
+			private function applyPassedParameters(optionParameters:Object):void {
+				
+				// ----------------------------------------------------
+				// flag indicating if fact conficences should influence 
+				// the edge alpha value encodings or not
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("use_alpha")) {
+			    if(optionParameters.hasOwnProperty("ua")) {
+					if(optionParameters["ua"] == "true")
+					   UEdge.DEFAULT_EDGE.useAlpha = true;
+					else 
+					   if(optionParameters["ua"] == "false")
+					      UEdge.DEFAULT_EDGE.useAlpha = false;
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the background color for UViz
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("background_color")) {
+				if(optionParameters.hasOwnProperty("bc")) {
+					var bColor:uint = parseInt(optionParameters["bc"]);
+					// this is not a valid integer value
+					if(isNaN(bColor))
+					   return;
+					// set the background color
+					FlareVis.setStyle("backgroundColor",bColor);
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the node color for UViz
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("node_color")) {
+				if(optionParameters.hasOwnProperty("nc")) {
+					var nColor:uint = parseInt(optionParameters["nc"]);
+					// this is not a valid integer value
+					if(isNaN(nColor))
+					   return;
+					// set the node color
+					UNode.DEFAULT_NODE.fillColor = UApplicationControlBar.computeAlphaRGB(nColor);
+				    UNode.DEFAULT_NODE.alpha = 1.0;
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the node alpha value for UViz
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("node_alpha")) {
+				if(optionParameters.hasOwnProperty("na")) {
+					var nAlpha:Number = parseFloat(optionParameters["na"]);
+					// this is not a valid float value
+					if(isNaN(nAlpha))
+					   return;
+					// set the node alpha
+				    UNode.DEFAULT_NODE.alpha = nAlpha;
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the node label color for UViz
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("node_label_color")) {
+				if(optionParameters.hasOwnProperty("nlc")) {
+					var nlColor:uint = parseInt(optionParameters["nlc"]);
+					// this is not a valid integer value
+					if(isNaN(nlColor))
+					   return;
+					// set the node label color
+					FlareVis.visHelper.changeLabelFormatterNodes("Verdana", nlColor, 12, true);
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the color for edges that were set
+				// to "true" by the URDF reasoner
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("edge_true_color")) {
+				if(optionParameters.hasOwnProperty("etc")) {
+					var etColor:uint = parseInt(optionParameters["etc"]);
+					// this is not a valid integer value
+					if(isNaN(etColor))
+					   return;
+					// set the edge true color (for true facts)
+				    UEdge.DEFAULT_EDGE.trueEdgeColor = etColor;
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the color for edges that were set
+				// to "false" by the URDF reasoner
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("edge_false_color")) {
+				if(optionParameters.hasOwnProperty("efc")) {
+					var efColor:uint = parseInt(optionParameters["efc"]);
+					// this is not a valid integer value
+					if(isNaN(efColor))
+					   return;
+					// set the edge false color (for false facts)
+					UEdge.DEFAULT_EDGE.falseEdgeColor = efColor; 
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the overall color for edges that 
+				// for both "false" and "true" edges 
+				// ----------------------------------------------------
+				
+				if(optionParameters.hasOwnProperty("ec")) {
+					var eColor:uint = parseInt(optionParameters["ec"]);
+					// this is not a valid integer value
+					if(isNaN(eColor))
+					   return;
+					// set the edge false color (for false facts)
+					UEdge.DEFAULT_EDGE.falseEdgeColor = eColor; 
+					UEdge.DEFAULT_EDGE.trueEdgeColor = eColor;
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the graph distance to use 
+				// ----------------------------------------------------
+				
+				if(optionParameters.hasOwnProperty("gd")) {
+					var gDistance:int = parseInt(optionParameters["gd"]);
+					// this is not a valid integer value
+					if(isNaN(efColor))
+					   return;
+					
+					if(gDistance < 0) {
+						FlareVis.numOfHops = -1;
+						FlareVis.graphDistanceFilter.distance = -1;
+						_optionsPanel.GraphOptionsPanel.HopSlider.value = -1;
+						ZoomPanel.HopSlider.value = -1;
+					}
+				    else
+				       if(gDistance > 10) {
+				       	  FlareVis.numOfHops = 10;
+				          FlareVis.graphDistanceFilter.distance = 10;
+				          _optionsPanel.GraphOptionsPanel.HopSlider.value = 10;
+				          ZoomPanel.HopSlider.value = 10;
+				       }
+				    else {
+				    	FlareVis.numOfHops = gDistance;
+				        FlareVis.graphDistanceFilter.distance = gDistance;
+				        _optionsPanel.GraphOptionsPanel.HopSlider.value = gDistance;
+				        ZoomPanel.HopSlider.value = gDistance;
+				    }
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies the layout to use 
+				// ----------------------------------------------------
+				
+				if(optionParameters.hasOwnProperty("l")) {
+					if(optionParameters["l"] == "radial") {
+					   FlareVis.layout = UFlareVis.RADIAL_LAYOUT;
+					   _optionsPanel.updateLayout(UFlareVis.RADIAL_LAYOUT);//GraphOptionsPanel.changeLayout(UFlareVis.RADIAL_LAYOUT);
+					}
+					else 
+					   if(optionParameters["l"] == "force") {
+					      FlareVis.layout = UFlareVis.FORCE_LAYOUT;
+					      _optionsPanel.updateLayout(UFlareVis.FORCE_LAYOUT);//GraphOptionsPanel.changeLayout(UFlareVis.FORCE_LAYOUT);
+					   }
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies radius for the radial layout 
+				// ----------------------------------------------------
+				
+				if(optionParameters.hasOwnProperty("ri")) {
+					var rIncrement:int = parseInt(optionParameters["ri"]);
+					// this is not a valid integer value
+					if(isNaN(rIncrement))
+					   return;
+					
+					if(rIncrement < 0)
+						return;
+				    else {
+				       FlareVis.radialLayout.radiusIncrement = rIncrement;
+				       _optionsPanel.GraphLayoutsPanel.RadiusSlider.value = rIncrement;//GraphOptionsPanel.RadiusSlider.value = rIncrement;
+				    }
+				}
+				
+				// ----------------------------------------------------
+				// flag that specifies spring length for the force layout 
+				// ----------------------------------------------------
+				
+				if(optionParameters.hasOwnProperty("sl")) {
+					var sLength:int = parseInt(optionParameters["sl"]);
+					// this is not a valid integer value
+					if(isNaN(sLength))
+					   return;
+					
+					if(sLength < 0 || sLength > 1000)
+						return;
+				    else {
+				       FlareVis.forceDirectedLayout.defaultSpringLength = sLength;
+				       _optionsPanel.GraphLayoutsPanel.DefaultSpringLengthSlider.value = sLength;//GraphOptionsPanel.DefaultSpringLengthSlider.value = sLength;
+				    }
+				}
+				
+				// ----------------------------------------------------
+				// flag indicating if UViz should use rules or not
+				// ----------------------------------------------------
+				
+				//if(optionParameters.hasOwnProperty("use_alpha")) {
+			    if(optionParameters.hasOwnProperty("ur")) {
+					if(optionParameters["ur"] == "false") {
+					   UApplicationControlBar.useRulesForDataLoading = false;
+					   UVizApplicationControlBar.RuleProcessingCheckBox.selected = false;
+					}
+				}
+				
+			}
+			
+			private function onCreationComplete():void {
+				
+				// ----------------------------------------
+				// add all the necessary event listeners
+				addEventListeners();
+				// ----------------------------------------
+				
+				// try to parse the query url
+				//parseQueryURL();
+				// parse the URL query string
+				_urlExtracedQueryString = new UQueryURLString();
+				
+				if(_urlExtracedQueryString.literals != null && _urlExtracedQueryString.literals.length != 0) { 
+				   // add an event listener to find out when to submit the url string extracted query
+				   this.addEventListener(URulesUpdatedEvent.RULES_UPDATED,onRulesReceived,false,0,true);
+				   
+				   // apply the extracted parameters
+				   applyPassedParameters(_urlExtracedQueryString.parameters);
+				}
+				
+				// request the default system internal rules
+				reasoner.requestRules();
+				//reasoner.requestHardRules();
+				
+				_optionsPanel.GraphDataAccessPanel.hideCompareProperties(); 
+					
+			}
+			
+			private function onRulesReceived(event:URulesUpdatedEvent):void {
+				// remove the rule updated event listener again, this is only needed when startin UViz
+				// and using a url query string 
+				this.removeEventListener(URulesUpdatedEvent.RULES_UPDATED,onRulesReceived);
+				_queryPanel.parseURLString(_urlExtracedQueryString.literals);
+			}
+			
+			// add all event listerners that the UViz main interface should use to listen
+			// to events from the server, the visualization and the user iterface
+			private function addEventListeners():void {
+				stage.addEventListener(KeyboardEvent.KEY_DOWN, handleKeyboardAction,false,0,true);
+				// add an event listener for the quick access menu actions
+			    this.addEventListener(UQuickAccessEvent.QUICK_ACCESS_EVENT,handleQuickAccessEvent,false,0,true);
+				// the event listener to determine which GUI panel should be pop-up
+				this.addEventListener(MouseEvent.MOUSE_MOVE, determineGUIPanelVisibility,false,0,true);
+				this.addEventListener(UQueryEvent.PROCESS_QUERY,dynamicUpdate,false,0,true);
+				// we receive a query event from the query panel -> submit the current query
+				_queryPanel.addEventListener(FlexEvent.VALUE_COMMIT, executeQuery,false,0,true);
+				// we receive a query event from the query panel -> submit the current query
+				this.addEventListener(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY, submitRuleChangedQuery,false,0,true);	
+				this.addEventListener(ULineageEvent.PRODUCE_LINEAGE_GRAPH, enterLineageMode,false,0,true);
+			    this.addEventListener(ULineageLeaveEvent.LEAVE_LINEAGE_MODE, leaveLineageMode,false,0,true); 
+			    this.addEventListener(URootNodeUpdateEvent.UPDATE_ROOT_NODE, updateRootNode,false,0,true);
+			    this.addEventListener(UGraphConfigEvent.GRAPH_CONFIG_EVENT, updateGraph,false,0,true);
+			    this.addEventListener(UStatisticsUpdateEvent.UPDATE_STATISTICS, updateDataStatistics,false,0,true);
+			    // add an event listener for rule update to execute
+			    this.addEventListener(URuleUpdateEvent.UPDATE_RULES, updateRules,false,0,true); 
+			    // add an event listener for the compare mode activation event form the query panel
+			    this.addEventListener(UCompareModeEvent.ACTIVATE_COMPARE_MODE,activateCompareMode,false,0,true);
+			    this.addEventListener(UCompareModeEvent.DEACTIVATE_COMPARE_MODE,deactivateCompareMode,false,0,true);
+			    // add an event listener for the glow mode activation event form the query panel
+			    //this.addEventListener(UCompareModeEvent.ACTIVATE_GLOW_MODE,activateGlowMode,false,0,true);
+			    //this.addEventListener(UCompareModeEvent.DEACTIVATE_GLOW_MODE,deactivateGlowMode,false,0,true);
+			    /// this event listener listens for the center visualization event
+			    this.addEventListener(UStringConstants.CENTER_VISUALIZATION,FlareVis.centerVisualization,true,0,true); 			    
+			    // add an event listener for the updates to the force layout
+			    this.addEventListener(UForceLayoutEvent.FORCE_LAYOUT_EVENT,FlareVis.updateForceLayout,false,0,true);
+			     // add an event listener for the updates to the radius increment of the radial layout, the graoh distance, and the bounds enforcing
+			    this.addEventListener(URadiusDistanceEvent.RADIUS_AND_DISTANCE_EVENT,updateRadiusOrDistance,false,0,true);		    
+			    // add an event listener to switch between the radial and the force layout back and forth
+			    this.addEventListener(ULayoutEvent.LAYOUT,FlareVis.updateLayout,false,0,true);		    
+			    // add an event listener to switch between the radial and the force layout back and forth
+			    this.addEventListener(ULineageLayoutEvent.LINEAGE_LAYOUT_EVENT,FlareVis.updateLineageLayout,false,0,true);		    
+			    // add an event listener to switch between the radial and the force layout back and forth
+			    this.addEventListener(UDataSpriteEvent.DATASPRITE_EVENT,FlareVis.updateDataSpriteShadows,false,0,true);		    
+			     // add an event listener compare result clusters
+			    this.addEventListener(UClusterCompareEvent.CLUSTER_COMPARE_EVENT,compareClusters,false,0,true);			    
+			    this.addEventListener(URequestAllFactsEvent.REQUEST_ALL_FACTS,handleAllFactsRequest,false,0,true);		    
+			    this.addEventListener(URequestAllFactsEvent.CHANGE_NUM_OF_RESULT_FACTS,handleNumOfResultFactsChange,false,0,true);		    
+			    this.addEventListener(UNodeAndLabelColorEvent.NODE_AND_LABEL_COLOR_EVENT,updateSpriteColors,false,0,true);			    
+			    this.addEventListener(UFactSelectEvent.FACT_SELECT_EVENT,selectFact,false,0,true);			    
+			    this.addEventListener(UPanZoomEvent.ZOOM_EVENT,this.zoomGraph,false,0,true);		    
+			    this.addEventListener(UKillSessionEvent.KILL_SESSION_EVENT,this.resetCurrentDBConnection,false,0,true);
+			    // the event listener for the pulsating events
+			    this.addEventListener(UPulsateEvent.PULSATE_EVENT,FlareVis.doPulsating,false,0,true);			    
+			    // an event listener for the lineage indication event
+			    this.addEventListener(ULineageIndicationEvent.LINEAGE_INDICATION_EVENT,FlareVis.changeLineageIndication,false,0,true);			    
+			    this.addEventListener(UFilterEvent.FILTER_EVENT,applyFilters,false,0,true);
+			    // an event listener for the graph overview
+			    this.addEventListener(UGraphOverviewEvent.OVERVIEW_EVENT,updateGraphOverview,false,0,true);		    
+			    this.addEventListener(UDeselectButtonEvent.DESELECT_HELP_BUTTON,deselectHelpButton,false,0,true);
+			    
+			    // show the complete lineage tree at once
+			    this.addEventListener(UShowCompleteLineageTreeEvent.SHOW_COMPLETE_TREE,FlareVis.showCompleteLineageTree,false,0,true);
+			    // fix or unfix node clusters (the nodes with more than average number of connected edges)
+			    this.addEventListener(UClusterFixingEvent.CLUSTER_FIXING_EVENT,FlareVis.fixUnfixClusters,false,0,true);
+			}
+			
+			private function updateGraphOverview(event:UGraphOverviewEvent):void {
+				//_optionsPanel.GraphOptionsPanel.updateOverview(FlareVis.updateGraphOverView(event));
+				GraphOverviewPanel.updateOverview(FlareVis.updateGraphOverView(event));
+			}
+			
+			/*
+			private function updateLayout(event:ULayoutEvent):void {
+				FlareVis.updateLayout(event);
+				_optionsPanel.toggleFilterPanelVisibility(event);
+			}
+			*/
+			private function selectFact(event:UFactSelectEvent):void {
+				_optionsPanel.GraphOptionsPanel.HopSlider.value = 0;
+				ZoomPanel.HopSlider.value = 0;
+				FlareVis.numOfHops = 0;
+				FlareVis.graphDistanceFilter.distance = 0;
+				FlareVis.selectFact(event);
+			}
+			
+			private function updateRootNode(event:URootNodeUpdateEvent):void {
+				if(event.useResultCluster) {
+					_optionsPanel.GraphOptionsPanel.HopSlider.value = 0;
+					ZoomPanel.HopSlider.value = 0;
+					FlareVis.numOfHops = 0;
+					FlareVis.graphDistanceFilter.distance = 0;
+					FlareVis.updateRoot(event);
+				}
+				else {
+					if(event.nodeClicked) {
+						FlareVis.updateRoot(event);
+					}
+					else {
+						_optionsPanel.GraphOptionsPanel.HopSlider.value = 1;
+						ZoomPanel.HopSlider.value = 1;
+						FlareVis.numOfHops = 1;
+						FlareVis.graphDistanceFilter.distance = 1;
+						FlareVis.updateRoot(event);
+					}
+				}
+			}
+			
+			private function applyFilters(event:UFilterEvent):void {
+				if(FlareVis.applyFilterToSprites(event)) {
+					if(event.typeOfFilter == UFilterEvent.NODE_FILTER_EVENT) {
+						_optionsPanel.GraphOptionsPanel.HopSlider.value = 1;
+						ZoomPanel.HopSlider.value = 1;
+					}
+					else {
+						_optionsPanel.GraphOptionsPanel.HopSlider.value = 0;
+						ZoomPanel.HopSlider.value = 0;
+					}
+				}
+				else {
+					FilterErrorPanel.visible = true;
+					FilterErrorPanel.visible = false;
+				}
+				//FlareVis.applyFilterToSprites(event);
+			}
+			
+			private function updateGraph(event:UGraphConfigEvent):void {
+				_optionsPanel.GraphLayoutsPanel.resetValues(event);
+				FlareVis.updateGraph(event);
+			}
+			
+			private function updateRadiusOrDistance(event:URadiusDistanceEvent):void {
+				FlareVis.updateRadiusOrDistance(event);
+				if(event.typeOfAction == URadiusDistanceEvent.INCREMENT_HOP_SIZE) {
+				   _optionsPanel.GraphOptionsPanel.HopSlider.value = event.hopSize;
+				   ZoomPanel.HopSlider.value = event.hopSize;
+				}
+			}
+			
+			private function updateSpriteColors(event:UNodeAndLabelColorEvent):void {
+				if(event.doEdgeColoring)
+				   FlareVis.updateEdgeColors(event);
+				else
+				   FlareVis.updateNodeAndLabelColors(event);
+			}
+			
+			public function firstQueryProcessed():Boolean {
+				return _firstQueryProcessed;
+			}
+			
+			private function enterLineageMode(event:ULineageEvent):void {
+				// we are in compare mode -> abort
+				//if(_glowModeActive)
+				  // return;
+				
+				//_optionsPanel.GraphDataAccessPanel.hideNonLineageProperties();
+				//_optionsPanel.GraphOptionsPanel.hideNonLineageProperties();
+				_optionsPanel.hideNonLineagePanels();
+				FlareVis.showLineage(event);
+				ZoomPanel.showLineageButtonGlow();
+			}
+			
+			public function leaveLineageMode(event:ULineageLeaveEvent):void {
+				
+				// we are not in lineage mode -> there is no need to leave this mode
+				if(!UFlareVis.lineageMode)
+				   return;
+				
+				_optionsPanel.showNonLineagePanels();
+				if(_compareModeActive)
+				   _optionsPanel.GraphDataAccessPanel.showCompareProperties();
+				//_optionsPanel.GraphOptionsPanel.showNonLineageProperties();
+				FlareVis.leaveLineageMode(event);
+				// hide the glow from the lineage button
+				ZoomPanel.hideLineageButtonGlow();
+			}
+			
+			private function submitRuleChangedQuery(event:UQueryEvent):void {
+				_ruleChangedQuery = true;
+				// set the current event for the special fact request node
+				_currentEvent = event;
+				_queryPanel.buildQuery(event);
+			}
+			
+			/***/
+			private function startVisRenderTimer(renderTimer:Timer):void {
+			    renderTimer = new Timer(100,0);
+			    //renderTimer = new Timer(500,0);
+			    renderTimer.addEventListener(TimerEvent.TIMER, renderTimerHandler,false,0,true);
+			    renderTimer.start(); 
+			}
+        
+			private function renderTimerHandler(event:TimerEvent):void {
+			    
+			    if(FlareVis.rootNodeBeforeLineage != null && FlareVis.focusNodes != null && FlareVis.focusNodes.length > 0)
+			        flare.display.DirtySprite.renderDirty();
+			    
+			    UVizApplicationControlBar.updateMemoryConsumption();
+			    
+			    _tickNumber++;
+			    if(_tickNumber == 10) {
+			    //if(_tickNumber == 2) {
+			    	UVizApplicationControlBar.updateFrameRate();
+			    	_tickNumber = 0;
+			    }
+			    
+			}
+			 
+			private function onResize(event:ResizeEvent):void {
+				
+				if(this.initialized) {
+				    
+				    if(event.target == _queryPanel || event.target == _optionsPanel || event.target == _statisticsPanel || 
+				       event.target == _rulesPanel)
+				       return;
+				    
+				    this.invalidateSize();
+				    this.invalidateDisplayList();
+				
+				    if(_controlBarShown) {
+				        _applicationTopY = UVizApplicationControlBar.height;
+				        _applicationHeight = this.height - UVizApplicationControlBar.height;
+				    }
+				    else {
+				        _applicationTopY = 0;
+				        _applicationHeight = this.height;
+				    }
+				        
+					//_applicationHeight = this.height - UVizApplicationControlBar.height;
+					
+					// adjust the height of the options panel
+				    if(_applicationHeight <= 405)
+				       _optionsPanel.height = 0.75 * _applicationHeight;
+				    else
+				       _optionsPanel.height = 405;
+					
+				    //FlareVis.y = _applicationTopY;
+					FlareVis.height = this.height;//this.height;//this.measuredWidth;
+					FlareVis.width = this.width;//this.measuredHeight;
+				    var visBounds:Rectangle = new Rectangle(FlareVis.x,FlareVis.y,FlareVis.width,FlareVis.height);
+				    FlareVis.resize(visBounds);
+					FlareVis.invalidateSize();
+				    FlareVis.invalidateDisplayList(); 
+				    //FlareVis.centerVisualization(null);
+					
+					_queryPanel.setConstraintValue("top",_applicationTopY);  
+					_queryPanel.setConstraintValue("left",this.width/2 - _queryPanel.width/2);
+					// adjust the query string tooltip position
+				    //_queryPanel.QueryStringToolTip.y = _queryPanel.getConstraintValue("top") + _queryPanel.getExplicitOrMeasuredHeight();
+				    
+					_optionsPanel.setConstraintValue("top",_applicationTopY + _applicationHeight/2 - _optionsPanel.height/2);
+					_statisticsPanel.setConstraintValue("top",_applicationTopY + _applicationHeight/2 - _statisticsPanel.height/2);
+					_statisticsPanel.setConstraintValue("right",0);
+					_rulesPanel.setConstraintValue("bottom",0);
+					_rulesPanel.setConstraintValue("left",this.width/2 - _rulesPanel.width/2);
+					
+				}
+				
+			}
+			
+			private function adjustDisplay():void {
+				    if(_controlBarShown) {
+				        _applicationTopY = UVizApplicationControlBar.height;
+				        _applicationHeight = this.height - UVizApplicationControlBar.height;
+				    }
+				    else {
+				        _applicationTopY = 0;
+				        _applicationHeight = this.height;
+				    }
+				        
+					//_applicationHeight = this.height - UVizApplicationControlBar.height;
+					
+					// adjust the height of the options panel
+				    if(_applicationHeight <= 405)
+				       _optionsPanel.height = 0.75 * _applicationHeight;
+				    else
+				       _optionsPanel.height = 405;
+					
+					_queryPanel.setConstraintValue("top",_applicationTopY);  
+					_queryPanel.setConstraintValue("left",this.width/2 - _queryPanel.width/2);
+					// adjust the query string tooltip position
+				    //_queryPanel.QueryStringToolTip.y = _queryPanel.getConstraintValue("top") + _queryPanel.getExplicitOrMeasuredHeight();
+				    
+					_optionsPanel.setConstraintValue("top",_applicationTopY + _applicationHeight/2 - _optionsPanel.height/2);
+					_statisticsPanel.setConstraintValue("top",_applicationTopY + _applicationHeight/2 - _statisticsPanel.height/2);
+					_statisticsPanel.setConstraintValue("right",0);
+					_rulesPanel.setConstraintValue("bottom",0);
+					_rulesPanel.setConstraintValue("left",this.width/2 - _rulesPanel.width/2);
+					
+					OptionsButton.y = _applicationHeight/2 + _applicationTopY + OptionsButton.width/2;
+    	            StatisticsButton.y = _applicationHeight/2 + _applicationTopY - StatisticsButton.width/2;
+    	            QueryButton.hide();
+    	            QueryButton.setConstraintValue("top",(_queryPanel.visible ? (_applicationTopY + _queryPanel.height) 
+    	                                      : _applicationTopY));//(UVizApplicationControlBar.visible 
+    	                     //? (_applicationTopY + _queryPanel.height) : )); 
+    	            QueryButton.show();
+    	            
+			}
+			
+			private function executeQuery(event:FlexEvent):void 
+			{				
+				// set the current event for the special fact request node
+				_currentEvent = event;
+				
+				// set the query string
+			    _queryString = _queryPanel.query.toString();
+				
+				//this.execTime = flash.utils.getTimer();
+			    //reasoner.processQuery(_queryPanel.query);
+			    
+			    // -------------------------------------
+			    // set the current rule store properties
+			    // -------------------------------------
+			    
+			    _ruleStore.setSoftRules(_rulesPanel.requestSoftRules());
+			    //_ruleStore.setSoftRulesChanged(_rulesPanel.areSoftRulesChanged());
+			    _ruleStore.setHardRules(_rulesPanel.requestHardRules());
+			    //_ruleStore.setHardRulesChanged(_rulesPanel.areHardRulesChanged());
+			    
+			    // because data structures on the server are not initialized yet
+			    // in case we haven`t submitted a query so far
+			    // set the flag manually
+			    if(_firstQueryProcessed) {
+			    	// we want caching on the server
+			    	if(UVizApplicationControlBar.CachingUsageCheckBox.selected) {
+			    		_ruleStore.setSoftRulesChanged(_rulesPanel.areSoftRulesChanged());
+			    	    _ruleStore.setHardRulesChanged(_rulesPanel.areHardRulesChanged());
+			    	}
+			    	// we do not want caching on the server
+			    	else {
+			    	    _ruleStore.setSoftRulesChanged(true);
+			    	    _ruleStore.setHardRulesChanged(true);
+			    	}
+			    }
+			    else {
+			    	_ruleStore.setSoftRulesChanged(false);
+			    	_ruleStore.setHardRulesChanged(false);
+			    	//_ruleStore.setSoftRulesChanged(true);
+			    	//_ruleStore.setHardRulesChanged(true);
+			    }
+			    
+			    // set the starting time point for the measurements
+			    this.execTime = flash.utils.getTimer();
+			    
+			    reasoner.processQuery(_queryPanel.query,_ruleStore,UApplicationControlBar.useRulesForDataLoading, _useAllResults, _numOfReturnedFacts);
+          
+                // reset the all facts request data
+			    if(_useAllResults)
+				    _useAllResults = false;
+				
+				// remove potential temporary facts request data
+			    FlareVis.graphData.removeAllFactsRequestSprites(FlareVis.visualization.data);
+			    //FlareVis.visualization.update();
+			    UVizApplicationControlBar.updateDataStatistics(FlareVis);
+			}
+			
+			private function dynamicUpdate(event:UQueryEvent):void 
+			{
+				
+				var queryArray:Array = event.queries;
+				
+				// update the node who should be the new root after loading its data
+				_dataLoadNode = event.dataLoadNode;
+				
+				event.stopImmediatePropagation();
+				
+				if(queryArray.length < 2) {
+				   return;
+				}
+				
+				// set the current event for the special fact request node
+				_currentEvent = event;
+				
+				//trace("load data !!");
+				   
+				var queryOne:UQuery = (UQuery)(queryArray[0]);
+				var queryTwo:UQuery = (UQuery)(queryArray[1]);       
+				
+				// -------------------------------------
+			    // set the current rule store properties
+			    // -------------------------------------
+				
+				_ruleStore.setSoftRules(_rulesPanel.requestSoftRules());
+			    //_ruleStore.setSoftRulesChanged(_rulesPanel.areSoftRulesChanged());
+			    _ruleStore.setHardRules(_rulesPanel.requestHardRules());
+			    //_ruleStore.setHardRulesChanged(_rulesPanel.areHardRulesChanged());
+			    
+			    // because data structures on the server are not initialized yet
+			    // in case we haven`t submitted a query so far
+			    // set the flag manually
+			    if(_firstQueryProcessed) {
+			    	// we want caching on the server
+			    	if(UVizApplicationControlBar.CachingUsageCheckBox.selected) {
+			    		_ruleStore.setSoftRulesChanged(_rulesPanel.areSoftRulesChanged());
+			    	    _ruleStore.setHardRulesChanged(_rulesPanel.areHardRulesChanged());
+			    	}
+			    	// we do not want caching on the server
+			    	else {
+			    	    _ruleStore.setSoftRulesChanged(true);
+			    	    _ruleStore.setHardRulesChanged(true);
+			    	}
+			    }
+			    else {
+			    	_ruleStore.setSoftRulesChanged(false);
+			    	_ruleStore.setHardRulesChanged(false);
+			    	//_ruleStore.setSoftRulesChanged(true);
+			    	//_ruleStore.setHardRulesChanged(true);
+			    }
+				
+				// set the starting time point for the measurements
+			    this.execTime = flash.utils.getTimer();
+				
+			    reasoner.loadData(queryOne,queryTwo,_ruleStore,UApplicationControlBar.useRulesForDataLoading, _useAllResults, _numOfReturnedFacts);
+          
+                // reset the all facts request data
+			    if(_useAllResults) 
+				    _useAllResults = false;
+				
+				// remove potential temporary facts request data
+			    FlareVis.graphData.removeAllFactsRequestSprites(FlareVis.visualization.data);
+			    //FlareVis.visualization.update();
+			    UVizApplicationControlBar.updateDataStatistics(FlareVis);
+			}
+			
+			private function updateRules(event:URuleUpdateEvent):void {
+				
+				event.stopImmediatePropagation();
+				
+				// request the default system internal rules
+				reasoner.requestRules();
+			}
+			
+			private function resultHandlerQuery(event:ResultEvent):void 
+			{
+				
+			    _queryResult = (UQueryResult)(event.result);
+			    
+			    if(_queryResult.getGlobalDependencyGraph().size() == 0) {
+			       Alert.show("There is no result available for this query!");
+			       return;
+			    }
+			    
+			    // ---------------------------------------------------------
+			    // --------------- compute statistics ----------------------
+			    // ---------------------------------------------------------		    		    
+			    
+			    // time between server function call and result response from server
+				var exTime:int = flash.utils.getTimer() - this.execTime;
+			    var executionTime:int = _queryResult.getStatistics().getExecTime(); 
+			    _statisticsPanel.updatePerformanceStatistics(_queryResult,exTime,executionTime);
+			    
+			    // update the visualization 
+			    // are we in compare mode ??
+			    if(_compareModeActive) {
+			    	if(_firstQueryProcessed == false)
+				       _firstQueryProcessed = true;
+				    // apply changes and render visualization
+				    if(_ruleChangedQuery)
+				        FlareVis.loadGraphData(_queryResult,null,true,UStringConstants.RULE_CHANGED + " : " + _queryString);
+				    else
+				        FlareVis.loadGraphData(_queryResult,null,true,UStringConstants.QUERY_ONLY + " : " + _queryString);
+			    }
+			    else {
+			    	if(_firstQueryProcessed == false)
+				       _firstQueryProcessed = true;
+				    else
+				       FlareVis.clear();
+				    // apply changes and render visualization 
+				    if(_ruleChangedQuery)
+				       FlareVis.updateVisualization(_queryResult,UStringConstants.RULE_CHANGED + " : " + _queryString);
+				    else
+				       FlareVis.updateVisualization(_queryResult,UStringConstants.QUERY_ONLY + " : " + _queryString);
+			    }
+			    
+                _queryResult = null;
+				
+				// reset the rule update flag
+				_ruleChangedQuery = false;
+				
+			}      
+			
+			private function resultHandlerDataLoading(event:ResultEvent):void {
+				
+				_queryResult = (UQueryResult)(event.result);
+				
+				if(_queryResult.getGlobalDependencyGraph().size() == 0) {
+				   Alert.show("There was no data loading possible !!");
+				   return;
+				}
+				
+				// ---------------------------------------------------------
+			    // --------------- compute statistics ----------------------
+			    // ---------------------------------------------------------		    		    
+			    
+			    // time between server function call and result response from server
+				var exTime:int = flash.utils.getTimer() - this.execTime;
+			    var executionTime:int = _queryResult.getStatistics().getExecTime(); 
+			    _statisticsPanel.updatePerformanceStatistics(_queryResult,exTime,executionTime);
+				
+				// update the visualization 
+			    // are we in compare mode ??
+			    if(_compareModeActive) {
+				    // apply changes and render visualization
+				    FlareVis.loadGraphData(_queryResult,_dataLoadNode,true,UStringConstants.DATA_LOADING + " : " + _dataLoadNode.data.tooltip);
+			    }
+			    else {
+				    // apply changes and render visualization 
+				    FlareVis.loadGraphData(_queryResult,_dataLoadNode,false,UStringConstants.DATA_LOADING + " : " + _dataLoadNode.data.tooltip);
+			    }
+				
+				_queryResult = null;
+				
+				// reset the rule update flag
+				_ruleChangedQuery = false;
+			}
+			
+			private function resultHandlerRuleRequest(event:ResultEvent):void {
+				
+				_ruleStore = URuleStore(event.result);
+				
+				// switch over the rule type value set by the last rule update event
+				switch(_ruleUpdateType) {
+					case URuleUpdateEvent.ALL: _rulesPanel.updateDefaultRules(_ruleStore); break;
+					case URuleUpdateEvent.SOFT_ONLY: _rulesPanel.updateDefaultSoftRules(_ruleStore); break;
+					case URuleUpdateEvent.HARD_ONLY: _rulesPanel.updateDefaultHardRules(_ruleStore); break;
+				}
+				
+				// dispatch the event to notify UViz that the rules were updated successfully
+				this.dispatchEvent(new URulesUpdatedEvent(URulesUpdatedEvent.RULES_UPDATED,true));
+			}
+			
+			 
+			private function faultHandlerQuery(event:FaultEvent):void
+			{
+				Alert.show("error = " + event.fault.getStackTrace()); 
+				//Alert.show("error = " + event.fault.faultString.toString()); 
+			}
+			
+			private function updateDataStatistics(event:UStatisticsUpdateEvent):void {
+				//trace("update data statistics");
+				UVizApplicationControlBar.updateDataStatistics(FlareVis);
+				_optionsPanel.GraphDataAccessPanel.nodeList = FlareVis.graphData.graphCache.usedNodesList;
+				_optionsPanel.GraphDataAccessPanel.predicateList = FlareVis.graphData.graphCache.usedPredicatesList;
+				_optionsPanel.GraphDataAccessPanel.factList = FlareVis.graphData.factNamesAndIDs;
+				_optionsPanel.GraphDataAccessPanel.resultClusterList = FlareVis.graphData.resultList;
+				_optionsPanel.GraphDataAccessPanel.lineageFactList = FlareVis.graphData.factLineageAvalaibilityMap;
+			}
+			
+			private function activateCompareMode(event:UCompareModeEvent):void {
+				_compareModeActive = true;
+				_optionsPanel.GraphDataAccessPanel.showCompareProperties();
+				FlareVis.activateCompareMode(true);
+				//FlareVis.activateGlowMode(_glowModeActive);
+				//trace("Compare mode activated");
+			}
+			
+			private function deactivateCompareMode(event:UCompareModeEvent):void {
+				_compareModeActive = false;
+				_optionsPanel.GraphDataAccessPanel.hideCompareProperties();
+				FlareVis.activateCompareMode(false);
+				//FlareVis.activateGlowMode(_glowModeActive);
+				// deactivate glow mode
+				// deactivateGlowMode(null);
+			}
+			
+			private function compareClusters(event:UClusterCompareEvent):void {
+				_optionsPanel.GraphOptionsPanel.HopSlider.value = 0;
+				ZoomPanel.HopSlider.value = 0;
+				FlareVis.numOfHops = 0;
+				FlareVis.graphDistanceFilter.distance = 0;
+				FlareVis.compareClusters(event,_compareModeActive);
+			}
+			
+			/* private function activateGlowMode(event:UCompareModeEvent):void {
+				_glowModeActive = true;
+				//FlareVis.setStyle("backgroundColor",UColors.BLACK);
+				FlareVis.activateGlowMode(_glowModeActive);
+				//trace("Glow mode activated");
+			}
+			
+			private function deactivateGlowMode(event:UCompareModeEvent):void {
+				_glowModeActive = false;
+				//FlareVis.setStyle("backgroundColor",UColors.grey(3));
+				FlareVis.activateGlowMode(_glowModeActive);
+				//trace("Glow mode deactivated");
+			} */
+		    
+		    private function handleAllFactsRequest(event:URequestAllFactsEvent):void {
+		    	
+		    	_useAllResults = true;
+		    	
+		    	if(_currentEvent is FlexEvent)
+		    	   _queryPanel.dispatchEvent(_currentEvent);
+		    	else {
+		    	   var loadEvent:UQueryEvent;
+		    	   if(UQueryEvent(_currentEvent).type == UQueryEvent.PROCESS_QUERY) {
+		    	   	  loadEvent = new UQueryEvent(UQueryEvent.PROCESS_QUERY,UQueryEvent(_currentEvent).queries,true);
+		    	   	  loadEvent.dataLoadNode = UQueryEvent(_currentEvent).dataLoadNode;
+		    	   }
+		    	   else {
+		    	   	  loadEvent = new UQueryEvent(UQueryEvent.SUBMIT_RULE_CHANGED_QUERY,null,true);
+		    	   }
+		    	   this.dispatchEvent(loadEvent);
+		    	}
+		    	
+				// remove potential temporary facts request data
+			    FlareVis.graphData.removeAllFactsRequestSprites(FlareVis.visualization.data);
+			    FlareVis.visualization.update();
+			    UVizApplicationControlBar.updateDataStatistics(FlareVis);
+		    } 
+		    
+		    private function handleNumOfResultFactsChange(event:URequestAllFactsEvent):void {
+		    	//trace("I change the number to " + event.numOfResultFacts);
+		    	_numOfReturnedFacts = event.numOfResultFacts;
+		    } 
+			
+			private function handleQuickAccessEvent(event:UQuickAccessEvent):void {
+				switch(event.menuToAccess) {
+				   case UQuickAccessEvent.NOTHING: {
+				   	    
+				   	    if(event.backgroundColorChange) {
+				   	    	FlareVis.setStyle("backgroundColor",event.applicationBackgroundColor);
+				   	    	return;
+				   	    }
+				   	    
+				   	    _quickAccessMenuOnly = event.onlyQuickMenu; 
+                        if(_quickAccessMenuOnly) {
+                           this.removeEventListener(MouseEvent.MOUSE_MOVE, determineGUIPanelVisibility,false);
+                           OptionsButton.visible = true;
+                           RulesButton.visible = true;
+                           StatisticsButton.visible = true;
+                           QueryButton.visible = true;
+                        }
+                        else {
+                           this.addEventListener(MouseEvent.MOUSE_MOVE, determineGUIPanelVisibility,false,0,true);
+                           OptionsButton.visible = false;
+                           RulesButton.visible = false;
+                           StatisticsButton.visible = false;
+                           QueryButton.visible = false;
+                        }
+                        break;
+				   }
+				   case UQuickAccessEvent.QUERY_MENU: {
+				        if(_queryPanel.visible)
+				           _queryPanel.hide();
+				        else
+				           _queryPanel.show(); 
+				        break;
+				   }
+				   case UQuickAccessEvent.OPTIONS_MENU: {
+				        if(_optionsPanel.visible)
+				           _optionsPanel.hide();
+				        else {
+				           _optionsPanel.show();
+				           _optionsPanel.includeInLayout = false;
+				        } 
+				        break;
+				   }
+				   case UQuickAccessEvent.RULE_MENU: {
+				        if(_rulesPanel.visible)
+				           _rulesPanel.hide();
+				        else
+				           _rulesPanel.show(); 
+				        break;
+				   }
+				   case UQuickAccessEvent.STATISTICS_MENU: {
+				        if(_statisticsPanel.visible)
+				           _statisticsPanel.hide();
+				        else
+				           _statisticsPanel.show(); 
+				        break;
+				   }
+				}
+				
+				event.stopImmediatePropagation();
+			}
+			
+			private function determineGUIPanelVisibility(event:MouseEvent):void {
+				
+				// in case a panel is performing opening or closing actions -> abort
+				//if(_panelsBusy)
+				  // return;
+				
+				var x:int = this.contentMouseX;
+				var y:int = this.contentMouseY;
+				
+			    if((!_controlBarShown && y < 5) || (_controlBarShown && y < _applicationTopY)) {
+			    	//_panelsBusy = true;
+			    	_queryPanel.show();
+			    	QueryButton.setConstraintValue("top",_applicationTopY + _queryPanel.height); 
+			    	return;
+			    } 
+			    
+			    //if(y > (_applicationHeight - 5)) {
+			    if(y > (this.height - 5)) {
+			    	//_panelsBusy = true;
+			    	_rulesPanel.show();
+			    	RulesButton.setConstraintValue("bottom",_rulesPanel.height);
+			    	return;
+			    }   
+				
+				// depending on the  x value, we allow the statistics
+				// or the menu to show up simultaneously with the 
+				// query panel   
+				if(x < 7) {	
+				   //_panelsBusy = true;
+				   _optionsPanel.show();
+				   OptionsButton.x = _optionsPanel.x + _optionsPanel.width;
+				   return;
+				} 
+				
+				if(x > (this.width - 5)) {
+					//_panelsBusy = true;
+					_statisticsPanel.show();
+					StatisticsButton.x = this.width - _statisticsPanel.width;
+					return;
+				}
+				
+				
+				if(_queryPanel.visible && (y > (_queryPanel.y + _queryPanel.height) || x < _queryPanel.x || x > (_queryPanel.x + _queryPanel.width))) {
+					//_panelsBusy = true;
+					if(_queryPanel.hide()) {
+					   QueryButton.setConstraintValue("top",_applicationTopY); 
+					  return;	
+					}   
+				}
+				// subtracted the value 5 from the y-value, new on 15.11.10
+				if(_rulesPanel.visible && (y < (_applicationHeight - _rulesPanel.height - 5) || x < _rulesPanel.x || x > (_rulesPanel.x + _rulesPanel.width))) {
+					//_panelsBusy = true;
+					if(_rulesPanel.hide()) {
+					   RulesButton.setConstraintValue("bottom",0);
+					   return;
+					}
+				}
+			    if(_optionsPanel.visible && 
+			        (y < _optionsPanel.y || y > (_optionsPanel.y + _optionsPanel.height) || x > (_optionsPanel.x + _optionsPanel.width))) { 
+			        //_panelsBusy = true;
+					if(_optionsPanel.hide()) {
+					  OptionsButton.x = 0;	   
+					  return;
+					}
+			    }
+				if(_statisticsPanel.visible && 
+				    (y < _statisticsPanel.y || (y > _statisticsPanel.y + _statisticsPanel.height) || x < _statisticsPanel.x)) {
+				    //_panelsBusy = true;
+					if(_statisticsPanel.hide()) {
+					  StatisticsButton.x = this.width;
+					  return;
+					}
+				}
+				
+			}
+			
+			/**
+			 * Toggles the visibility of the main UViz application control bar.
+			 * */
+			public function toggleControlBarVisibility():void {
+				if(UVizApplicationControlBar.visible) {
+				   UVizApplicationControlBar.hide();
+				   _controlBarShown = false;
+				   this.adjustDisplay();
+				}
+				else {
+				   UVizApplicationControlBar.show();
+				   _controlBarShown = true;
+				   this.adjustDisplay();
+				}
+			}
+			
+			/**
+			 * Toggles the visibility of the main UViz options-panel button.
+			 * */
+			public function toggleOptionsPanelVisibility(changePanelVisibility:Boolean = true):void {
+				if(_optionsPanel.visible) {
+				   OptionsButton.hide();
+				   if(changePanelVisibility)
+				      _optionsPanel.hideButtonTriggered();
+				   OptionsButton.x = 0;
+				   OptionsButton.show();
+				}
+				else {
+				   OptionsButton.hide();
+				   if(changePanelVisibility)
+				      _optionsPanel.showButtonTriggered();
+				   OptionsButton.x = _optionsPanel.x + _optionsPanel.width;
+				   OptionsButton.show();
+				}
+			}
+			
+			/**
+			 * Toggles the visibility of the main UViz rules-panel button.
+			 * */
+			public function toggleRulesPanelVisibility(changePanelVisibility:Boolean = true):void {
+				if(_rulesPanel.visible) {
+				   RulesButton.hide();
+				   if(changePanelVisibility)
+				      _rulesPanel.hideButtonTriggered();
+				   RulesButton.setConstraintValue("bottom",0);
+				   RulesButton.show();
+				}
+				else {
+				   RulesButton.hide();
+				   if(changePanelVisibility)
+				     _rulesPanel.showButtonTriggered();
+				   RulesButton.setConstraintValue("bottom",_rulesPanel.height);
+				   RulesButton.show();
+				}
+			}
+			
+			/**
+			 * Toggles the visibility of the main UViz statistics-panel button.
+			 * */
+			public function toggleStatisticsPanelVisibility(changePanelVisibility:Boolean = true):void {
+				if(_statisticsPanel.visible) {
+				   StatisticsButton.hide();
+				   if(changePanelVisibility)
+				     _statisticsPanel.hideButtonTriggered();
+				   StatisticsButton.x = this.width;
+				   StatisticsButton.show();
+				}
+				else {
+				   StatisticsButton.hide();
+				   if(changePanelVisibility)
+				     _statisticsPanel.showButtonTriggered();
+				   StatisticsButton.x = this.width - _statisticsPanel.width;
+				   StatisticsButton.show();
+				}
+			}
+			
+			/**
+			 * Toggles the visibility of the main UViz query-panel button.
+			 * */
+			public function toggleQueryPanelVisibility(changePanelVisibility:Boolean = true):void {
+				if(_queryPanel.visible) {
+				   QueryButton.hide();
+				   if(changePanelVisibility)
+				     _queryPanel.hideButtonTriggered();
+				   QueryButton.setConstraintValue("top",_applicationTopY);  
+				   QueryButton.show();
+				}
+				else {
+				   QueryButton.hide();
+				   if(changePanelVisibility)
+				     _queryPanel.showButtonTriggered();
+				   QueryButton.setConstraintValue("top",_applicationTopY + _queryPanel.height);  
+				   QueryButton.show();
+				}
+			}
+			
+			/*
+			private function changeOptionsButtonColor(rollover:Boolean):void {
+				if(rollover)
+				   OptionsButton.setStyle("backgroundColor","#01C5FD");
+				else
+				   OptionsButton.setStyle("backgroundColor","#3F3F3F");
+			}
+			*/
+			
+			private function zoomInMenuButton():void {
+				UVizMainMenuButton.width = 90;
+				UVizMainMenuButton.height = 90;
+			}
+			
+			private function zoomOutMenuButton():void {
+				UVizMainMenuButton.width = 67;
+				UVizMainMenuButton.height = 67;
+			}
+			
+			public function blurUViz():void {
+				// we exclude the last child, this is out error panel
+				for(var i:int=0; i<(this.numChildren-1); i++)
+				   this.getChildAt(i).filters = [BlurFilter];
+			}
+			
+			public function unblurUViz():void {
+				for(var i:int=0; i<(this.numChildren-1); i++)
+				   this.getChildAt(i).filters = null;
+			}
+			
+			public function handleKeyboardAction(event:KeyboardEvent):void {
+				// see website : http://www.adobe.com/livedocs/flash/9.0/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00001136.html
+				if(event.keyCode == 13) {
+					if(UVizErrorPanel.visible)
+					   UVizErrorPanel.handleKeyboardAction(event);
+					else
+					   _queryPanel.handleKeyboardAction(event);
+				}
+				else
+				   return;
+	        }
+	        
+	        
+	        public function toggleZoomPanelVisibility():void {
+	        	if(ZoomPanel.visible) {
+	        	   ZoomPanel.hide();
+	        	   ZoomPanelToggleButton.filters = null;
+	        	}
+	        	else {
+	        	   ZoomPanel.show();
+	        	   ZoomPanelToggleButton.filters = [GlowFilter];
+	        	}   
+	        }
+	        
+	        private function zoomGraph(event:UPanZoomEvent):void {
+	        	if(event.doZoom)
+	        	   //FlareVis.panZoomCtrlVis.zoom(event,FlareVis);
+	        	   FlareVis.panZoomCtrlVis.zoomPosition(event,FlareVis);
+	        	else
+	        	   FlareVis.panZoomCtrlVis.adjustPosition(event,FlareVis);
+	        	//else
+	        	  // FlareVis.panZoomCtrlVis.pan(event);
+	        }
+	        
+	        public function get rulesPanel():URuleStoreMenu {
+	        	return _rulesPanel;
+	        }
+	        
+	        public function showFocusNodesChange():void {
+	        	if(ZoomIn.isPlaying || ZoomOut.isPlaying)
+	        	      return;
+	        	//FocusNodesChangeLabel.text = FOCUS_NODES_CHANGE_TEXT;
+	        	//FadeIn.play([FocusNodesChangePanel]);
+                //FadeStay.play([FocusNodesChangePanel]);
+                //FadeOut.play([FocusNodesChangePanel]);
+                FocusNodesChangePanel.visible = true;
+                FocusNodesChangePanel.visible = false
+	        }
+	        
+	        
+	        // ---------------------------------------------------
+	        // kill the current session in case the execution 
+	        // takes to much time
+	        // ---------------------------------------------------
+	        private function resetCurrentDBConnection(event:UKillSessionEvent = null):void {
+	            reasoner.resetDBConnection();
+	        }
+	        
+	        private function resultHandlerDBConnectionReset(event:ResultEvent):void {
+	        	var succesful:Boolean = event.result;
+	        	// do nothing
+	        	if(succesful) {
+	        	   if(FadeIn.isPlaying || FadeOut.isPlaying)
+	        	      return;
+	        	   FocusNodesChangeLabel.text = "Succesfully reset the database connection. Call the server to get a new one.";        	                       
+		           FadeIn.play([FocusNodesChangePanel]);
+	               //FadeStay.play([FocusNodesChangePanel]);
+	               FadeOut.play([FocusNodesChangePanel]);
+	        	   return;
+	        	}
+	        	else {
+	        	   if(FadeIn.isPlaying || FadeOut.isPlaying)
+	        	      return;
+	        	   FocusNodesChangeLabel.text = "Could not reset the database connection. Please close and re-open yout internet browser.";        	                       
+		           FadeIn.play([FocusNodesChangePanel]);
+	               //FadeStay.play([FocusNodesChangePanel]);
+	               FadeOut.play([FocusNodesChangePanel]);
+	        	   return;
+	        	}
+	        }
+	        
+	        // deselct the help button from the screen state panel
+	        private function deselectHelpButton(event:UDeselectButtonEvent):void {
+	        	ScreenStatePanel.deselectHelpButton();
+	        }
+	        
+	        public function showHelpPanel():void {
+	        	UVizHelpPanel.show();
+	        }
+	        
+	        public function hideHelpPanel():void {
+	        	UVizHelpPanel.hide();
+	        }
+	        
+	        public function showGraphOverview():void {
+	        	GraphOverviewPanel.show();
+	        }
+	        
+	        public function hideGraphOverview():void {
+	        	GraphOverviewPanel.hide();
+	        }
+	        
+	        /*
+	        private function updatePanelClosedFlag(event:UPanelVisibilityEvent):void {
+	        	//private var _panelsAllowedToClose:Boolean = true;
+   		        //private var _panelsAllowedToOpen:Boolean = true;
+   		        _panelsBusy = false;
+	        }
+	        
+	        private function updatePanelOpenedFlag(event:UPanelVisibilityEvent):void {
+	        	//private var _panelsAllowedToClose:Boolean = true;
+   		        //private var _panelsAllowedToOpen:Boolean = true;
+   		        _panelsBusy = false;
+	        }
+	        */
+	        
+	        /*
+	        
+	         private function buildDemoQueryStrings():void {
+            	_demoQueryStrings.push("livesIn(Al_Gore,?X)");   
+            	_demoQueryStrings.push("isMarriedTo(Woody_Allen,?X)"); 
+            	_demoQueryStrings.push("actedIn(?X,Total_Recall)^bornIn(?X,Thal,_Austria)"); 
+            	_demoQueryStrings.push("actedIn(Arnold_Schwarzenegger,?X)^actedIn(?Y,?X)^bornIn(?Y,?Z)^notEquals(Arnold_Schwarzenegger,?Y)"); 
+            	_demoQueryStrings.push("bornIn(?X,Oxford)^graduatedFrom(?X,?Y)^hasAcademicAdvisor(?X,?Z)^graduatedFrom(?Z,University_of_Cambridge)"); 
+            	_demoQueryStrings.push("bornIn(?X,Paris)^isCitizenOf(?X,?Y)^locatedIn(Paris,?Z)^notEquals(?Y,?Z)"); 
+            	_demoQueryStrings.push("bornIn(?GUY,?BIRTHPLACE)^livesIn(?GUY,?LIVESIN)^bornOnDate(?GUY,?BIRTHDATE)^isMarriedTo(?GUY,?SPOUSE)^actedIn(?GUY,Total_Recall)"); 
+            	_demoQueryStrings.push("hasWonPrize(?X,Nobel_Prize_in_Physics)^bornIn(?X,Ulm)^bornOnDate(?X,?Z)^yearBefore(?Z,1900)^type(?X,wikicategory_Patent_examiners)"); 
+            	_demoQueryStrings.push("isMarriedTo(Emma_Thompson,?SPOUSE)^actedIn(Emma_Thompson,?MOVIE)^actedIn(?SPOUSE,?MOVIE)"); 
+            	_demoQueryStrings.push("directed(Martin_Scorsese,?MOVIE)^actedIn(?GUY1,?MOVIE)^actedIn(?GUY2,?MOVIE)^notEquals(?GUY1,?GUY2)^notEquals(?GUY1,Martin_Scorsese)^notEquals(?GUY2,Martin_Scorsese)"); 
+            	_demoQueryStrings.push("gaz_hasName(?A,Saarbrucken)^gaz_isLocatedIn(?B,Saarland)^notEquals(?A,?B)^gaz_isClose(?A,?B)^gaz_hasName(?B,?D)"); 
+            	_demoQueryStrings.push("hasWonPrize(?X,Nobel_Prize_in_Physics)^bornIn(?X,?Y)^gaz_hasName(?Z,?Y)^gaz_isLocatedIn(?Z,Germany)"); 
+            	//_demoQueryStrings.push("gaz_isLocatedIn(?A,Liechtenstein)^gaz_hasName(?A,?B)^gaz_isClose()");           
+  
+    // for these queries I have to change the ULiteral actionscript class and the parsing algorithms
+    
+    //q[11] = new UQuery("Q12", new ULiteral(URelation.ISCLOSE, "Saarbrucken", "?X", 5));
+
+   // q[13] = new UQuery("Q14", new ULiteral(URelation.gaz_ISLOCATEDIN, "?A", "Liechtenstein"), new ULiteral(URelation.gaz_HASNAME, "?A", "?B"), new ULiteral(
+     //   URelation.gaz_ISCLOSE, "?A", "?C", 5), new ULiteral(URelation.gaz_HASNAME, "?C", "?D"));
+            	
+            } 
+	        
+	        */
+			
+		]]>
+	</mx:Script> 
+	
+	<!--   
+	<mx:Style>
+		
+		.myButtonStyle {
+            embedFonts: true;
+        }			
+		
+	</mx:Style>
+	-->
+	
+	 <mx:Style>
+        .myPanelTitle {
+            textIndent: 300;
+        }
+        
+        .myButtonStyle {
+            embedFonts: true;
+        }
+        
+    </mx:Style>   
+	
+	<mx:RemoteObject id="reasoner" 
+		destination="UReasoner"  
+		showBusyCursor="true"
+		fault="faultHandlerQuery(event)"
+	    concurrency="single">
+		<mx:method name="processQuery" result="resultHandlerQuery(event)"/>
+		<mx:method name="loadData" result="resultHandlerDataLoading(event)"/>
+		<mx:method name="requestRules" result="resultHandlerRuleRequest(event)"/>
+		<mx:method name="resetDBConnection" result="resultHandlerDBConnectionReset(event)"/>
+	</mx:RemoteObject> 
+    	
+    <ns3:UFlareVis 	
+       	id="FlareVis" 
+       	backgroundAlpha="1.0" 
+       	alpha="1.0" 
+       	backgroundColor="#020000" 
+       	left="1" 
+       	right="1" 
+       	bottom="1"
+        top="1" includeInLayout="false">
+    </ns3:UFlareVis>
+    
+    <application:UApplicationControlBar 
+    	dock="false" 
+    	id="UVizApplicationControlBar" 
+    	width="100%" 
+    	fillAlphas="[0,0]"
+    	includeInLayout="false" filters="{[DropShadowFilter]}"/>
+    
+    <mx:DropShadowFilter id="DropShadowFilter" angle="45" alpha="0.8" quality="2" blurX="4" blurY="4" distance="10"/>
+    <mx:GlowFilter id="GlowFilter" color="#18ff00"/>
+    <mx:BlurFilter id="BlurFilter"/>
+    
+    <mx:Button id="UVizMainMenuButton" height="67" width="67" filters="{[DropShadowFilter]}" 
+    	upSkin="@Embed(source='assets/UVizLogoIncScape2.png')" 
+        overSkin="@Embed(source='assets/UVizLogoIncScape2.png')"
+        downSkin="@Embed(source='assets/UVizLogoIncScape3.png')"
+        disabledSkin="@Embed(source='assets/UVizLogoIncScape2.png')"
+        themeColor="#00FF0C" 
+        fillAlphas="[1.0, 1.0, 1.0, 1.0]" 
+        fillColors="[#3F3F3F, #3F3F3F, #19FF01, #01F0FF]"
+        enabled="true" 
+        click="toggleControlBarVisibility();"
+        mouseOver="zoomInMenuButton();" 
+        mouseOut="zoomOutMenuButton();"
+        includeInLayout="false"
+        toolTip="Show/Hide UViz main control panel."/>
+        
+    <tooltip:UErrorToolTip id="UVizErrorPanel" includeInLayout="false" visible="false"
+       left="{0.5 * this.width - 0.5 * UVizErrorPanel.width}" top="{0.5 * this.height - 0.5 * UVizErrorPanel.height}"/> 
+    
+    <!--   
+    <tooltip:UStringToolTip id="LineageToolTip" title="Lineage Tooltip" includeInLayout="false" 
+    	visible="false" backgroundColor="#FFFC00" alpha="0.5" 
+    	right="0" top="{0.5 * this.height - 0.5 * LineageToolTip.height}"/>
+    <tooltip:UNodeToolTip id="NodeToolTip" includeInLayout="false"  alpha="0.5"
+    	visible="false" right="0" top="{0.5 * this.height - 0.5 * NodeToolTip.height}"/>
+    <tooltip:UEdgeToolTip id="EdgeToolTip" includeInLayout="false"  alpha="0.5"
+    	visible="false" right="0" top="{0.5 * this.height - 0.5 * EdgeToolTip.height}"/>
+    
+    <mx:TextInput x="0" y="{_applicationTopY + _applicationHeight/2 + OptionsButton.width/2}" text="Options" id="OptionsButton" 
+    	enabled="true" click="toggleOptionsPanelVisibility()" fontSize="15" 
+    	color="#FCFDFD" backgroundColor="#3F3F3F" rollOver="changeOptionsButtonColor(true);" rollOut="changeOptionsButtonColor(false);" 
+    	cornerRadius="10" borderColor="#B7BABC" rotation="-90" 
+    	styleName="myButtonStyle" fontFamily="Verdana" 
+    	fontWeight="normal" editable="false" useHandCursor="true" buttonMode="true" borderStyle="solid" 
+    	borderThickness="2" width="150" textAlign="center" mouseChildren="false"/>
+    -->
+    
+    <mx:Button id="ZoomPanelToggleButton" x="7" y="80"
+    	 fillAlphas="[1.0, 1.0]" 
+    	 fillColors="[#3F3F3F, #3F3F3F, #83FD01, #83FD01]" alpha="0.26" 
+    	 color="#FCFEFE" label="Quick Options" enabled="true"
+    	 click="toggleZoomPanelVisibility();" cornerRadius="10" width="102" 
+    	 paddingLeft="2" paddingRight="2" 
+    	 toolTip="Show/Hide the quick options panel which lets you directly control the visible path length in the graph, center the graph and leave the lineage/explanation mode."/>
+    <application:UZoomPanel
+        id="ZoomPanel"	 
+    	x="7" 
+    	y="105" 
+    	backgroundAlpha="0.2" 
+    	alpha="1.0"
+        includeInLayout="false" visible="false"/>
+    
+    <application:UPanelButton x="0" y="{_applicationHeight/2 + OptionsButton.width/2}" 
+    	text="Options" id="OptionsButton" 
+    	click="toggleOptionsPanelVisibility()" rotation="-90" visible="false" includeInLayout="false"/>
+    <application:UPanelButton x="{this.width/2 - RulesButton.width/2}" bottom="0" 
+    	text="Rules" id="RulesButton" 
+    	click="toggleRulesPanelVisibility()" visible="false" includeInLayout="false"/>
+    <application:UPanelButton x="{this.width}" y="{_applicationHeight/2 - StatisticsButton.width/2}" 
+    	text="Statistics" id="StatisticsButton" 
+    	click="toggleStatisticsPanelVisibility()" rotation="90" visible="false" includeInLayout="false"/>
+    <application:UPanelButton x="{this.width/2 - QueryButton.width/2}" top="{_applicationTopY + _queryPanel.height}" 
+    	text="Query" id="QueryButton" 
+    	click="toggleQueryPanelVisibility()" visible="false" includeInLayout="false"/>
+    
+    <mx:Canvas id="FocusNodesChangePanel" 
+    	cornerRadius="10" color="#FDFEFE"
+        bottom="5" width="775" x="{this.width/2 - FocusNodesChangePanel.width/2}" 
+        borderThickness="2" borderColor="#9A9A9A" backgroundAlpha="0.75" alpha="1.0" visible="false"
+        includeInLayout="false" paddingBottom="0" paddingTop="0" paddingRight="0" paddingLeft="0" 
+        height="20" showEffect="ZoomIn" hideEffect="ZoomOut">
+        <mx:Label id="FocusNodesChangeLabel" 
+        	text="{FOCUS_NODES_CHANGE_TEXT}"
+            color="#000000"/>
+    </mx:Canvas>
+    
+    <mx:Canvas id="FilterErrorPanel" 
+    	cornerRadius="10" color="#FDFEFE" borderStyle="solid" borderThickness="1"
+    	width="310" x="{this.width/2 - FilterErrorPanel.width/2}" y="{this.height/2 - FilterErrorPanel.height/2}" 
+        borderColor="#FFFCFC" backgroundAlpha="1.0" alpha="1.0" visible="false"
+        includeInLayout="false" paddingBottom="0" paddingTop="0" paddingRight="0" paddingLeft="5" height="22" backgroundColor="#000000"
+        showEffect="ZoomIn" hideEffect="ZoomOut">
+        <mx:Label id="FilterErrorLabel" 
+        	text="No visual item matched the specified filter values!"
+            color="#fe0101" fontSize="12" fontFamily="Arial" fontWeight="bold"/>
+    </mx:Canvas>
+    
+    <application:UScreenStateCanvas id="ScreenStatePanel" left="2" bottom="2" visible="true" includeInLayout="false"/>
+    
+    <application:UGraphOverviewPanel id="GraphOverviewPanel"
+    	 bottom="30" left="7" showEffect="DissolveIn" hideEffect="DissolveOut"
+    	 includeInLayout="false" visible="false"/>
+    
+    <help:UTutorialPanel id="UVizHelpPanel" x="{this.width/2 - UVizHelpPanel.width/2}"
+    	y="{this.height/2 - UVizHelpPanel.height/2}" visible="false" includeInLayout="false"
+        showEffect="ZoomIn" hideEffect="ZoomOutHelp"/>
+    	  
+    <mx:Fade id="FadeIn" alphaFrom="0.0" alphaTo="0.75" duration="1000"/>
+    <!--
+    <mx:Fade id="FadeStay" alphaFrom="0.75" alphaTo="0.75" duration="1000"/>
+    <mx:Fade id="FadeInLineage" alphaFrom="0.0" alphaTo="0.75" duration="1000" effectStart="showNoLineageLabel();"/>
+    <mx:Fade id="FadeOutLineage" alphaFrom="0.75" alphaTo="0.0" duration="1000" startDelay="2000" effectEnd="hideNoLineageLabel();"/>
+    -->
+    <mx:Fade id="FadeOut" alphaFrom="0.75" alphaTo="0.0" duration="1000" startDelay="2000"/>
+    
+    <mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+    
+    <mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="500"/>
+        
+    <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" startDelay="2000" duration="500"/>
+    
+    <mx:Zoom 
+		id="ZoomOutHelp" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="500"/>
+     	
+</mx:Application>

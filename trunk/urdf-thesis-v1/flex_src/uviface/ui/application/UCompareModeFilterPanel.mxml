@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	layout="absolute" 
+	width="698" 
+	height="612"
+	horizontalAlign="center" 
+    headerHeight="0"
+    borderStyle="solid"
+    backgroundColor="#5F5751" 
+	borderColor="#A79999" 
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    highlightAlphas="[0,0]"
+    headerColors="[#b1b7c4,#8392ab]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="1" 
+    verticalAlign="middle"
+    fontFamily="Arial">
+	
+	<mx:Style>
+		
+		.MySliderLabel
+		{
+		  color: white;
+		}
+		
+	</mx:Style>
+	
+	<mx:Script>
+		<![CDATA[
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.ItemClickEvent;
+			
+			import uviface.viz.UStringConstants;
+			
+			[Bindable]
+			private var _filters:Array = [new BlurFilter()];
+			
+			[Bindable]
+			private var _resultClusterList:ArrayCollection = new ArrayCollection();
+			
+			[Bindable]
+			private var _availableButtonLabels:Array = ["SELECT_BLACK","SELECT_WHITE"];
+			
+			public function set resultClusterList(resultClusterList:ArrayCollection):void {
+				_resultClusterList = resultClusterList;
+			}
+			
+			
+		]]>
+	</mx:Script>
+	
+	<mx:VBox 
+		horizontalAlign="center" 
+		verticalGap="5" 
+		verticalAlign="middle" 
+		left="10" 
+		right="10" 
+		top="10" 
+		bottom="10" 
+		borderStyle="solid" 
+		cornerRadius="20" 
+		borderThickness="4" 
+		borderColor="#FDFEFE">
+		<mx:HBox id="DisableGraphDistanceFilterSwitchBox" width="400" horizontalAlign="center" verticalAlign="middle" horizontalGap="10"
+			borderStyle="solid" borderThickness="4" cornerRadius="20" borderColor="#FFFFFF" backgroundColor="#4B0101">
+			  
+			  <mx:Label id="DisableGraphDistanceFilterSwitchLabel" text="Disable Graph Distance Filter:" fontWeight="bold" color="#FFFFFF" fontSize="10" fontStyle="normal" textDecoration="normal"/>
+			  
+		<mx:RadioButtonGroup id="DisableGraphDistanceFilterSwitch"/>
+		<mx:RadioButton label="yes" groupName="DisableGraphDistanceFilterSwitch" color="#FEFEFE" selected="false" enabled="true" id="YesSwitchButton"
+		 	  click="handleGraphDistanceFilterSwitchClick();" themeColor="#12FF00"/>
+		<mx:RadioButton label="No" groupName="DisableGraphDistanceFilterSwitch" color="#FEFEFE" selected="true" enabled="true" id="NoSwitchButton"
+		 	  click="handleGraphDistanceFilterSwitchClick();" themeColor="#12FF00"/>
+			  
+		</mx:HBox>
+		<mx:HBox 
+		id="RuleManagementHBox0" 
+		textAlign="center" 
+		backgroundColor="#CFCDCD" 
+		width="498" 
+		height="240" 
+		cornerRadius="15" 
+		borderStyle="solid" 
+		borderThickness="3">
+		
+		<mx:Panel 
+			id="AvailableClusters" 
+			title="Available Clusters" 
+			width="260" 
+			height="230" 
+			horizontalAlign="center" 
+			backgroundColor="#FEFDFD" 
+			borderColor="white" 
+			cornerRadius="15" 
+		     borderStyle="solid" 
+		     borderThickness="3" 
+			verticalAlign="middle"
+			roundedBottomCorners="true">
+			  
+			  <mx:List  
+			  	id="AvailableClusters"  
+			  	cornerRadius="5" 
+			  	borderStyle="solid" 
+			  	borderThickness="2" 
+			  	rowCount="10" 
+			  	dataProvider="{_availableSoftRules}" 
+			         selectedIndex="-1" 
+			         enabled="true"  
+			  	backgroundColor="#FEFDFD"
+			      labelField="label"
+			      width="218" 
+			      height="150"
+			      itemClick="handleAvailableSoftRuleListClick();" />
+			  <mx:LinkBar 
+			  	id="AvailableRulesButtonBar0" 	
+			  	dataProvider="{_availableRulesButtonLabels}" fontSize="10" fontWeight="bold"
+			  	itemClick="handleAvailableRulesButtonClick();"/>
+			
+		</mx:Panel>  
+		
+		<mx:Panel 
+			id="FilterClusters" 
+			title="Clusters to Compare" 
+			width="221" 
+			height="230"  
+			horizontalAlign="center" 
+			backgroundColor="#FEFDFD" 
+			borderColor="white" 
+			cornerRadius="15" 
+		     borderStyle="solid" 
+		     borderThickness="3" 
+			verticalAlign="middle"
+			roundedBottomCorners="true">
+			    <mx:Label text="Black Cluster" id="BlackClusterLabel" enabled="true"/>
+			    <mx:TextInput editable="false" enabled="true" id="BlackClusterTextArea" width="180" height="20" borderStyle="solid" cornerRadius="10" borderThickness="2"/>
+			    <mx:Label text="White Cluster" id="WhiteClusterLabel" enabled="true"/>
+			    <mx:TextArea width="180" height="20" borderStyle="solid" borderThickness="2" cornerRadius="10" id="WhiteClusterTextArea"/>
+			    <mx:Button id="ClusterCompareButton" click="handleCompareButtonClick();" label="COMPARE"/>
+			
+		</mx:Panel>
+		
+		</mx:HBox>
+	  </mx:VBox>
+	
+</mx:Panel>

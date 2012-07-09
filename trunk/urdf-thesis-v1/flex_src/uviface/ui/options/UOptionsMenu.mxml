@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel 
+	xmlns:mx="http://www.adobe.com/2006/mxml" 
+	xmlns:application="uviface.ui.application.*" 
+	layout="absolute" 
+	width="520" 
+	height="405" 
+    textAlign="center" 
+    borderStyle="solid"
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    headerHeight="0"
+    highlightAlphas="[0,0]"
+    headerColors="[#5F5751,white]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="2"
+    backgroundColor="#767675" 
+    backgroundAlpha="1.0" 
+	alpha="1.0" 
+	fontFamily="Arial"
+	borderColor="#7B7979" 
+    hideEffect="{wipeToLeftIn}" 
+    showEffect="{wipeToRightOut}" 
+    color="#040200" 
+    verticalScrollPolicy="auto"
+    fontSize="15" horizontalAlign="center" 
+    verticalAlign="middle" horizontalScrollPolicy="off" xmlns:options="uviface.ui.options.*"
+    creationComplete="init();">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ItemClickEvent;
+			import uviface.event.UPanelVisibilityEvent;
+			import uviface.event.ULayoutEvent;
+			
+			[Bindable]
+			private var _optionButtons:Array = ["Data Access","Graph Options","Graph Layouts"];
+			[Bindable]
+			private var _graphDataTooltip:String = "The Filter Panel is only available when the Force Layout is selected. The Radial Layout is a tree layout and the " + 
+					"independent filter values can lead to an unexpected and messed-up radial layout."
+					
+		    private function init():void {
+		    	this.addEventListener(ULayoutEvent.LAYOUT,toggleFilterPanelVisibility,false,0,true);
+		    }
+			
+			private function toggleFilterPanelVisibility(event:ULayoutEvent):void {
+				GraphDataAccessPanel.toggleFilterPanelVisibility(event);
+				/*
+				switch(event.layout){
+					case UFlareVis.FORCE_LAYOUT: {
+						GraphDataAccessPanel.FilterPanel.enabled = false;
+						GraphDataAccessPanel.FilterPanel.filters = _filters;
+						break;
+					}
+					case UFlareVis.RADIAL_LAYOUT: {
+						GraphDataAccessPanel.FilterPanel.enabled = true;
+						GraphDataAccessPanel.FilterPanel.filters = null;
+						break;
+					}
+				}
+				*/
+			}
+			
+			// a flag to indicate that the panel is currently opening or closing   
+		    //[Bindable]
+		    //private var _isBusy:Boolean = false;
+			
+			public function hide():Boolean {
+				if(wipeToLeftIn.isPlaying || wipeToRightOut.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function show():Boolean {
+				if(wipeToLeftIn.isPlaying || wipeToRightOut.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function hideButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function showButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function handleVisibilityButtonClick():void {
+				if(this.visible)
+				   this.visible = false;
+				else
+				   this.visible = true;
+			}
+			
+			public function updateLayout(layoutType:int):void {
+				GraphLayoutsPanel.updateLayout(layoutType);
+				GraphOptionsPanel.updateLayout(layoutType);				
+			}
+			
+			private function switchLinkBar(event:ItemClickEvent):void {
+				
+				if(event.index == MenuViewStack.selectedIndex)
+				   return;
+				switch(event.index) {
+					case 0: {
+						MenuViewStack.selectedIndex = 0;
+					    DataAccessLinkBar.visible = true;
+					    GraphDataAccessPanel.GraphAccessViewStack.selectedIndex = 0;
+				        GraphOptionsLinkBar.visible = false;
+				        GraphLayoutsLinkBar.visible = false;
+					    break;
+					}
+					case 1: {
+						MenuViewStack.selectedIndex = 1;
+					    DataAccessLinkBar.visible = false;
+					    GraphOptionsLinkBar.visible = true;
+					    GraphOptionsPanel.ConfigurationViewStack.selectedIndex = 0;
+					    GraphLayoutsLinkBar.visible = false;
+				        break;
+					}
+					case 2: {
+						MenuViewStack.selectedIndex = 2;
+					    DataAccessLinkBar.visible = false;
+					    GraphOptionsLinkBar.visible = false;
+					    GraphLayoutsLinkBar.visible = true;
+					    GraphLayoutsPanel.LayoutsViewStack.selectedIndex = 0;
+				        break;
+					}
+				}
+				/*
+				if(event.index == 0) {
+					MenuViewStack.selectedIndex = 0;
+					DataAccessLinkBar.visible = true;
+				    GraphOptionsLinkBar.visible = false;
+					return;
+				}
+				else {
+					MenuViewStack.selectedIndex = 1;
+					DataAccessLinkBar.visible = false;
+					GraphOptionsLinkBar.visible = true;
+				    return;
+				}
+				*/
+			}
+			
+			public function hideNonLineagePanels():void {
+				GraphDataAccessPanel.hideNonLineageProperties();
+				//GraphOptionsLinkBar.selectedIndex = 4;
+				GraphLayoutsLinkBar.selectedIndex = 2;
+				GraphLayoutsPanel.hideNonLineageProperties();
+				GraphOptionsPanel.hideNonLineageProperties();
+			}
+			
+			public function showNonLineagePanels():void {
+				GraphDataAccessPanel.showNonLineageProperties();
+				//GraphOptionsLinkBar.selectedIndex = 4;
+				GraphLayoutsLinkBar.selectedIndex = 0;
+				GraphLayoutsPanel.showNonLineageProperties();
+				GraphOptionsPanel.showNonLineageProperties();
+			}
+			
+			/*
+			private function panelClosed():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_CLOSED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    
+		    private function panelOpened():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_OPENED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    */	
+			
+		]]>
+	</mx:Script>
+	
+	<mx:ApplicationControlBar 
+		id="OptionsControlBar" 
+		height="60" 
+		horizontalAlign="center" 
+		verticalAlign="middle" 
+		paddingTop="2" 
+		paddingBottom="2" 
+		fontSize="10" dock="true" width="100%" creationPolicy="all" 
+		fillAlphas="[0.0, 0.0]" fillColors="[#767675, #767675]">
+		
+		<mx:Canvas id="OptionsButtonCanvas" width="100%" height="60" borderStyle="none" 
+			 cornerRadius="15" borderThickness="2" backgroundColor="#767675" 
+		     backgroundAlpha="0.0" borderColor="#6D6E6F" alpha="1.0" color="#FDFEFE" creationPolicy="all" 
+		     dropShadowEnabled="false">					
+		
+			<mx:ToggleButtonBar id="OptionsMainLinkBar" color="#030303" fontWeight="bold" borderStyle="solid" 
+	    		cornerRadius="10" borderThickness="0" backgroundColor="#FFFFFF" fontSize="11" visible="true"
+	    	    dataProvider="{_optionButtons}" itemClick="switchLinkBar(event);" alpha="1.0" y="2" 
+	    	    x="{OptionsButtonCanvas.width/2 - OptionsMainLinkBar.width/2}" selectedIndex="0"/>
+	    	
+	    	<mx:LinkBar id="DataAccessLinkBar" color="#FFFEFE" fontWeight="bold" borderStyle="solid" 
+	    		cornerRadius="10" borderThickness="0" backgroundColor="#767675" fontSize="9" visible="true"
+	    	    dataProvider="{GraphDataAccessPanel.GraphAccessViewStack}"
+	    	    hideEffect="ZoomOut" showEffect="ZoomIn" alpha="1.0" y="30" x="{OptionsButtonCanvas.width/2 - DataAccessLinkBar.width/2}" 
+	    	    selectedIndex="0" backgroundAlpha="1.0" height="23" toolTip="{_graphDataTooltip}"/>
+	    	<mx:LinkBar id="GraphOptionsLinkBar" color="#FFFEFE" fontWeight="bold" borderStyle="solid" 
+	    		cornerRadius="10" borderThickness="0" backgroundColor="#767675" fontSize="9" visible="false"
+	    		dataProvider="{GraphOptionsPanel.ConfigurationViewStack}" backgroundAlpha="1.0"
+	    		hideEffect="ZoomOut" showEffect="ZoomIn" x="{OptionsButtonCanvas.width/2 - GraphOptionsLinkBar.width/2}" 
+	    		y="30" selectedIndex="0" height="23"/>
+	        <mx:LinkBar id="GraphLayoutsLinkBar" color="#FFFEFE" fontWeight="bold" borderStyle="solid" 
+	    		cornerRadius="10" borderThickness="0" backgroundColor="#767675" fontSize="9" visible="false"
+	    		dataProvider="{GraphLayoutsPanel.LayoutsViewStack}" backgroundAlpha="1.0"
+	    		hideEffect="ZoomOut" showEffect="ZoomIn" x="{OptionsButtonCanvas.width/2 - GraphLayoutsLinkBar.width/2}" 
+	    		y="30" selectedIndex="0" height="23"/>
+		
+		</mx:Canvas>
+		
+	</mx:ApplicationControlBar>
+	
+	<mx:ViewStack id="MenuViewStack" width="100%" height="340" creationPolicy="all" fontSize="10" dropShadowEnabled="false" y="60">
+		
+		    <options:UGraphDataAccessPanel title="Data Access" label="Direct Data Access" width="100%" height="100%" 
+		    	    id="GraphDataAccessPanel" fontSize="10" dropShadowEnabled="false" verticalAlign="middle"
+		    	    hideEffect="DissolveOut" showEffect="DissolveIn" verticalScrollPolicy="off"/>	    
+		    <options:UGraphConfigurationPanel title="Graph Options" label="Graph Options" width="100%" height="100%" 
+		    	    id="GraphOptionsPanel" fontSize="10" dropShadowEnabled="false"
+		    	    hideEffect="DissolveOut" showEffect="DissolveIn" verticalScrollPolicy="off"/>
+		    <options:UGraphLayoutsPanel title="Graph Layouts" label="Graph Layouts" width="100%" height="100%" 
+		    	    id="GraphLayoutsPanel" fontSize="10" dropShadowEnabled="false"
+		    	    hideEffect="DissolveOut" showEffect="DissolveIn" verticalScrollPolicy="off"/>
+		
+	</mx:ViewStack>			
+	
+	<mx:WipeLeft id="wipeToLeftIn" duration="500"/>
+	<mx:WipeRight id="wipeToRightOut" duration="500"/> 
+	
+	<mx:Zoom 
+		id="ZoomIn" 
+		zoomHeightFrom="0.0" 
+        zoomWidthFrom="0.0" 
+        zoomHeightTo="1.0" 
+        zoomWidthTo="1.0" duration="250"/>
+        
+    <mx:Zoom 
+		id="ZoomOut" 
+		zoomHeightFrom="1.0" 
+        zoomWidthFrom="1.0" 
+        zoomHeightTo="0.0" 
+        zoomWidthTo="0.0" duration="250"/>
+        
+    <mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+	
+</mx:Panel>

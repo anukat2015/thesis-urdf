@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+     layout="absolute" 
+	width="270" 
+	height="215"  
+	textAlign="center"
+    borderThickness="5"
+    backgroundColor="#3F3F3F"
+    borderColor="black"
+    borderStyle="none" 
+    horizontalAlign="center"
+    cornerRadius="15" paddingTop="0"  paddingBottom="0"  backgroundAlpha="0.0" color="#FCFCFC" cacheAsBitmap="true" headerColors="0" headerHeight="0" verticalAlign="middle">
+	
+	<mx:Label x="0" y="0" width="250" height="20" fontSize="10" fontWeight="bold" textAlign="center" text="Current Server Statistics"/>
+	<mx:HRule y="18" width="240" height="3" x="9"/>
+	<mx:Label x="5" y="25" text="Dependency Graph Size:"/>
+	<mx:Label x="185" y="25" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelDGSC" text="0"/>
+	<mx:Label x="5" y="45" text="Grounded Soft Rules Produced:"/>
+	<mx:Label x="185" y="45" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelGSRPC" text="0"/>
+	<mx:Label x="5" y="65" text="Grounded Hard Rules Produced:"/>
+	<mx:Label x="185" y="65" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelGHRPC" text="0"/>
+	<mx:Label x="5" y="85" text="Query Processing Time:"/>
+	<mx:Label x="189" y="85" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelSRTC" text="0 ms"/>
+	<mx:Label x="5" y="105" text="Server Execution Time:"/>
+	<mx:Label x="189" y="105" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelSETC" text="0 ms"/>
+	<mx:Label x="5" y="125" text="Data Transfer Time:"/>
+	<mx:Label x="189" y="125" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelSTC" text="0 ms"/>
+	<mx:Label x="5" y="145" text="Sorting Query Literals Time:"/>
+	<mx:Label x="189" y="145" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelSQL" text="0 ms"/>
+	<mx:Label x="5" y="165" text="Inverting Rules Time:"/>
+	<mx:Label x="189" y="165" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelISR" text="0 ms"/>
+	<mx:Label x="5" y="185" text="Solving MAX-SAT Time:"/>
+	<mx:Label x="189" y="185" width="65" textAlign="right" fontStyle="italic" fontWeight="bold" id="labelSMS" text="0 ms"/>
+    
+    
+</mx:Panel>

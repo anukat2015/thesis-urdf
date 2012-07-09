@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:ComboBox xmlns:mx="http://www.adobe.com/2006/mxml"
+	  editable="false"
+	  dataProvider="{_relations}"
+	  textAlign="center" 
+	  dropdownWidth="150" 
+	  rowCount="10" 
+	  change="checkRelation(event);" 
+	  dataChange="checkRelation();">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ListEvent;
+			import flash.events.Event;
+			import util.UStringUtil;
+			import uviface.event.UStringChangeEvent;
+		
+			import urdf.api.URelation;
+			import mx.collections.ArrayCollection;
+			import mx.events.CollectionEvent;
+			
+			[Bindable]
+			private var _relations:ArrayCollection = URelation.getRelations();
+			
+			private function checkRelation(event:ListEvent = null):void {
+				if(this.selectedIndex > 0)
+				    this.dispatchEvent(new UStringChangeEvent(UStringChangeEvent.STRING_CHANGE_EVENT,
+				                       UStringChangeEvent.PREDICATE, this.textInput.text,true));
+				else 
+				   return;
+			}
+			
+		]]>
+	</mx:Script>
+	
+</mx:ComboBox>
