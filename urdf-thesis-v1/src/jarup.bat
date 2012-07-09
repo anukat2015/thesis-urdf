@@ -1,0 +1,1 @@
+jar -cvf urdf.jar urdf gazetter MPII_SPARQL_endpoint mmcidemo.ini yago.ini yago2.ini

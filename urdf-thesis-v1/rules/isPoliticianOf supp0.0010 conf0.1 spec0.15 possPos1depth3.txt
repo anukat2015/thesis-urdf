@@ -1,0 +1,177 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/isPoliticianOf>
+ 
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 7.100321 support: 0.5974026 specialityRatio: 0.013633669
+N+(c): 703 E+(c): 46 N(c): 46 B(c): 3374 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/New_Mexico>)
+confidence: 1.0 support: 0.1875 specialityRatio: 0.1875
+N+(c): 6 E+(c): 6 N(c): 6 B(c): 32 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/Maryland>)
+confidence: 2.2857144 support: 0.032258064 specialityRatio: 0.25
+N+(c): 8 E+(c): 2 N(c): 2 B(c): 8 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/Missouri>)
+confidence: 1.0 support: 0.03773585 specialityRatio: 0.4
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 5 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 1.66547 support: 0.015946286 specialityRatio: 0.19094767
+N+(c): 657 E+(c): 38 N(c): 270 B(c): 1414 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_politicians_of_Irish_descent>)(B,<http://yago-knowledge.org/resource/Maryland>)
+confidence: 2.2857144 support: 0.032258064 specialityRatio: 0.25
+N+(c): 8 E+(c): 2 N(c): 2 B(c): 8 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)
+confidence: 0.39272818 support: 0.0012589174 specialityRatio: 0.21019109
+N+(c): 32 E+(c): 3 N(c): 33 B(c): 157 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.125 support: 0.039215688 specialityRatio: 0.6666667
+N+(c): 3 E+(c): 2 N(c): 2 B(c): 3 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_California>)(B,<http://yago-knowledge.org/resource/California>)
+confidence: 6.0 support: 0.028169014 specialityRatio: 0.16666667
+N+(c): 12 E+(c): 2 N(c): 2 B(c): 12 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 71.0 support: 0.9220779 specialityRatio: 0.005586592
+N+(c): 5041 E+(c): 71 N(c): 71 B(c): 12709 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.625788 support: 1.4117647 specialityRatio: 0.1764706
+N+(c): 145 E+(c): 72 N(c): 72 B(c): 408 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/California>)
+confidence: 1.0 support: 0.028169014 specialityRatio: 0.2857143
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 7 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 3.0617416 support: 0.028955098 specialityRatio: 0.15670246
+N+(c): 4899 E+(c): 69 N(c): 1591 B(c): 10153 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 71.0 support: 0.8961039 specialityRatio: 0.014084507
+N+(c): 4899 E+(c): 69 N(c): 69 B(c): 4899 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_politicians_of_Irish_descent>)(B,<http://yago-knowledge.org/resource/California>)
+confidence: 1.0 support: 0.028169014 specialityRatio: 1.0
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 2 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)isPoliticianOf(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.125 support: 0.039215688 specialityRatio: 0.6666667
+N+(c): 3 E+(c): 2 N(c): 2 B(c): 3 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)(B,<http://yago-knowledge.org/resource/Ohio>)
+confidence: 1.0 support: 0.032786883 specialityRatio: 0.5
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 4 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)(B,<http://yago-knowledge.org/resource/Texas>)
+confidence: 0.46862698 support: 0.06666667 specialityRatio: 0.21428572
+N+(c): 3 E+(c): 3 N(c): 3 B(c): 14 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/Idaho>)
+confidence: 0.7427157 support: 0.06666667 specialityRatio: 0.4
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 5 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/North_Carolina>)
+confidence: 1.0 support: 0.029850746 specialityRatio: 0.33333334
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 6 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/Massachusetts>)
+confidence: 1.0 support: 0.036585364 specialityRatio: 0.42857143
+N+(c): 3 E+(c): 3 N(c): 3 B(c): 7 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 0.38226694 support: 0.015946286 specialityRatio: 0.41402215
+N+(c): 427 E+(c): 38 N(c): 561 B(c): 1355 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.5625 support: 0.039215688 specialityRatio: 0.4
+N+(c): 5 E+(c): 2 N(c): 2 B(c): 5 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,C)wasBornIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_North_Carolina>)(B,<http://yago-knowledge.org/resource/North_Carolina>)
+confidence: 1.0 support: 0.029850746 specialityRatio: 1.0
+N+(c): 2 E+(c): 2 N(c): 2 B(c): 2 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)
+confidence: 0.15435833 support: 0.007133865 specialityRatio: 0.28037384
+N+(c): 7 E+(c): 17 N(c): 30 B(c): 107 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 0.3936906 support: 0.029374737 specialityRatio: 1.0
+N+(c): 69 E+(c): 70 N(c): 143 B(c): 143 E+: 2383
+isPoliticianOf(A,B)<-wasBornIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 3.65252 support: 0.71428573 specialityRatio: 0.0034891835
+N+(c): 449 E+(c): 55 N(c): 55 B(c): 15763 E+: 2383
+isPoliticianOf(A,B)<-wasBornIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_Roman_Catholic_politicians>)(B,<http://yago-knowledge.org/resource/Ohio>)
+confidence: 2.0 support: 0.032786883 specialityRatio: 0.25
+N+(c): 4 E+(c): 2 N(c): 2 B(c): 8 E+: 2383
+isPoliticianOf(A,B)<-wasBornIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_politician_110451263>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.3851043 support: 0.05882353 specialityRatio: 0.27272728
+N+(c): 5 E+(c): 3 N(c): 3 B(c): 11 E+: 2383
+isPoliticianOf(A,B)<-wasBornIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 1.6420869 support: 0.0058749476 specialityRatio: 0.20242915
+N+(c): 232 E+(c): 14 N(c): 100 B(c): 494 E+: 2383
+isPoliticianOf(A,B)<-wasBornIn(A,C)diedIn(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_California>)(B,<http://yago-knowledge.org/resource/California>)
+confidence: 2.0416667 support: 0.028169014 specialityRatio: 0.2857143
+N+(c): 7 E+(c): 2 N(c): 2 B(c): 7 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.74025977 specialityRatio: 0.34969324
+N+(c): 57 E+(c): 57 N(c): 57 B(c): 163 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.0 support: 0.05882353 specialityRatio: 0.1764706
+N+(c): 3 E+(c): 3 N(c): 3 B(c): 17 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Living_people>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.077922076 specialityRatio: 0.25
+N+(c): 6 E+(c): 6 N(c): 6 B(c): 24 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)
+confidence: 0.12794168 support: 0.0062945867 specialityRatio: 0.3768116
+N+(c): 5 E+(c): 15 N(c): 26 B(c): 69 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.064935066 specialityRatio: 1.0
+N+(c): 5 E+(c): 5 N(c): 5 B(c): 5 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_lawyer_110249950>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.14285715 specialityRatio: 0.18333334
+N+(c): 11 E+(c): 11 N(c): 11 B(c): 60 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 0.38365552 support: 0.02391943 specialityRatio: 1.0
+N+(c): 56 E+(c): 57 N(c): 118 B(c): 118 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.72727275 specialityRatio: 1.0
+N+(c): 56 E+(c): 56 N(c): 56 B(c): 56 E+: 2383
+isPoliticianOf(A,B)<-hasPreferredName(A,C)isCalled(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)
+confidence: 0.12017141 support: 0.00461603 specialityRatio: 0.31707317
+N+(c): 2 E+(c): 11 N(c): 13 B(c): 41 E+: 2383
+isPoliticianOf(A,B)<-isMarriedTo(A,C)livesIn(A,B)(B,<http://yago-knowledge.org/resource/Massachusetts>)
+confidence: 1.1081942 support: 0.024390243 specialityRatio: 0.5
+N+(c): 3 E+(c): 2 N(c): 2 B(c): 4 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.9091174 support: 0.76623374 specialityRatio: 0.38562092
+N+(c): 61 E+(c): 59 N(c): 59 B(c): 153 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)(B,<http://yago-knowledge.org/resource/Pennsylvania>)
+confidence: 1.0 support: 0.05882353 specialityRatio: 0.15789473
+N+(c): 3 E+(c): 3 N(c): 3 B(c): 19 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Living_people>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.077922076 specialityRatio: 0.3529412
+N+(c): 6 E+(c): 6 N(c): 6 B(c): 17 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)
+confidence: 0.1036409 support: 0.007553504 specialityRatio: 0.39473686
+N+(c): 5 E+(c): 18 N(c): 30 B(c): 76 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 1.0 support: 0.064935066 specialityRatio: 1.0
+N+(c): 5 E+(c): 5 N(c): 5 B(c): 5 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_lawyer_110249950>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.88736695 support: 0.14285715 specialityRatio: 0.18333334
+N+(c): 11 E+(c): 11 N(c): 11 B(c): 60 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 0.3831788 support: 0.02391943 specialityRatio: 0.9672131
+N+(c): 58 E+(c): 57 N(c): 118 B(c): 122 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.8783361 support: 0.72727275 specialityRatio: 0.9655172
+N+(c): 58 E+(c): 56 N(c): 56 B(c): 58 E+: 2383
+isPoliticianOf(A,B)<-isCalled(A,C)hasPreferredName(D,C)livesIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_officers>)
+confidence: 0.12283248 support: 0.00461603 specialityRatio: 0.325
+N+(c): 2 E+(c): 11 N(c): 13 B(c): 40 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/Louisiana>)
+confidence: 0.75730354 support: 2.2096775 specialityRatio: 0.010092081
+N+(c): 141 E+(c): 137 N(c): 137 B(c): 13575 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.6233841 support: 1.4025974 specialityRatio: 0.0071353065
+N+(c): 110 E+(c): 108 N(c): 108 B(c): 15136 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/Virginia>)
+confidence: 1.0 support: 1.1408451 specialityRatio: 0.011260948
+N+(c): 81 E+(c): 81 N(c): 81 B(c): 7193 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/Georgia_(U.S._state)>)
+confidence: 0.8998829 support: 1.2804878 specialityRatio: 0.010930669
+N+(c): 105 E+(c): 105 N(c): 105 B(c): 9606 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/Maryland>)
+confidence: 0.9610735 support: 1.967742 specialityRatio: 0.008367053
+N+(c): 122 E+(c): 122 N(c): 122 B(c): 14581 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/Texas>)
+confidence: 0.915254 support: 3.6 specialityRatio: 0.009024567
+N+(c): 162 E+(c): 162 N(c): 162 B(c): 17951 E+: 2383
+isPoliticianOf(A,B)<-hasGivenName(A,C)hasFamilyName(D,C)livesIn(D,B)(B,<http://yago-knowledge.org/resource/California>)
+confidence: 0.73766905 support: 1.4225352 specialityRatio: 0.0057461457
+N+(c): 110 E+(c): 101 N(c): 101 B(c): 17577 E+: 2383
+isPoliticianOf(A,B)<-isMarriedTo(C,A)livesIn(A,B)(B,<http://yago-knowledge.org/resource/Massachusetts>)
+confidence: 1.1081942 support: 0.024390243 specialityRatio: 0.5
+N+(c): 3 E+(c): 2 N(c): 2 B(c): 4 E+: 2383
+time elapsed for whole partition: 34822

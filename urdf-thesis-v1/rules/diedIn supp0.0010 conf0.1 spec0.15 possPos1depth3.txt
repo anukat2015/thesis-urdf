@@ -1,0 +1,90 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/diedIn>
+ 
+diedIn(A,B)<-wasBornIn(A,C)created(D,C)isKnownFor(D,B)
+confidence: 0.71929824 support: 0.0019506519 specialityRatio: 0.29533678
+N+(c): 41 E+(c): 57 N(c): 57 B(c): 193 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)created(C,B)isKnownFor(C,B)
+confidence: 0.71929824 support: 0.0019506519 specialityRatio: 0.29533678
+N+(c): 41 E+(c): 57 N(c): 57 B(c): 193 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)hasCapital(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_Union_Army_generals>)
+confidence: 0.20292427 support: 0.0014031006 specialityRatio: 0.4456522
+N+(c): 12 E+(c): 41 N(c): 41 B(c): 92 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)hasCapital(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_United_States_Military_Academy_alumni>)
+confidence: 0.34811783 support: 0.0012319906 specialityRatio: 0.31858408
+N+(c): 19 E+(c): 36 N(c): 36 B(c): 113 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)hasCapital(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_United_States_Army_generals>)
+confidence: 0.31787705 support: 0.0011635468 specialityRatio: 0.2982456
+N+(c): 17 E+(c): 34 N(c): 34 B(c): 114 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)hasCapital(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wordnet_politician_110451263>)
+confidence: 0.54972976 support: 0.001882208 specialityRatio: 0.15277778
+N+(c): 50 E+(c): 55 N(c): 55 B(c): 360 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)isKnownFor(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_American_silent_film_actors>)
+confidence: 0.4673168 support: 0.0019848738 specialityRatio: 0.17417417
+N+(c): 46 E+(c): 58 N(c): 58 B(c): 333 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)isKnownFor(C,B)type(A,D)(D,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.4292357 support: 0.0011293248 specialityRatio: 0.28695652
+N+(c): 16 E+(c): 33 N(c): 33 B(c): 115 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_sovereign_110628644>)
+confidence: 0.25065964 support: 0.012970124 specialityRatio: 0.36724806
+N+(c): 95 E+(c): 379 N(c): 379 B(c): 1032 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.1553398 support: 0.010574587 specialityRatio: 0.30234835
+N+(c): 48 E+(c): 309 N(c): 309 B(c): 1022 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_writer_110794014>)
+confidence: 0.19277108 support: 0.008521269 specialityRatio: 0.20064464
+N+(c): 48 E+(c): 249 N(c): 249 B(c): 1241 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_People_from_New_York_City>)
+confidence: 0.18118466 support: 0.009821704 specialityRatio: 0.23314379
+N+(c): 52 E+(c): 287 N(c): 287 B(c): 1231 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Union_Army_generals>)
+confidence: 0.13197969 support: 0.006741727 specialityRatio: 0.67235494
+N+(c): 26 E+(c): 197 N(c): 197 B(c): 293 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Harvard_University_alumni>)
+confidence: 0.20491803 support: 0.008350159 specialityRatio: 0.24696356
+N+(c): 50 E+(c): 244 N(c): 244 B(c): 988 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_politician_110451263>)
+confidence: 0.32608697 support: 0.004722631 specialityRatio: 0.2875
+N+(c): 45 E+(c): 138 N(c): 138 B(c): 480 E+: 29221
+diedIn(A,B)<-wasBornIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.24299066 support: 0.0036617501 specialityRatio: 0.29805014
+N+(c): 26 E+(c): 107 N(c): 107 B(c): 359 E+: 29221
+diedIn(A,B)<-hasPreferredName(A,C)isCalled(D,C)wasBornIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.17486358 support: 0.007563054 specialityRatio: 0.35238096
+N+(c): 41 E+(c): 221 N(c): 222 B(c): 630 E+: 29221
+diedIn(A,B)<-hasPreferredName(A,C)isCalled(D,C)wasBornIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_writer_110794014>)
+confidence: 0.20780422 support: 0.0048937406 specialityRatio: 0.21375187
+N+(c): 32 E+(c): 143 N(c): 143 B(c): 669 E+: 29221
+diedIn(A,B)<-hasPreferredName(A,C)isCalled(D,C)wasBornIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Harvard_University_alumni>)
+confidence: 0.21283829 support: 0.0043461896 specialityRatio: 0.22719142
+N+(c): 29 E+(c): 127 N(c): 127 B(c): 559 E+: 29221
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(C,B)
+confidence: 0.13018478 support: 0.025906026 specialityRatio: 0.15857142
+N+(c): 120 E+(c): 757 N(c): 777 B(c): 4900 E+: 29221
+diedIn(A,B)<-isMarriedTo(A,C)isMarriedTo(C,D)wasBornIn(D,B)
+confidence: 0.13593341 support: 0.04065569 specialityRatio: 0.218618
+N+(c): 257 E+(c): 1188 N(c): 1294 B(c): 5919 E+: 29221
+diedIn(A,B)<-isMarriedTo(A,C)hasChild(D,C)wasBornIn(D,B)
+confidence: 0.113695785 support: 0.010232368 specialityRatio: 0.2383117
+N+(c): 57 E+(c): 299 N(c): 367 B(c): 1540 E+: 29221
+diedIn(A,B)<-isCalled(A,C)hasPreferredName(D,C)wasBornIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_scientist_110560637>)
+confidence: 0.15921935 support: 0.0076999418 specialityRatio: 0.35625
+N+(c): 41 E+(c): 225 N(c): 228 B(c): 640 E+: 29221
+diedIn(A,B)<-isCalled(A,C)hasPreferredName(D,C)wasBornIn(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Fellows_of_the_Royal_Society>)
+confidence: 0.18481725 support: 0.0031826426 specialityRatio: 0.2942943
+N+(c): 23 E+(c): 93 N(c): 98 B(c): 333 E+: 29221
+diedIn(A,B)<-hasChild(C,A)wasBornIn(C,B)
+confidence: 0.11630806 support: 0.019095855 specialityRatio: 0.20869288
+N+(c): 100 E+(c): 558 N(c): 653 B(c): 3129 E+: 29221
+diedIn(A,B)<-hasChild(C,A)isMarriedTo(C,D)wasBornIn(D,B)
+confidence: 0.1038101 support: 0.013859895 specialityRatio: 0.22208014
+N+(c): 77 E+(c): 405 N(c): 521 B(c): 2346 E+: 29221
+diedIn(A,B)<-isMarriedTo(C,A)wasBornIn(C,B)
+confidence: 0.13018478 support: 0.025906026 specialityRatio: 0.15857142
+N+(c): 120 E+(c): 757 N(c): 777 B(c): 4900 E+: 29221
+diedIn(A,B)<-isMarriedTo(C,A)hasChild(D,C)wasBornIn(D,B)
+confidence: 0.11369578 support: 0.010232368 specialityRatio: 0.2383117
+N+(c): 57 E+(c): 299 N(c): 367 B(c): 1540 E+: 29221
+diedIn(A,B)<-isMarriedTo(C,A)isMarriedTo(D,C)wasBornIn(D,B)
+confidence: 0.13593334 support: 0.04065569 specialityRatio: 0.218618
+N+(c): 257 E+(c): 1188 N(c): 1294 B(c): 5919 E+: 29221
+time elapsed for whole partition: 883710

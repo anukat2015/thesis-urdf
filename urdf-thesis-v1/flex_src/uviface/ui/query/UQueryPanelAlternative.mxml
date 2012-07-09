@@ -1,0 +1,624 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+	layout="absolute" 
+	width="680" 
+	height="88"
+	textAlign="center"
+	horizontalAlign="center" 
+	borderThicknessLeft="0"
+    borderThicknessTop="0"
+    borderThicknessBottom="0"
+    borderThicknessRight="0"
+    headerHeight="0"
+    title="UViz Query Panel"
+    headerColors="[#5F5751,white]"
+    borderStyle="solid"
+    borderThickness="2" 
+    creationComplete="onCreationComplete();" 
+    hideEffect="{wipeToTopIn}" 
+    showEffect="{wipeToBottomOut}"
+	xmlns:query="uviface.ui.query.*"
+	xmlns:tooltip="uviface.ui.tooltip.*" 
+	cornerRadius="15" 
+	backgroundColor="#3F3F3F" 
+	borderColor="#7B7979" 
+	backgroundAlpha="1.0" 
+	alpha="1.0" 
+	fontFamily="Arial"
+	verticalAlign="middle" 
+	color="#000000" 
+    fontSize="15"
+    roundedBottomCorners="true">
+	
+	<mx:Script>
+		<![CDATA[
+			import mx.events.ToolTipEvent;
+			import uviface.ui.tooltip.UStringToolTip;
+			import uviface.event.UCompareModeEvent;
+			import uviface.viz.UFlareVis;
+		    import mx.events.FlexEvent;
+			import urdf.api.URelation;
+			import util.UStringUtil;
+			import flare.query.StringUtil;
+			import mx.controls.CheckBox;
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.managers.PopUpManager;
+			import mx.containers.VBox;
+			import mx.containers.ControlBar;
+			import mx.controls.Button;
+			import mx.controls.Menu;
+			import mx.effects.easing.*;
+			import mx.controls.List;
+
+			import mx.events.MenuEvent;
+			import uviface.event.ULineageLeaveEvent;
+			import uviface.event.UQueryEvent;
+			import uviface.event.UTextAreaEvent;
+			
+			import com.hillelcoren.components.AutoComplete;
+			import urdf.api.UQuery;
+			import urdf.api.ULiteral;
+			
+			import util.UStringUtil;
+			
+			import mx.collections.ArrayCollection;
+			import urdf.api.URelation;
+			import uviface.ui.query.UQueryErrorPanel;
+			
+			import uviface.ui.query.UPredicateMenu;
+			
+			[Bindable]
+			private var _relations:ArrayCollection = URelation.getRelations();
+			[Bindable]
+			private var _demoQueryStrings:ArrayCollection;
+			
+			private var _query:UQuery;	
+			
+			[Bindable]
+			private var _dropDown:ClassFactory;	
+			[Bindable]
+			private var _dropDownStringOnly:ClassFactory;	
+			
+			private var _predicateMenu:UPredicateMenu;	
+			
+			private function dataTipProducer(value:Object):String{
+				return value.label;
+			}
+			
+			private function dataTipProducerStringOnly(value:Object):String{
+				return value as String;
+			}
+					
+			private function onCreationComplete():void {                                             
+                
+                // add an event listener for the changes to the literals
+                //this.addEventListener(UQueryEvent.QUERY_STRING_UPDATE_EVENT,buildQueryString,false,0,true);
+						
+                // build the query string
+                //this.buildQueryString(null);
+                
+                _dropDown = new ClassFactory(List);
+				_dropDown.properties = {showDataTips:true, dataTipFunction:dataTipProducer};
+				_dropDownStringOnly = new ClassFactory(List);
+				_dropDownStringOnly.properties = {showDataTips:true, dataTipFunction:dataTipProducerStringOnly}
+				
+				// build the demo query strings
+				_demoQueryStrings = new ArrayCollection();
+				buildDemoQueryStrings();
+				
+				// build the predicate drop down menu
+				_predicateMenu = new UPredicateMenu(QueryLiteralsConjunctionText);
+				_predicateMenu.menu.addEventListener(KeyboardEvent.KEY_DOWN,handleMenuClick,false,0,true);
+				_predicateMenu.menu.addEventListener(UTextAreaEvent.DROP_DOWN_OPEN_EVENT,showPredicateMenu,false,0,true);
+				
+				//_predicateMenu.showMenu(25,25);
+				
+				QueryLiteralsConjunctionText.text = "hasAcademicAdvisor(?Y,Gerhard_Weikum)";
+            }
+            
+            private function buildDemoQueryStrings():void {
+            	_demoQueryStrings.addItem({label: 'Q1 - Where does Al Gore live in?', text: 'livesIn(Al_Gore,?X)'}); 
+            	_demoQueryStrings.addItem({label: 'Q2 - To whom is Woody Allen married to?', text: 'isMarriedTo(Woody_Allen,?X)'});
+            	_demoQueryStrings.addItem({label: 'Q3 - Who acted in Total Recall and lives in Thal, Austria?', 
+            	                            text: 'actedIn(?X,Total_Recall)^bornIn(?X,Thal,_Austria)'}); 
+            	_demoQueryStrings.addItem({label: 'Q4 - Who acted in in a movie together with Arnold Schwarzenegger and where does this person live?', 
+            	                            text: 'actedIn(Arnold_Schwarzenegger,?X)^actedIn(?Y,?X)^bornIn(?Y,?Z)^notEquals(Arnold_Schwarzenegger,?Y)'}); 
+            	_demoQueryStrings.addItem({label: 'Q5 - Which person who is born in Oxford has an academic advisor who graduated from Cambridge and where did this person graduated from?',
+            	                           text: 'bornIn(?X,Oxford)^graduatedFrom(?X,?Y)^hasAcademicAdvisor(?X,?Z)^graduatedFrom(?Z,University_of_Cambridge)'}); 
+            	_demoQueryStrings.addItem({label: 'Q6 - Which persons who are born in Paris live in another country than France now?',
+            	                           text: 'bornIn(?X,Paris)^isCitizenOf(?X,?Y)^locatedIn(Paris,?Z)^notEquals(?Y,?Z)'}); 
+            	_demoQueryStrings.addItem({label: 'Q7 - Who played in Total Recall and what are his birthplace, his birthdate, his current ' + 
+            			                  'place of living and the name of his spuse ?', 
+            			                  text: 'bornIn(?GUY,?BIRTHPLACE)^livesIn(?GUY,?LIVESIN)^bornOnDate(?GUY,?BIRTHDATE)^isMarriedTo(?GUY,?SPOUSE)^actedIn(?GUY,Total_Recall)'}); 
+            	_demoQueryStrings.addItem({label: 'Q8 - Which patent examiner who was born before 1900 in Ulm won the Nobel Prize for Physics?',
+            	                           text: 'hasWonPrize(?X,Nobel_Prize_in_Physics)^bornIn(?X,Ulm)^bornOnDate(?X,?Z)^yearBefore(?Z,1900)^type(?X,wikicategory_Patent_examiners)'}); 
+            	_demoQueryStrings.addItem({label: 'Q9 - Who acted in a movie together with Emma Thompson is now married to her?', 
+            	                           text: 'isMarriedTo(Emma_Thompson,?SPOUSE)^actedIn(Emma_Thompson,?MOVIE)^actedIn(?SPOUSE,?MOVIE)'}); 
+            	_demoQueryStrings.addItem({label: 'Q10 - Which persons have acted in a movie directed by Martin Scorse, so far?', 
+            	                           text: 'directed(Martin_Scorsese,?MOVIE)^actedIn(?GUY1,?MOVIE)^actedIn(?GUY2,?MOVIE)^notEquals(?GUY1,?GUY2)^notEquals(?GUY1,Martin_Scorsese)^notEquals(?GUY2,Martin_Scorsese)'}); 
+            	_demoQueryStrings.addItem({label: 'Q11 - Which cities located in Saarland are near Saarbrücken?', 
+            	                           text: 'gaz_hasName(?A,Saarbrucken)^gaz_isLocatedIn(?B,Saarland)^notEquals(?A,?B)^gaz_isClose(?A,?B)^gaz_hasName(?B,?D)'}); 
+            	_demoQueryStrings.addItem({label: 'Q12 - Which persons born in cities located in Germany have won the Nobel Prize for Physics, so far?', 
+            	                           text: 'hasWonPrize(?X,Nobel_Prize_in_Physics)^bornIn(?X,?Y)^gaz_hasName(?Z,?Y)^gaz_isLocatedIn(?Z,Germany)'});    
+            	/*
+            	_demoQueryStrings.addItem("isMarriedTo(Woody_Allen,?X)"); 
+            	_demoQueryStrings.addItem("actedIn(?X,Total_Recall)^bornIn(?X,Thal,_Austria)"); 
+            	_demoQueryStrings.addItem("actedIn(Arnold_Schwarzenegger,?X)^actedIn(?Y,?X)^bornIn(?Y,?Z)^notEquals(Arnold_Schwarzenegger,?Y)"); 
+            	_demoQueryStrings.addItem("bornIn(?X,Oxford)^graduatedFrom(?X,?Y)^hasAcademicAdvisor(?X,?Z)^graduatedFrom(?Z,University_of_Cambridge)"); 
+            	_demoQueryStrings.addItem("bornIn(?X,Paris)^isCitizenOf(?X,?Y)^locatedIn(Paris,?Z)^notEquals(?Y,?Z)"); 
+            	_demoQueryStrings.addItem("bornIn(?GUY,?BIRTHPLACE)^livesIn(?GUY,?LIVESIN)^bornOnDate(?GUY,?BIRTHDATE)^isMarriedTo(?GUY,?SPOUSE)^actedIn(?GUY,Total_Recall)"); 
+            	_demoQueryStrings.addItem("hasWonPrize(?X,Nobel_Prize_in_Physics)^bornIn(?X,Ulm)^bornOnDate(?X,?Z)^yearBefore(?Z,1900)^type(?X,wikicategory_Patent_examiners)"); 
+            	_demoQueryStrings.addItem("isMarriedTo(Emma_Thompson,?SPOUSE)^actedIn(Emma_Thompson,?MOVIE)^actedIn(?SPOUSE,?MOVIE)"); 
+            	_demoQueryStrings.addItem("directed(Martin_Scorsese,?MOVIE)^actedIn(?GUY1,?MOVIE)^actedIn(?GUY2,?MOVIE)^notEquals(?GUY1,?GUY2)^notEquals(?GUY1,Martin_Scorsese)^notEquals(?GUY2,Martin_Scorsese)"); 
+            	_demoQueryStrings.addItem("gaz_hasName(?A,Saarbrucken)^gaz_isLocatedIn(?B,Saarland)^notEquals(?A,?B)^gaz_isClose(?A,?B)^gaz_hasName(?B,?D)"); 
+            	_demoQueryStrings.addItem("hasWonPrize(?X,Nobel_Prize_in_Physics)^bornIn(?X,?Y)^gaz_hasName(?Z,?Y)^gaz_isLocatedIn(?Z,Germany)"); 
+            	*/
+            	//_demoQueryStrings.push("gaz_isLocatedIn(?A,Liechtenstein)^gaz_hasName(?A,?B)^gaz_isClose()");           
+  
+    // for these queries I have to change the ULiteral actionscript class and the parsing algorithms
+    
+    //q[11] = new UQuery("Q12", new ULiteral(URelation.ISCLOSE, "Saarbrucken", "?X", 5));
+
+   // q[13] = new UQuery("Q14", new ULiteral(URelation.gaz_ISLOCATEDIN, "?A", "Liechtenstein"), new ULiteral(URelation.gaz_HASNAME, "?A", "?B"), new ULiteral(
+     //   URelation.gaz_ISCLOSE, "?A", "?C", 5), new ULiteral(URelation.gaz_HASNAME, "?C", "?D"));
+            	
+            }
+			
+			public function parseLiteralStringSPARQL(literalString:String, literal:ULiteral):Boolean {
+				
+				// check if the string starts with the typical SPARQL pattern initializer "<"
+				// and ends with ">"
+				if(!(UStringUtil.startsWith(literalString,"<") && UStringUtil.endsWith(literalString,">")))
+				   return false;
+				 
+				if(literalString.indexOf(",") < 0)
+				   return false; 
+				 
+				// set a temporary literal string 
+				//var tempLiteralString:String = new String(literalString); 
+				var tempLiteralArray:Array = new Array();
+				// set a temporary literal string and eliminate the "<" and the ">"
+				var tempLiteralString:String = literalString.substring(1,literalString.length -1);
+				// split the literal string into an array of substrings
+				tempLiteralArray = tempLiteralString.split(",");
+				
+				// the relation string
+				var relationString:String = tempLiteralArray[1] as String;
+				
+				if(!UStringUtil.startsWith(relationString,"?") && !_relations.contains(relationString))
+				   return false;
+				
+				literal.initLiteralFull(URelation.valueOfRelation(relationString),tempLiteralString[0] as String,tempLiteralString[2] as String);
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function parseLiteralStringDatalog(literalString:String, literal:ULiteral):Boolean {
+				
+				// check if the string contains the Datalog-style notation "predicate(subject,object)"
+				if((literalString.indexOf("(") < 0) || (literalString.indexOf(")") < 0))
+				   return false;
+				
+				if(literalString.indexOf(",") < 0)
+				   return false; 
+				 
+				// set a temporary literal string 
+				var tempLiteralString:String = new String(literalString); 
+				var tempLiteralArray:Array = new Array();
+				tempLiteralArray = tempLiteralString.split("(");
+				
+				// the relation string
+				var relationString:String = tempLiteralArray[0] as String;
+				
+				if(!UStringUtil.startsWith(relationString,"?") && !_relations.contains(relationString))
+				   return false;
+				
+				if(tempLiteralArray.length < 2)
+				   return false;
+				
+				// set a temporary literal string and eliminate the ")"
+				tempLiteralString = tempLiteralArray[1] as String;
+				tempLiteralString = tempLiteralString.substring(0,tempLiteralString.length -1);
+				// split the literal string into an array of substrings
+				tempLiteralArray = tempLiteralString.split(",");
+				   
+				literal.initLiteralFull(URelation.valueOfRelation(relationString),tempLiteralArray[0] as String,tempLiteralArray[1] as String);
+				   
+				// everything went ok -> return true
+				return true;
+			}
+			
+			public function parseLiteralFromURL(literalArray:Array, literal:ULiteral):Boolean {
+				
+				if(literalArray.length < 3)
+				   return false;
+				   
+				// the relation string
+				var relationString:String = literalArray[1] as String;
+				
+				if(!UStringUtil.startsWith(relationString,"?") && !_relations.contains(relationString))
+				   return false;
+				
+				literal.initLiteralFull(URelation.valueOfRelation(relationString),literalArray[0] as String,literalArray[2] as String);
+				
+				return true;
+			}
+			
+			private function adjustQueryString():void {
+				// adjust the first literal argument
+				var argument:String = QueryLiteralsConjunctionText.text;
+				var temp1:String;
+				var temp2:String;
+				var argArray:Array = argument.split(" ",2);
+				//if(argArray.length == 0) 
+				  // argArray = argument.split(" + ",2);
+				
+				if(argArray.length == 2) {
+					temp1 = (String)(argArray[0]);
+					temp2 = (String)(argArray[1]);
+					//QueryLiteralArg1Input.text = temp1.charAt(0).toUpperCase().concat(temp1.substr(1,temp1.length -1))
+					  //                         + "_" + temp2.charAt(0).toUpperCase().concat(temp2.substr(1,temp2.length -1));
+					QueryLiteralsConjunctionText.text = temp1 + "_" + temp2;
+				}
+				//else
+				    //QueryLiteralArg1Input.text = argument.charAt(0).toUpperCase().concat(argument.substr(1,argument.length -1));
+				
+			}
+            
+            /** 
+             * Delivers the internally managed UQuery object.
+             * 
+             * @return the internally managed UQuery object. 
+             * */
+            public function get query():UQuery {
+            	return _query;
+            }		    		   		      		   		    		  
+		    
+		    private function parseQueryString(literals:Array):Boolean {
+		    	
+		    	// copy the query string
+		    	var tempQueryString:String = new String(QueryLiteralsConjunctionText.text);
+		    	
+		    	// split the query string according to the dot notation for SPARQL join patterns
+		    	var literalArray:Array = (tempQueryString.lastIndexOf("^") < 0) 
+		    	                         ? tempQueryString.split(".") : tempQueryString.split("^");
+		    	
+		    	// the temporary literal string
+		    	var literalString:String = "";
+		    	
+		    	/*
+		    	if(literalArray.length > 8) {
+		    	  mx.core.Application.application.UVizErrorPanel.writeTooManyLiteralsError();
+		    	  mx.core.Application.application.UVizErrorPanel.show();
+		    	  //Alert.show("Too many literals specified! We allow only 8 literal patterns for the query.", "Literal Number Error!");
+		    	  return;
+		    	}
+		    	*/
+		    	
+		    	// iterate over all literals
+		    	for (var i:int = 0; i<literalArray.length; i++) {
+		    		
+		    		var literal:ULiteral = new ULiteral();
+		    		
+		    		// parse the literal string
+		    		literalString = literalArray[i] as String;
+		    		
+		    		if(literalString.lastIndexOf("<") < 0) {
+			    		if(!parseLiteralStringDatalog(literalString,literal)) {
+			    		   mx.core.Application.application.UVizErrorPanel.writeLiteralError(i);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+			    		   return false;
+			    		}
+		    		}
+		    		else {
+			    		if(!parseLiteralStringSPARQL(literalString,literal)) {
+			    		   mx.core.Application.application.UVizErrorPanel.writeLiteralError(i);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+			    		   return false;
+			    		}
+		    		}
+		    		
+		    		// add the current literal
+		    		literals.push(literal);	
+		    	}
+		    	
+		    	// everything was ok!
+		    	return true;    	
+		    }						
+									
+			public function buildQuery(event:UQueryEvent = null):Boolean {
+					
+				var literalArray:Array = new Array();
+				
+				if(!parseQueryString(literalArray)) {
+					
+					// todo -> suitable error messages
+					
+					return false;
+				}
+				
+				if(literalArray.length == 0) {
+				   // we need the number 1 to show the suitable text in the popup window
+				   //createQueryErrorPopUp(VALUE);
+				   mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+	    	       mx.core.Application.application.UVizErrorPanel.show();
+				   return false;
+				}
+				
+				this._query = new UQuery();
+				
+				// new since 30.10.10
+				try {
+				   this._query.initQuery("current query","Q",literalArray);
+				}
+				catch(e:Error) {
+					if(e.errorID == 0) {
+					    mx.core.Application.application.UVizErrorPanel.writeLiteralConstantError();
+	    	            mx.core.Application.application.UVizErrorPanel.show();
+	    	            return false;
+	                }
+	                else if(e.errorID == 1) {
+					    mx.core.Application.application.UVizErrorPanel.writeChainingError();
+	    	            mx.core.Application.application.UVizErrorPanel.show();
+	    	            return false;
+	                }
+				}
+				this.dispatchEvent(new FlexEvent(FlexEvent.VALUE_COMMIT));
+				// rebuild the query string
+				//buildQueryString();
+				
+				//QueryLiteralsConjunctionText.text = QueryStringToolTip.toolTipText; 
+				
+				return true;
+				
+			}
+			
+			public function buildQueryFromURL(literalArray:Array):Boolean {
+				
+				if(literalArray.length == 0) {
+				   // we need the number 1 to show the suitable text in the popup window
+				   //createQueryErrorPopUp(VALUE);
+				   mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+	    	       mx.core.Application.application.UVizErrorPanel.show();
+				   return false;
+				}
+				
+				this._query = new UQuery();
+				
+				// new since 30.10.10
+				try {
+				   this._query.initQuery("current query","Q",literalArray);
+				}
+				catch(e:Error) {
+					if(e.errorID == 0) {
+					    mx.core.Application.application.UVizErrorPanel.writeLiteralConstantError();
+	    	            mx.core.Application.application.UVizErrorPanel.show();
+	    	            return false;
+	                }
+	                else if(e.errorID == 1) {
+					    mx.core.Application.application.UVizErrorPanel.writeChainingError();
+	    	            mx.core.Application.application.UVizErrorPanel.show();
+	    	            return false;
+	                }
+				}
+				this.dispatchEvent(new FlexEvent(FlexEvent.VALUE_COMMIT));
+				// rebuild the query string
+				//buildQueryString();
+				
+				//QueryLiteralsConjunctionText.text = QueryStringToolTip.toolTipText; 
+				
+				return true;
+				
+			}
+			
+			public function handleKeyboardAction(event:KeyboardEvent):void {
+				// see website : http://www.adobe.com/livedocs/flash/9.0/main/wwhelp/wwhimpl/common/html/wwhelp.htm?context=LiveDocs_Parts&file=00001136.html
+				if(event.keyCode == 13) {
+				   // if the visualization is in lineage mode
+				   // leave the lineage mode and return
+				   if(UFlareVis.lineageMode)
+				      this.dispatchEvent(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));
+				   // otherwise build the query
+				   else {
+				      //if(buildQuery())
+				        // hide();
+				        buildQuery();
+				   }
+				}
+				else
+				   return;
+			}
+			
+			private function submitQuery():void {
+				// if the visualization is in lineage mode
+				// leave the lineage mode and return
+				if(UFlareVis.lineageMode) {
+				      this.dispatchEvent(new ULineageLeaveEvent(ULineageLeaveEvent.LEAVE_LINEAGE_MODE,true));
+				      //if(buildQuery())
+				        // hide();
+				         buildQuery();
+			    }
+				// otherwise build the query
+			    else {
+			       //if(buildQuery())
+				     //hide();
+				      buildQuery();
+			    }
+			}
+			
+			public function hide():void {
+				this.visible = false;
+				this.includeInLayout = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+			}
+			
+			public function show():void {
+				this.visible = true;
+				//this.includeInLayout = true;
+			}
+			
+			public function parseURLString(literalArray:Array):void {
+		    	
+		    	QueryLiteralsConjunctionText.text = "";
+		    	
+		    	for each (var array:Array in literalArray) {
+		    		if(QueryLiteralsConjunctionText.text.length == 0) {
+		    			QueryLiteralsConjunctionText.text += (array[1] as String) + "(" + 
+		    			                                    (array[0] as String) + "," + (array[2] as String) + ")";
+		    		}
+		    		else {
+		    			QueryLiteralsConjunctionText.text +=  "+" + (array[1] as String) + "(" + 
+		    			                                    (array[0] as String) + "," + (array[2] as String) + ")";
+		    		}
+		    	}
+		    	
+		    	var literals:Array = new Array();
+		    	
+		    	if(literalArray.length < 1) {
+		    	  mx.core.Application.application.UVizErrorPanel.writeNoValidLiteralError();
+		    	  mx.core.Application.application.UVizErrorPanel.show();
+		    	  //Alert.show("Too many literals specified! We allow only 8 literal patterns for the query.", "Literal Number Error!");
+		    	  return;
+		    	}
+		    	
+		    	/*
+		    	if(literalArray.length > 8) {
+		    	  mx.core.Application.application.UVizErrorPanel.writeTooManyLiteralsError();
+		    	  mx.core.Application.application.UVizErrorPanel.show();
+		    	  //Alert.show("Too many literals specified! We allow only 8 literal patterns for the query.", "Literal Number Error!");
+		    	  return;
+		    	}
+		    	*/
+		    	
+		    	// iterate over all literals
+		    	for (var i:int = 0; i<literalArray.length; i++) {
+		    		// get the current literal
+		    		//var literal:UQueryLiteralBuilder = (UQueryLiteralBuilder)(_queryLiterals[i]);
+		    		var literal:ULiteral = new ULiteral();
+		    		
+		    		// parse the array that represents the current literal
+		    		if(!parseLiteralFromURL(literalArray[i] as Array,literal)) {
+			    		   mx.core.Application.application.UVizErrorPanel.writeLiteralError(i);
+		    	           mx.core.Application.application.UVizErrorPanel.show();
+			    		   return;
+			    	}
+			    	
+			    	literals.push(literal);    		
+		    	}
+		    	
+		    	//buildQueryString();
+		    	//buildQuery();	
+		    	buildQueryFromURL(literals);
+		    }
+		    
+		    private function dynamicParseQueryString():Boolean {
+		    	
+		    	
+		    	
+		    	return true;
+		    }
+		    
+		    private function copyRelationToQuery():void {
+		    	var predicate:String = PredicateSuggestionComboBox.selectedItem as String;
+		    	QueryLiteralsConjunctionText.replaceText(predicate);
+		    }
+		    
+		    private function handleDemoQueryStringClick():void {
+		    	QueryLiteralsConjunctionText.text = DemoQueriesComboBox.selectedItem.text as String;
+		    	buildQuery();
+		    }
+		    
+		    private function handleMenuClick(event:KeyboardEvent):void {
+		    	switch(event.keyCode) {
+		         case Keyboard.ENTER:
+			           QueryLiteralsConjunctionText.replaceText(_predicateMenu.menu.selectedItem as String);
+			           break;
+			     case Keyboard.TAB:
+			           QueryLiteralsConjunctionText.replaceText(_predicateMenu.menu.selectedItem as String);
+			           break;
+		       }
+		    }
+		    
+		    private function showPredicateMenu(event:UTextAreaEvent):void {
+		    	_predicateMenu.showMenu(100,100);
+		    }
+		    
+		    /*
+		    
+		    <mx:TextArea 
+		id="QueryLiteralsConjunctionText" 
+		y="3" 
+	    right="72"
+		borderThickness="0" 
+		color="#030303" 
+		backgroundColor="#FEFDFD"  
+		backgroundAlpha="1.0"
+		editable="true"
+		alpha="1.0"
+		enabled="true" 
+		cornerRadius="10" 
+		fontSize="10" 
+		fontFamily="Verdana" 
+		borderColor="#010101" 
+		fontWeight="bold" 
+		textAlign="center"
+	    paddingLeft="2" 
+	    paddingRight="2"
+	    width="600" wordWrap="true" height="49">
+		<mx:text>You can use this text field to parse a query string !</mx:text>
+	</mx:TextArea> 
+		     
+		    */
+			
+		]]> 
+	</mx:Script>
+	
+	<mx:Style>
+		
+		.myComboBox {
+			color: #FFFFFF;
+		}
+		
+	</mx:Style>
+	
+	<mx:Button 
+		x="607" 
+		y="4" 
+		height="48" 
+		click="submitQuery();" 
+		fontSize="15" 
+		id="QuerySubmitButton" 
+		width="64" 
+		fillAlphas="[0.0, 0.0, 1.0, 1.0]" 
+		fillColors="[#5F5751, #5F5751, #39FD05, #39FD05]" 
+		enabled="true" 
+		label="Submit" fontFamily="Arial"
+	    paddingBottom="2" paddingLeft="2" paddingRight="2" paddingTop="2" color="#FFFBFB" cornerRadius="10"/>
+	
+	<query:UTextArea 
+		id="QueryLiteralsConjunctionText" 
+		y="3" 
+	    right="72"/>
+	
+	<mx:ComboBox id="PredicateSuggestionComboBox" width="195"
+		dataProvider="{_relations}" 
+		selectedIndex="-1" 
+		enabled="true" 
+		editable="false" 
+		rowCount="10" dropdownFactory="{_dropDownStringOnly}" x="475" y="56" 
+		fontSize="12" fillAlphas="[0.4, 1.0, 0.4, 0.4]" fillColors="[#3F3F3F, #3F3F3F]" textInputStyleName="myComboBox"
+		iconColor="#FFFEFE" change="copyRelationToQuery();"/> 
+	
+	<mx:Label x="5" y="57" text="Demo Queries" id="DemoQueriesLabel" fontSize="12" color="#FFFFFF"/>
+	<mx:ComboBox x="97" y="56" id="DemoQueriesComboBox" dataProvider="{_demoQueryStrings}" 
+		change="handleDemoQueryStringClick()" width="300" editable="false" enabled="true" selectedIndex="-1"
+		rowCount="10" dropdownFactory="{_dropDown}" fontSize="12" labelField="label" 
+		fillAlphas="[0.4, 1.0, 0.4, 0.4]" fillColors="[#3F3F3F, #3F3F3F]" textInputStyleName="myComboBox" iconColor="#FFFEFE"/>
+	
+	<mx:WipeUp id="wipeToTopIn" duration="250"/>
+	<mx:WipeDown id="wipeToBottomOut" duration="250"/> 
+	<mx:Label x="405" y="59" text="Predicates" id="DemoQueriesLabel0" fontSize="12" color="#FFFFFF"/>
+	
+</mx:Panel>

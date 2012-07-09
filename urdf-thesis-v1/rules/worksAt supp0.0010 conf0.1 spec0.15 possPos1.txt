@@ -1,0 +1,3 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/worksAt>
+ 
+time elapsed for whole partition: 12004

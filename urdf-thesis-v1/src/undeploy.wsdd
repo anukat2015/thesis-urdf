@@ -1,0 +1,9 @@
+<undeployment name="test" xmlns="http://xml.apache.org/axis/wsdd/">
+  <service name="urn:urdf"/>
+  <service name="urn:urdf2"/>
+  <service name="urn:urdf3"/>
+  <service name="urn:yago1"/>
+  <service name="urn:yago2"/>
+  <service name="urn:yago3"/>
+  <service name="urn:location1"/>
+</undeployment>

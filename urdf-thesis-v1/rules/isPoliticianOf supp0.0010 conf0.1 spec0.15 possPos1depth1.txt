@@ -1,0 +1,9 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/isPoliticianOf>
+ 
+isPoliticianOf(A,B)<-livesIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_American_people_of_English_descent>)
+confidence: 0.15435833 support: 0.007133865 specialityRatio: 0.28037384
+N+(c): 7 E+(c): 17 N(c): 30 B(c): 107 E+: 2383
+isPoliticianOf(A,B)<-livesIn(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wikicategory_Governors_of_Delaware>)
+confidence: 0.3936906 support: 0.029374737 specialityRatio: 1.0
+N+(c): 69 E+(c): 70 N(c): 143 B(c): 143 E+: 2383
+time elapsed for whole partition: 981

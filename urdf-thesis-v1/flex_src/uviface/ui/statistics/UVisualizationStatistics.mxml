@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Panel xmlns:mx="http://www.adobe.com/2006/mxml"
+    layout="absolute" 
+	width="312" 
+	height="263" 
+    textAlign="center" 
+    borderStyle="solid"
+    cornerRadius="10"
+    borderAlpha="1"
+    roundedBottomCorners="true"
+    headerHeight="0"
+    highlightAlphas="[0,0]"
+    headerColors="[#5F5751,white]"
+    borderThicknessLeft="1"
+    borderThicknessRight="1"
+    borderThicknessTop="0"
+    borderThicknessBottom="-5"
+    borderThickness="2"
+    backgroundColor="#767675" 
+    backgroundAlpha="1.0" 
+	alpha="1.0" 
+	fontFamily="Arial"
+	borderColor="#7B7979" 
+    hideEffect="{wipeToRightIn}"
+    showEffect="{wipeToLeftOut}" 
+    xmlns:application="uviface.ui.application.*" 
+    color="#000101" 
+    creationComplete="onCreationComplete();" 
+    horizontalAlign="center" 
+    verticalAlign="middle" horizontalScrollPolicy="off" xmlns:statistics="uviface.ui.statistics.*">
+     
+    <mx:Script>
+	    <![CDATA[
+	    	import uviface.viz.UFlareVis;
+	    	import urdf.api.UStatistics;
+	    	import urdf.api.UQueryResult;
+	    	import uviface.event.UPanelVisibilityEvent;
+	    	import uviface.ui.statistics.*;
+	    
+		    //[Bindable]
+		    //private var _queryResult:UQueryResult;
+		    
+		    private var _chachesWarm:Boolean = false;
+		    private var _cacheWarmCounter:int = 0;
+		    
+		    private var _dependencyGraphSizeTotal:int = 0;
+		    //private var _dependencyGraphSizeCurrent:int = 0;
+		    //private var _dependencyGraphSizeAVG:int = 0;
+		    
+		    private var _numOfProdGroundedSoftRulesTotal:int = 0;
+		    //private var _numOfProdGroundedSoftRulesCurrent:int = 0;
+		    //private var _numOfProdGroundedSoftRulesAVG:int = 0;
+		    
+		    private var _numOfProdGroundedHardRulesTotal:int = 0;
+		    //private var _numOfProdGroundedHardRulesCurrent:int = 0;
+		    //private var _numOfProdGroundedHardRulesAVG:int = 0;
+		    
+		    private var _numOfProdQQueryResultsTotal:int = 0;
+		    //private var _numOfProdQQueryResultsCurrent:int = 0;
+		    //private var _numOfProdQQueryResultsAVG:int = 0;
+		    
+		    /** The value for the total number of executed queries. */
+			private var _numOfExQueries:int = 0;
+			private var _responseTimeTotal:int = 0;
+			private var _execTimeServerTotal:int = 0;
+			private var _serializationTimeTotal:int = 0;
+			private var _sortLiteralsTimeTotal:int = 0;
+			private var _invertRulesTimeTotal:int = 0;
+			private var _solveMAXSATTimeTotal:int = 0;
+			
+			private function onCreationComplete():void {
+				selectTotalStatistics();
+			}
+			
+			/**  
+			 * Updates the internally managed statistical response/serialization values. 
+			 * 
+			 * */
+			public function updatePerformanceStatistics(queryResult:UQueryResult, responseTimeCurrent:int, execTimeServerCurrent:int):void {
+				
+				//trace("result facts are : ");
+				//trace(queryResult.getResultLineage().toString());
+				
+				var statistics:UStatistics = queryResult.getStatistics();
+				
+				// only update values after calibration, otherwise average values are messed up
+				if(_cacheWarmCounter < 2) {
+					//if(_numOfExQueries == 0){
+						
+						// do not increment the counter
+						// , because we do not count the first server call
+						// usually we need one call to warm up the caches
+						
+						// increment query counter
+					    //_numOfExQueries++
+					    TotalServerStatisticsPanel.labelQST.text = _numOfExQueries.toString();
+					    
+					    // update dependency graph values
+						CurrentServerStatisticsPanel.labelDGSC.text = queryResult.getGlobalDependencyGraph().size().toString();
+						
+						// update grounded soft rules values
+						CurrentServerStatisticsPanel.labelGSRPC.text = statistics.getNumOfGroundedSoftRules().toString();
+						
+						// update grounded hard rules values
+						CurrentServerStatisticsPanel.labelGHRPC.text = statistics.getNumOfGroundedHardRules().toString();
+						
+						// update server response time values
+						CurrentServerStatisticsPanel.labelSRTC.text = responseTimeCurrent.toString() + " ms";
+						
+						// update server query execution time values
+						CurrentServerStatisticsPanel.labelSETC.text = execTimeServerCurrent.toString() + " ms";
+						
+						// update result data serialization and transmission time values
+						CurrentServerStatisticsPanel.labelSTC.text = (responseTimeCurrent - execTimeServerCurrent).toString() + " ms";
+						
+						// update result query literal sort time values
+						CurrentServerStatisticsPanel.labelSQL.text = statistics.getSortInMS().toString() + " ms";
+						
+						// update result data inverting rules time values
+						CurrentServerStatisticsPanel.labelISR.text = statistics.getInvRulInMS().toString() + " ms";
+						
+						// update result data MAX-SAT solving time values
+						CurrentServerStatisticsPanel.labelSMS.text = statistics.getMaxSatInMS().toString() + " ms";
+				
+				    //}
+				    
+				    //_chachesWarm = true;
+				    _cacheWarmCounter++;
+				    /*
+				    else {
+				        _chachesWarm = true;
+				         // increment query counter
+					    //_numOfExQueries = 0;
+					    TotalServerStatisticsPanel.labelQST.text = _numOfExQueries.toString();
+					}
+					*/
+					return;
+				}
+				
+				//var statistics:UStatistics = queryResult.getStatistics();
+				
+				// increment query counter, always add 2 to show, because we ignore the first 2 (warm-up caches)
+				_numOfExQueries++;
+				TotalServerStatisticsPanel.labelQST.text = (_numOfExQueries + 2).toString();  
+				
+				// update dependency graph values
+				var currDGSize:int = queryResult.getGlobalDependencyGraph().size();//trace("dependency graph : " + currDGSize);
+				//_dependencyGraphSizeCurrent = currDGSize;
+				_dependencyGraphSizeTotal += currDGSize;//trace("results : " + queryResult.getQueryResults().toString());
+				TotalServerStatisticsPanel.labelDGST.text = _dependencyGraphSizeTotal.toString();
+				//_dependencyGraphSizeCurrent = currDGSize; 
+				CurrentServerStatisticsPanel.labelDGSC.text = currDGSize.toString();
+				//_dependencyGraphSizeAVG = (int)(_dependencyGraphSizeTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelDGSA.text = ((int)(_dependencyGraphSizeTotal/_numOfExQueries)).toString();
+				
+				// update grounded soft rules values
+				var currNumOfPrGrSR:int = statistics.getNumOfGroundedSoftRules();//trace("soft rules : " + currNumOfPrGrSR.toString());
+				_numOfProdGroundedSoftRulesTotal += currNumOfPrGrSR;
+				TotalServerStatisticsPanel.labelGSRPT.text = _numOfProdGroundedSoftRulesTotal.toString();
+				//_numOfProdGroundedSoftRulesCurrent = currNumOfPrGrSR; 
+				CurrentServerStatisticsPanel.labelGSRPC.text = currNumOfPrGrSR.toString();
+				//_numOfProdGroundedSoftRulesAVG = (int)(_numOfProdGroundedSoftRulesTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelGSRPA.text = (int(_numOfProdGroundedSoftRulesTotal/_numOfExQueries)).toString();
+				
+				// update grounded hard rules values
+				var currNumOfPrGrHR:int = statistics.getNumOfGroundedHardRules();//trace("hard rules : " + currNumOfPrGrHR.toString());
+				_numOfProdGroundedHardRulesTotal += currNumOfPrGrHR;
+				TotalServerStatisticsPanel.labelGHRPT.text = _numOfProdGroundedHardRulesTotal.toString();
+				//_numOfProdGroundedHardRulesCurrent = currNumOfPrGrHR; 
+				CurrentServerStatisticsPanel.labelGHRPC.text = currNumOfPrGrHR.toString();
+				//_numOfProdGroundedHardRulesAVG = (int)(_numOfProdGroundedHardRulesTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelGHRPA.text = (int(_numOfProdGroundedHardRulesTotal/_numOfExQueries)).toString();
+				
+				// update server response time values
+				//_responseTimeCurrent = responseTimeCurrent;
+				CurrentServerStatisticsPanel.labelSRTC.text = responseTimeCurrent.toString() + " ms";
+				_responseTimeTotal += responseTimeCurrent;
+				//_responseTimeAvg = (int)(_responseTimeTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelSRTA.text = (int(_responseTimeTotal/_numOfExQueries)).toString() + " ms"
+				
+				// update server query execution time values
+				//_execTimeServerCurrent = execTimeServerCurrent;
+				CurrentServerStatisticsPanel.labelSETC.text = execTimeServerCurrent.toString() + " ms";
+				_execTimeServerTotal += execTimeServerCurrent;
+				TotalServerStatisticsPanel.labelPT.text = (_execTimeServerTotal/1000).toFixed(2) + " sec";//_execTimeServerTotal.toString() + " ms";
+				//_execTimeServerAvg = (int)(_execTimeServerTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelSETA.text = (int(_execTimeServerTotal/_numOfExQueries)).toString() + " ms";
+				
+				// update result data serialization and transmission time values
+				var serializationTimeCurrent:int = (responseTimeCurrent - execTimeServerCurrent);
+				CurrentServerStatisticsPanel.labelSTC.text = serializationTimeCurrent.toString() + " ms";
+				_serializationTimeTotal += serializationTimeCurrent;
+				TotalServerStatisticsPanel.labelDST.text = (_serializationTimeTotal/1000).toFixed(2) + " sec";//_serializationTimeTotal.toString() + " ms";
+				//_serializationTimeAvg = (int)(_serializationTimeTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelSTA.text = (int(_serializationTimeTotal/_numOfExQueries)).toString() + " ms";
+				
+				// update result data sorting literals time values
+				CurrentServerStatisticsPanel.labelSQL.text = statistics.getSortInMS().toString() + " ms";
+				_sortLiteralsTimeTotal += statistics.getSortInMS();
+				TotalServerStatisticsPanel.labelSQL.text = (_sortLiteralsTimeTotal/1000).toFixed(2) + " sec";//_sortLiteralsTimeTotal.toString() + " ms";
+				//_serializationTimeAvg = (int)(_serializationTimeTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelSQL.text = (int(_sortLiteralsTimeTotal/_numOfExQueries)).toString() + " ms";
+				
+				// update result data inverting rules time values
+				CurrentServerStatisticsPanel.labelISR.text = statistics.getInvRulInMS().toString() + " ms";
+				_invertRulesTimeTotal += statistics.getInvRulInMS();
+				TotalServerStatisticsPanel.labelISR.text = (_invertRulesTimeTotal/1000).toFixed(2) + " sec";//_invertRulesTimeTotal.toString() + " ms";
+				//_serializationTimeAvg = (int)(_serializationTimeTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelISR.text = (int(_invertRulesTimeTotal/_numOfExQueries)).toString() + " ms";
+				
+				// update result data solving MAX-SAT time values
+				CurrentServerStatisticsPanel.labelSMS.text = statistics.getMaxSatInMS().toString() + " ms";
+				_solveMAXSATTimeTotal += statistics.getMaxSatInMS();
+				TotalServerStatisticsPanel.labelSMS.text = (_solveMAXSATTimeTotal/1000).toFixed(2) + " sec";//_solveMAXSATTimeTotal.toString() + " ms";
+				//_serializationTimeAvg = (int)(_serializationTimeTotal/_numOfExQueries);
+				AverageServerStatisticsPanel.labelSMS.text = (int(_solveMAXSATTimeTotal/_numOfExQueries)).toString() + " ms";
+				
+			}
+			
+			public function hide():Boolean {
+				if(wipeToRightIn.isPlaying || wipeToLeftOut.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function show():Boolean {
+				if(wipeToRightIn.isPlaying || wipeToLeftOut.isPlaying)
+				   return false;
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function hideButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = false;
+				//this.dispatchEvent(new Event(Event.CLOSE,false));
+				return true;
+			}
+			
+			public function showButtonTriggered():Boolean {
+				//this.includeInLayout = false;
+				this.visible = true;
+				//wipeToBottomOut.play([this]);
+				//this.includeInLayout = true;
+				return true;
+			}
+			
+			public function handleVisibilityButtonClick():void {
+				if(this.visible)
+				   this.visible = false;
+				else
+				   this.visible = true;
+			}
+			
+			private function selectTotalStatistics():void {
+					StatisticsViewStack.selectedChild = TotalServerStatisticsPanel;
+					ServerTotalButton.emphasized = true;
+					ServerTotalButton.setStyle("fillColors",["#00FFC6"]);
+					ServerAvgButton.emphasized = false;
+					ServerAvgButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);
+					ServerCurrentButton.emphasized = false;
+					ServerCurrentButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);			
+			}
+			
+			private function selectAVGStatistics():void {
+					StatisticsViewStack.selectedChild = AverageServerStatisticsPanel;
+					ServerTotalButton.emphasized = false;
+					ServerTotalButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);
+					ServerAvgButton.emphasized = true;
+					ServerAvgButton.setStyle("fillColors",["#00FFC6"]);
+					ServerCurrentButton.emphasized = false;
+					ServerCurrentButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);			
+			}
+			
+			private function selectCurrentStatistics():void {
+					StatisticsViewStack.selectedChild = CurrentServerStatisticsPanel;
+					ServerTotalButton.emphasized = false;
+					ServerTotalButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);
+					ServerAvgButton.emphasized = false;
+					ServerAvgButton.setStyle("fillColors",["#C5C6C6", "#C5C6C6", "#38FE03", "#38FE03"]);
+					ServerCurrentButton.emphasized = true;
+					ServerCurrentButton.setStyle("fillColors",["#00FFC6"]);		
+			}
+			
+			/*
+			private function panelClosed():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_CLOSED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    
+		    private function panelOpened():void {
+		    	//this.dispatchEvent(new UPanelVisibilityEvent(UPanelVisibilityEvent.PANEL_OPENED_EVENT,true));
+		    	_isBusy = false;
+		    }
+		    */		
+			
+		]]>
+	</mx:Script>
+		
+		    <mx:HBox cornerRadius="10" borderStyle="solid" backgroundColor="#767675" horizontalGap="3" borderThickness="0" borderColor="#CFCBCB" height="32" width="300" horizontalAlign="center" verticalAlign="middle" y="5" x="2" dropShadowEnabled="false">
+	    	   <mx:Button 
+	    	   	id="ServerTotalButton" 
+	    	   	label="TOTAL STATS" 
+	    	    toolTip="Select the total statistics for all submitted queries so far."
+	    	   	click="selectTotalStatistics();" 
+	    	   	fontWeight="bold" 
+	    	   	fontSize="9" 
+	    	   	cornerRadius="10" 
+	    	   	fillAlphas="[1.0, 1.0]" 
+	    	   	fillColors="[#C5C6C6, #C5C6C6, #38FE03, #38FE03]" 
+	    	   	borderColor="#FCFDFD" 
+	    	   	color="#FFFEFE" 
+	    	   	alpha="0.7" 
+	    	   	themeColor="#00FFC6" fontFamily="Verdana"/>
+	    	   <mx:Button 
+	    	   	id="ServerAvgButton" 
+	    	   	label="AVG STATS" 
+	    	   	toolTip="Select the average statistics for all submitted queries so far."
+	    	   	click="selectAVGStatistics();" 
+	    	   	fontWeight="bold" 
+	    	   	fontSize="9" 
+	    	   	cornerRadius="10" 
+	    	   	fillAlphas="[1.0, 1.0]" 
+	    	   	fillColors="[#C5C6C6, #C5C6C6, #38FE03, #38FE03]" 
+	    	   	borderColor="#FCFDFD" 
+	    	   	color="#FFFFFF" 
+	    	   	alpha="0.7" 
+	    	   	themeColor="#00FFC6" fontFamily="Verdana"/>
+	    	   	<mx:Button 
+	    	   	id="ServerCurrentButton" 
+	    	   	label="CURRENT STATS" 
+	    	   	toolTip="Select the statistics for the current query."
+	    	   	click="selectCurrentStatistics();" 
+	    	   	fontWeight="bold" 
+	    	   	fontSize="9" 
+	    	   	cornerRadius="10" 
+	    	   	fillAlphas="[1.0, 1.0]" 
+	    	   	fillColors="[#C5C6C6, #C5C6C6, #38FE03, #38FE03]" 
+	    	   	borderColor="#FCFDFD" 
+	    	   	color="#FEFEFE" 
+	    	   	alpha="0.7" 
+	    	   	themeColor="#00FFC6" fontFamily="Verdana"/>
+	    	</mx:HBox>	
+		
+			<mx:ViewStack id="StatisticsViewStack" width="100%" height="215" creationPolicy="all" 
+				backgroundColor="#3F3F3F" backgroundAlpha="1.0" y="40">
+			
+			    <statistics:UServerTotalStatistics label="Server Total" width="100%" height="100%"
+			    	    id="TotalServerStatisticsPanel" hideEffect="DissolveOut" showEffect="DissolveIn"
+			    	    verticalScrollPolicy="off"/>
+			    	    
+			    <statistics:UServerAvgStatistics label="Server Average" width="100%" height="100%"
+			    	    id="AverageServerStatisticsPanel" hideEffect="DissolveOut" showEffect="DissolveIn"
+			    	    verticalScrollPolicy="off"/>
+			    	    
+			    <statistics:UServerCurrentStatistics label="Server Current" width="100%" height="100%"
+			    	    id="CurrentServerStatisticsPanel" hideEffect="DissolveOut" showEffect="DissolveIn"
+			    	    verticalScrollPolicy="off"/>	    
+			
+			</mx:ViewStack>		
+    
+    <mx:WipeLeft id="wipeToLeftOut" duration="500"/>
+	<mx:WipeRight id="wipeToRightIn" duration="500"/> 
+	
+	<mx:Dissolve
+        id="DissolveOut"
+        alphaFrom="1.0"
+        alphaTo="0"
+        duration="250"/>
+        
+     <mx:Dissolve
+        id="DissolveIn"
+        alphaFrom="0"
+        alphaTo="1.0"
+        duration="500"/>
+    
+</mx:Panel>

@@ -1,0 +1,30 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/actedIn>
+ 
+actedIn(A,B)<-wroteMusicFor(A,C)actedIn(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_person_100007846>)
+confidence: 0.188219 support: 0.0040825675 specialityRatio: 0.15786259
+N+(c): 584 E+(c): 1008 N(c): 517 B(c): 3275 E+: 126636
+actedIn(A,B)<-wroteMusicFor(A,C)actedIn(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.19032685 support: 0.003237626 specialityRatio: 0.27406418
+N+(c): 475 E+(c): 716 N(c): 410 B(c): 1496 E+: 126636
+actedIn(A,B)<-wroteMusicFor(A,C)actedIn(D,C)directed(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.30399123 support: 0.0052275816 specialityRatio: 0.17992261
+N+(c): 485 E+(c): 662 N(c): 837 B(c): 4652 E+: 126636
+actedIn(A,B)<-wroteMusicFor(A,C)actedIn(D,C)directed(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_American_film_actors>)
+confidence: 0.24036914 support: 0.0020768186 specialityRatio: 0.5583864
+N+(c): 173 E+(c): 331 N(c): 263 B(c): 471 E+: 126636
+actedIn(A,B)<-wroteMusicFor(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.33336422 support: 0.0012634638 specialityRatio: 0.20698577
+N+(c): 319 E+(c): 356 N(c): 160 B(c): 773 E+: 126636
+actedIn(A,B)<-wroteMusicFor(A,C)directed(D,C)wroteMusicFor(D,B)type(A,E)(E,<http://yago-knowledge.org/resource/wikicategory_Living_people>)
+confidence: 0.28476998 support: 0.0012160839 specialityRatio: 0.15127702
+N+(c): 161 E+(c): 298 N(c): 154 B(c): 1018 E+: 126636
+actedIn(A,B)<-edited(A,B)type(A,C)(C,<http://yago-knowledge.org/resource/wordnet_actor_109765278>)
+confidence: 0.15723221 support: 0.0012239806 specialityRatio: 0.18742442
+N+(c): 53 E+(c): 463 N(c): 155 B(c): 827 E+: 126636
+actedIn(A,B)<-directed(A,C)actedIn(D,C)wroteMusicFor(D,B)
+confidence: 0.20843202 support: 0.0060725226 specialityRatio: 0.20694295
+N+(c): 554 E+(c): 2377 N(c): 769 B(c): 3716 E+: 126636
+actedIn(A,B)<-directed(A,B)
+confidence: 0.24967128 support: 0.05064121 specialityRatio: 0.16794993
+N+(c): 1211 E+(c): 16147 N(c): 6413 B(c): 38184 E+: 126636
+time elapsed for whole partition: 265969
