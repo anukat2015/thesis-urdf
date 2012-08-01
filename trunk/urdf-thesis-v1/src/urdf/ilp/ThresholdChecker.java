@@ -311,7 +311,16 @@ public class ThresholdChecker
 		logger.log(Level.INFO,"Accuracy(positivesCovered/bodySize)="+conf+" from: "+rule.getRuleString());
 		rule.setConfidence(conf);	
 
-		if (rule.getConfidence()>this.confidenceThreshold) {// check if rule is above confidence threshold without pruning
+		if (rule.getConfidence()>this.confidenceThreshold) {
+			logger.log(Level.DEBUG,"Rule is good, accuracy="+rule.getConfidence()+">"+this.confidenceThreshold);
+			rule.setIsGood(true);
+		}
+		else {
+			logger.log(Level.DEBUG,"Rule is NOT good, accuracy="+rule.getConfidence()+"<="+this.confidenceThreshold);
+			rule.setIsGood(false);
+		}
+		
+		/*if (rule.getConfidence()>this.confidenceThreshold) {// check if rule is above confidence threshold without pruning
 			if (rule.getConstantInArg()==0)
 				calculateSpecialityRatio(rule, inputArg);
 			if (rule.getConfidence()>this.confidenceThreshold)
@@ -320,8 +329,9 @@ public class ThresholdChecker
 				rule.setIsGood(false);
 		}
 		else {
+			logger.log(Level.DEBUG,"Rule is NOT good, accuracy="+rule.getConfidence()+"<"+this.confidenceThreshold);
 			rule.setIsGood(false);
-		}
+		}*/
 	}
 	
 	private  boolean isDangerous(Rule rule) {
