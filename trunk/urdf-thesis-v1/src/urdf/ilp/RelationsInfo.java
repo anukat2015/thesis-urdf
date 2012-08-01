@@ -8,10 +8,15 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Hashtable;
+
+import urdf.rdf3x.Connection;
+import urdf.rdf3x.ResultSet;
+import urdf.rdf3x.Statement;
 
 /**
  * 	@author Christina Teflioudi
@@ -200,6 +205,32 @@ public class RelationsInfo implements Serializable {
            return null;
        }
 
+	}
+	
+	public void calculateMinAndMaxLiterals(Connection conn) throws SQLException {
+		Statement stmt = (Statement) conn.createStatement();
+		ResultSet rs;
+		for (Relation relation: relations.values()) {
+			Type range = relation.getRange();
+			if (range.isChildOf("<http://yago-knowledge.org/resource/yagoLiteral"))
+				relation.setRangeIsLiteral(true);
+			if (range.isChildOf("<http://yago-knowledge.org/resource/yagoNumber>") ||
+				range.isChildOf("<http://yago-knowledge.org/resource/yagoQuantity>") /*||
+				range.isChildOf("<http://yago-knowledge.org/resource/yagoGeoCoordinatePair>") ||
+				range.isChildOf("<http://yago-knowledge.org/resource/yagoGeoCoordinate>") ||
+				range.isChildOf("<http://yago-knowledge.org/resource/yagoDate>")*/) {
+				String queryMin = "SELECT ?min WHERE {?x "+relation.getName()+" ?min} ORDER BY ASC(?min) LIMIT 1";
+				rs = (ResultSet) stmt.executeQuery(queryMin);
+				rs.first();
+				relation.setMinValue(rs.getFloat(1));
+				
+				String queryMax = "SELECT ?max WHERE {?x "+relation.getName()+" ?max} ORDER BY DESC(?max) LIMIT 1";
+				rs = (ResultSet) stmt.executeQuery(queryMax);
+				rs.first();
+				relation.setMinValue(rs.getFloat(1));
+				
+			}
+		}
 	}
 
 }

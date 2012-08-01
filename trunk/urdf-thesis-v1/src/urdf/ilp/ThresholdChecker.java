@@ -63,19 +63,30 @@ public class ThresholdChecker
 		this.dangerousRelations=dangerousRelations;
 	}
 
-	
 	public boolean checkSupportThreshold(Rule rule,int inputArg) throws Exception  {
-		int possiblePositivesToBeCovered = rule.getPossiblePositivesToBeCovered(queryHandler);
-		int examplesCovered = rule.getExamplesCovered(queryHandler);
 		
-		int minExamples = Math.min(possiblePositivesToBeCovered,examplesCovered);
-		
-		rule.setSupport((float)minExamples/(float)rule.getHeadSize(queryHandler));
-		
-		if ((rule.getSupport()>this.supportThreshold && minExamples>=possiblePosToBeCoveredThreshold) && minExamples>=positivesCoveredThreshold) 
+		/*switch(rule.getConstantInArg()) {
+			case 1: case 2:
+				rule.setSupport(((float)rule.getPositivesCovered(queryHandler))/((float)rule.getHeadSize(queryHandler)));
+				if (rule.getSupport()>this.supportThreshold) 
+					return true;
+				break;
+			default:
+				int possiblePositivesToBeCovered = rule.getPossiblePositivesToBeCovered(queryHandler);
+				int examplesCovered = rule.getExamplesCovered(queryHandler);
+				int minExamples = Math.min(possiblePositivesToBeCovered,examplesCovered);
+				
+				rule.setSupport((float)minExamples/(float)rule.getHeadSize(queryHandler));			
+				if ((rule.getSupport()>this.supportThreshold && minExamples>=possiblePosToBeCoveredThreshold) && minExamples>=positivesCoveredThreshold) 
+					return true;
+		}*/
+		rule.setSupport(((float)rule.getPositivesCovered(queryHandler))/((float)rule.getHeadSize(queryHandler)));
+		if (rule.getSupport()>this.supportThreshold) 
 			return true;
 		
 		return false;
+		
+		
 	}
 	
 	public boolean checkPositivesThreshold(Rule rule,int inputArg) throws Exception {
@@ -91,8 +102,11 @@ public class ThresholdChecker
 		logger.log(Level.DEBUG, "Rule reaches positivesCovered Threshold: "+positivesCovered+">="+positivesCoveredThreshold );
 		
 		//use conf or accuracy
-		calculateConfidence(rule, inputArg,positivesCovered);		
-		//calculateAccuracy(rule, inputArg, positivesCovered);
+		//switch (rule.getConstantInArg()) {
+		//	case 1: case 2: calculateAccuracy(rule, inputArg, positivesCovered); break;
+		//	default: calculateConfidence(rule, inputArg,positivesCovered);	
+		//}
+		calculateAccuracy(rule, inputArg, positivesCovered);
 		
 		return true;
 	}
@@ -213,7 +227,7 @@ public class ThresholdChecker
 	// Calculate Confidence with the Improved formula
 	private void calculateConfidence(Rule rule, int inputArg, int positivesCovered) throws Exception
 	{
-		logger.log(Level.INFO,"Calculating confidence for arg"+inputArg+" in rule "+rule.getRuleString());
+		logger.log(Level.INFO,"Calculating confidence for "+rule.getRuleString());
 		
 		float multHead,multHeadIdeal,missingPairsFromHead, nom, denom, ratio = 0, conf, idealExamplesCovered;
 		
@@ -287,24 +301,19 @@ public class ThresholdChecker
 
 	private void calculateAccuracy(Rule rule, int inputArg, int positivesCovered) throws Exception {
 		
-		logger.log(Level.INFO,"Calculating Accuracy for arg"+inputArg+" in rule "+rule.getRuleString());
+		logger.log(Level.INFO,"Calculating Accuracy for in rule "+rule.getRuleString());
 		
 		float  conf,nom,denom;
-		int bodySize = rule.getBodySize();
-		if (bodySize < 0) {  // If rule bodySize was still not calculated
-			bodySize = getBodySize(rule,inputArg);
-			rule.setBodySize(bodySize);
-		}
 		
-		//nom=(float)(positivesCovered +beta*(rule.getExamplesCovered()-positivesCovered));
-		nom = (float)positivesCovered;
-		denom = bodySize;
-		conf = nom/denom;			
+		int bodySize = rule.getBodySize(queryHandler);
+
+		conf = ((float)positivesCovered)/((float)bodySize);			
 		logger.log(Level.INFO,"Accuracy(positivesCovered/bodySize)="+conf+" from: "+rule.getRuleString());
 		rule.setConfidence(conf);	
 
 		if (rule.getConfidence()>this.confidenceThreshold) {// check if rule is above confidence threshold without pruning
-			calculateSpecialityRatio(rule, inputArg);
+			if (rule.getConstantInArg()==0)
+				calculateSpecialityRatio(rule, inputArg);
 			if (rule.getConfidence()>this.confidenceThreshold)
 				rule.setIsGood(true);
 			else

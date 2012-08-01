@@ -103,14 +103,14 @@ public final class Statement implements java.sql.Statement
          t = System.currentTimeMillis() - t;
          
          
-         if (!query.startsWith("insert") && !query.startsWith("INSERT")) {
+         /*if (!query.startsWith("insert") && !query.startsWith("INSERT")) {
 	         String numberOfRows = ((header[1].equals("count") && result.size()==1)?result.get(0)[1]:Integer.toString(result.size()));
 	         if (t<1000)
 	        	 logger.log(Level.INFO, "["+(t)+"ms,"+numberOfRows+"rows] ");
 	         else
 	        	 logger.log(Level.WARN, "["+(t)+"ms,"+numberOfRows+"rows] "+query);
-         }
-         //logger.log(Level.INFO, "["+(t)+"ms] ");
+         }*/
+         logger.log(Level.INFO, "["+(t)+"ms] ");
          
          return new ResultSet(header,result.toArray(new String[0][]));
       }
