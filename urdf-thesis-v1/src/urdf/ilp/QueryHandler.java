@@ -224,5 +224,14 @@ public class QueryHandler
 		return ans;		
 	}
 	
+	public ResultSet retriveLiteralDistribution(Rule rule, int literalArg) throws SQLException {
+		
+		logger.log(Level.DEBUG, "Retrieving literal(?"+(char)literalArg+") distribution from rule: "+rule.getRuleString());
+		
+		String query = "SELECT ?"+(char)literalArg+" WHERE {"+ rule.getBodyPatterns() + " match " + rule.getHeadPattern() + "} ORDER BY ASC(?"+(char)literalArg+")";
+		return (ResultSet) stmt.executeQuery(query);
+		
+	}
+	
 }
 

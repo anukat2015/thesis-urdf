@@ -11,6 +11,8 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import urdf.rdf3x.ResultSet;
+
 
 
 /**
@@ -211,6 +213,11 @@ public class RuleLearner {
 				//	continue;
 				//}
 				
+				if (iCandidate.isRangeLiteral() && (joinCase==2 || joinCase==4)) {
+					logger.log(Level.DEBUG, "Trying to join on literal from relation: "+iCandidate.getName());
+					continue;
+				}
+				
 				
 				// STEP 1: WITH FREE VARIABLE	
 				newRule = rule.clone();
@@ -229,7 +236,7 @@ public class RuleLearner {
 						if (newRule.bindsHeadVariables() && newRule.isTooGeneral()&& newRule.isGood()) {
 							checkExtendRuleWithTypes(node, newRule, d);
 						}
-						if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0) {
+						if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0) {
 							checkExtendRuleWithConstants(node,newRule,d);
 						}
 					}
@@ -287,8 +294,12 @@ public class RuleLearner {
 								checkExtendRuleWithTypes(node, newRule, d);
 							
 							head.getHeadRelation().setConstantInArg(2);
-							if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0)
+							if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0)
 								checkExtendRuleWithConstants(node,newRule,d);
+							
+							if (newRule.bindsHeadVariables() && iCandidate.isRangeLiteral() && iCandidate.getMaxValue()!=Float.NaN && iCandidate.getMinValue()!=Float.NaN) {
+								checkExtendRuleWithLiteralRanging(node,newRule,arg2,d);
+							}
 
 						}
 					}					
@@ -301,7 +312,7 @@ public class RuleLearner {
 						if (evaluateRule(node,newRule, d,freeRule,bindRule)) {						
 							if (newRule.bindsHeadVariables() && newRule.isTooGeneral() && newRule.isGood())
 								checkExtendRuleWithTypes(node, newRule, d);
-							if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0)
+							if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0)
 								checkExtendRuleWithConstants(node,newRule,d);
 						}
 					}					
@@ -458,7 +469,7 @@ public class RuleLearner {
 						newRule2.setHasFreeVariables(false);
 						evaluateRule(node,newRule2, d);
 						
-						if (newRule2.bindsHeadVariables() && tryConstants && head.getHeadRelation().getConstantInArg()!=0)
+						if (newRule2.bindsHeadVariables() && tryConstants && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0)
 							checkExtendRuleWithConstants(node,newRule2,d+2);
 					}
 				}
@@ -527,12 +538,87 @@ public class RuleLearner {
 		}		
 	}
 	
+	private void checkExtendRuleWithLiteralRanging(RuleTreeNode node, Rule rule, int literalArg, int d) throws Exception {
+		
+		logger.log(Level.DEBUG, "Checking ranging of rule with Literal: "+rule.getRuleString());
+		
+		ResultSet rs = queryHandler.retriveLiteralDistribution(rule, literalArg);
+	
+		float minAcc = tChecker.confidenceThreshold;
+		float minPos = Math.max(tChecker.positivesCoveredThreshold, tChecker.supportThreshold*rule.getHeadSize());
+		float first = Float.NaN;
+		float  last = Float.NaN;
+		float  curr = Float.NaN;
+		float lastAcc = 0;
+		int currPos=0, currNeg=0, currTot=0;
+		int  rowPos=0,  rowNeg=0,  rowTot=0;
+		float rowAcc = -1;
+		boolean firstRow = true;
+		while (rs.next()) {
+			float value = rs.getFloat(1);
+			boolean match = rs.getInt(2)==1;
+			int count = rs.getInt(3);
+			
+			// got a new value
+			if (curr!=value && !firstRow) {
+				rowAcc = ((float) rowPos)/((float) rowTot);
+				if (rowAcc >= minAcc) {
+					if (first==Float.NaN) 
+						first = curr;
+					else if ((currPos+rowPos)>=minPos/* && (curr-first)>=minRange*/)  {
+						last = curr;
+						lastAcc = ((float) currPos)/((float) currTot);
+					}
+					
+					currPos += rowPos;
+					currTot += rowTot;
+					currNeg += rowNeg;
+					
+					
+				} else {
+					if (first!=Float.NaN) {
+						int tempPos = currPos+rowPos;
+						int tempTot = currTot+rowTot;
+						float tempAcc = ((float) tempPos)/((float) tempTot);
+						if (tempAcc < minAcc) {
+							if (first!=Float.NaN && last!=Float.NaN)
+								System.out.println("[" + first + ".." + last + "] Acc="+lastAcc);
+							first = last = Float.NaN;
+							currPos = currNeg = currTot = 0;
+						} else {
+							currPos += rowPos;
+							currTot += rowTot;
+							currNeg += rowNeg;
+						}
+					}
+				}
+				
+				curr = value;
+				rowPos = rowNeg = rowTot = 0;
+			} 
+			if (firstRow) {
+				curr = value;
+				firstRow = false;
+			}
+
+			if (match) 
+				rowPos = count;
+			else
+				rowNeg = count;
+			rowTot += count;
+		}
+		if (first!=Float.NaN && last!=Float.NaN)
+			System.out.println("[" + first + ".." + last + "] Acc="+lastAcc);
+		
+	}
+	
  	private ArrayList<Relation> getJoinableRelations(int joinCase, Relation relation) {
 		switch(joinCase) {
-			case 1: return info.arg1JoinOnArg1.get(relation);			
-			case 2: return info.arg1JoinOnArg2.get(relation);
-			case 3: return info.arg2JoinOnArg1.get(relation);
-			default: return info.arg2JoinOnArg2.get(relation);
+			case 1: return info.arg1JoinOnArg1.get(relation); 			
+			case 2: return info.arg1JoinOnArg2.get(relation); 
+			case 3: return info.arg2JoinOnArg1.get(relation); 
+			case 4: return info.arg2JoinOnArg2.get(relation); 
+			default: throw new IllegalArgumentException("Join case should be a number between 1 and 4");
 		}
 	}
  	

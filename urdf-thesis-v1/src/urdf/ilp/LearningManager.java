@@ -74,8 +74,8 @@ public class LearningManager
 		//info = preprocessor.getRelationsInfo();
 		
 		info = RelationsInfo.readFromDisk();
-		info.calculateMinAndMaxLiterals(conn);
-		info.persist();
+		//info.calculateMinAndMaxLiterals(conn);
+		//info.persist();
 
 		RelationsInfo.printRelations(info);
 				
