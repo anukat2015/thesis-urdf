@@ -22,6 +22,9 @@ public class Relation implements Serializable
 	private String name;
 	private Type domain;
 	private Type range;
+	private float max = Float.NaN;
+	private float min = Float.NaN;
+	private boolean rangeIsLiteral = false;
 	private boolean isFunction=false;
 	private boolean isSymmetric=false;
 	private int size=0; 								// number of facts in the relation
@@ -219,6 +222,24 @@ public class Relation implements Serializable
 	
 	public void setName(String newName) {
 		this.name = newName;
+	}
+	public float getMaxValue() {
+		return max;
+	}
+	public void setMaxValue(float max) {
+		this.max = max;
+	}
+	public float getMinValue() {
+		return min;
+	}
+	public void setMinValue(float min) {
+		this.min = min;
+	}
+	public boolean isRangeLiteral() {
+		return rangeIsLiteral;
+	}
+	public void setRangeIsLiteral(boolean rangeIsLiteral) {
+		this.rangeIsLiteral = rangeIsLiteral;
 	}
 	
 	

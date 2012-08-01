@@ -44,7 +44,7 @@ public class QueryHandler
 		String sparql = rule.positivesCoveredQuery();
 		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
 		if (rs.next()) 
-			result = rs.getInt(2);		
+			result = rs.getInt(1);		
 	
 		logger.log(Level.DEBUG,  "PositvesCovered="+result+" from:"+rule.getRuleString());
 		rs.close();
@@ -54,7 +54,7 @@ public class QueryHandler
 	public int calculateExamplesCovered(Rule rule, int inputArg) throws SQLException {		
 		int result = -1;	
 		String sparql = rule.examplesCoveredQuery(inputArg);
-		ResultSet rs = (ResultSet) stmt.executeQueryCountRows(sparql);		
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
 		if (rs.next()) 
 			result = rs.getInt(1);		
 
@@ -66,7 +66,7 @@ public class QueryHandler
 	public int calculatePossiblePositivesToBeCovered(Rule rule, int inputArg) throws SQLException {		
 		int result = -1;	
 		String sparql = rule.possiblePositivesToBeCoveredQuery(inputArg);
-		ResultSet rs = (ResultSet) stmt.executeQueryCountRows(sparql);		
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
 		if (rs.next()) 
 			result = rs.getInt(1);		
 
@@ -80,7 +80,7 @@ public class QueryHandler
 		String sparql = rule.bodySizeQuery();
 		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
 		if (rs.next()) 
-			result = rs.getInt(2);		
+			result = rs.getInt(1);		
 
 		logger.log(Level.DEBUG,  "BodySize="+result+" from:"+rule.getRuleString());
 		rs.close();
@@ -176,7 +176,7 @@ public class QueryHandler
 	}
 	
 	public int calculateRelationSize(Relation relation) throws SQLException {
-		return calculateRelationSize(relation, -1, null);
+		return calculateRelationSize(relation, 0, null);
 	}
 
 

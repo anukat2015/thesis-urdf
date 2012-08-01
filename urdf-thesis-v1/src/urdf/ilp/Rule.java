@@ -250,6 +250,7 @@ public class Rule implements Cloneable{
 		if (constant!=this.constant) {
 			this.constant = constant;
 			this.headSize = -1;
+			head.setConstant(constant);
 		}
 	}
 	
@@ -411,10 +412,10 @@ public class Rule implements Cloneable{
 	
 	public String getExamplesStats() {
 		String s = "N+(c): "+positivesCovered+
-				  " E+(c): "+possiblePosToBeCovered+
-				  " N(c): "+examplesCovered+
+				 // " E+(c): "+possiblePosToBeCovered+
+				 // " N(c): "+examplesCovered+
 				  " B(c): "+bodySize+
-				  " E+: "+head.getRelation().getSize();
+				  " E+: "+headSize;
 		return s;
 	}
 	
@@ -600,6 +601,15 @@ public class Rule implements Cloneable{
 		this.numOfFreeVariables=count;
 	}
 	
+	public String getHeadPattern() {
+		String pattern = head.getSparqlPattern();
+		switch (constantInArg) {
+			case 1: return pattern.replace(head.getFirstArgumentVariable(), this.constant);
+			case 2: return pattern.replace(head.getSecondArgumentVariable(), this.constant);
+			default: return head.getSparqlPattern();
+		}
+	}
+	
 	public String getBodyPatterns() {
 		String patterns = "";
 		// RDF3x requires filter patterns to be at the end
@@ -645,45 +655,51 @@ public class Rule implements Cloneable{
 	}
 	
 	public String positivesCoveredQuery() {
-		String patterns = head.getSparqlPattern();
+		String patterns = getHeadPattern();
 		patterns += getBodyPatterns();
 		patterns = patterns.substring(0,patterns.length()-2);
-		return "SELECT COUNT ?count WHERE {"+patterns+"}";
+		return "SELECT COUNTDISTINCT ?A ?B WHERE {"+patterns+"}";
 	}
 	
 	public String examplesCoveredQuery(int inputArg) {
+		if (constantInArg!=0)
+			throw new IllegalArgumentException("Examples Covered should doesn't apply for rules with constant case (it's same as Body Size)");
 		String patterns = head.getSparqlPattern(inputArg);
 		patterns += getBodyPatterns();
 		patterns = patterns.substring(0,patterns.length()-2);
-		return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+		return "SELECT COUNTDISTINCT "+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+		
 	}
 	
 	public String possiblePositivesToBeCoveredQuery(int inputArg) {
+		if (constantInArg!=0)
+			throw new IllegalArgumentException("Possible Positives To Be Covered should doesn't apply for rules with constant case (it's same as Head Size)");
+		
 		String patterns = head.getSparqlPattern(inputArg);
 		patterns += getBodyPatterns(); 
 		patterns = patterns.substring(0,patterns.length()-2);
 		switch (inputArg) {
-			case 1:  return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
-			case 2:  return "SELECT DISTINCT ?free "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
-			default: return "SELECT DISTINCT "+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+			case 1:  return "SELECT COUNTDISTINCT "+head.getFirstArgumentVariable()+" ?free WHERE {"+patterns+"}";
+			case 2:  return "SELECT COUNTDISTINCT ?free "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
+			default: return "SELECT COUNTDISTINCT "+head.getFirstArgumentVariable()+" "+head.getSecondArgumentVariable()+" WHERE {"+patterns+"}";
 		}
 	}
 
 	public String bodySizeQuery() {
 		String patterns = getBodyPatterns();
 		patterns = patterns.substring(0,patterns.length()-2);
-		return "SELECT COUNT ?count WHERE {"+patterns+"}" ;
+		return "SELECT COUNTDISTINCT ?A ?B WHERE {"+patterns+"}" ;
 	}
 	
-	public String findConstantsQuery(int inputArg) {
+	public String findConstantsQuery(int constantInArg) {
 		String patterns = head.getSparqlPattern();
 		patterns += getBodyPatterns();
 		patterns = patterns.substring(0,patterns.length()-2);
 		String typeArg = "";
-		switch (inputArg) {
+		switch (constantInArg) {
 			case 1:  typeArg = head.getSecondArgumentVariable(); break;
 			case 2:  typeArg = head.getFirstArgumentVariable(); break;
-			default: throw new IllegalArgumentException("Illegal inputArg="+inputArg+", it should be 1 or 2");
+			default: throw new IllegalArgumentException("Illegal inputArg="+constantInArg+", it should be 1 or 2");
 		}
 		return "SELECT COUNT "+typeArg+" WHERE {"+patterns+"} ORDER BY DESC(COUNT)";
 	}

@@ -144,7 +144,13 @@ public final class ResultSet implements java.sql.ResultSet
    public int getFetchSize() { return 0; }
    // Get an entry as float
    public float getFloat(int columnIndex) throws SQLException { 
-	   return Float.parseFloat(getString(columnIndex).replaceAll("\"", ""));
+	   String f = getString(columnIndex).replaceAll("\"", "");
+	   try {
+		   return Float.parseFloat(f);
+	   }catch (NumberFormatException e) {
+		   return Float.parseFloat(f.substring(0,f.indexOf('#')));
+		   
+	   }
    }
    // Get an entry as float
    public float getFloat(String columnLabel) throws SQLException { return getFloat(findColumn(columnLabel)); }
