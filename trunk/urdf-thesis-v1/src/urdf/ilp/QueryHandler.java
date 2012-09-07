@@ -39,52 +39,80 @@ public class QueryHandler
 	
 	//***************************** FOR RULELEARNER ********************************************
 
-	public int calculatePositivesCovered(Rule rule, int inputArg) throws SQLException {		
+	public int calculatePositivesCovered(Rule rule, int inputArg) {		
 		int result = -1;	
 		String sparql = rule.positivesCoveredQuery();
-		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
-		if (rs.next()) 
-			result = rs.getInt(1);		
-	
-		logger.log(Level.DEBUG,  "PositvesCovered="+result+" from:"+rule.getRuleString());
-		rs.close();
-		return result;
+		try {
+			ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
+			if (rs.next()) 
+				result = rs.getInt(1);		
+		
+			logger.log(Level.DEBUG,  "PositvesCovered="+result+" from:"+rule.getRuleString());
+			rs.close();
+			return result;
+		} catch (SQLException e) {
+			logger.log(Level.ERROR, sparql + "\n" + e.getMessage());
+			//e.printStackTrace();
+			return 0;
+		}
 	}
 	
-	public int calculateExamplesCovered(Rule rule, int inputArg) throws SQLException {		
+	public int calculateExamplesCovered(Rule rule, int inputArg) {		
 		int result = -1;	
 		String sparql = rule.examplesCoveredQuery(inputArg);
-		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
-		if (rs.next()) 
-			result = rs.getInt(1);		
-
-		logger.log(Level.DEBUG,  "ExamplesCovered="+result+" from:"+rule.getRuleString());
-		rs.close();
-		return result;
+		try {
+			ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
+			if (rs.next()) 
+				result = rs.getInt(1);		
+	
+			logger.log(Level.DEBUG,  "ExamplesCovered="+result+" from:"+rule.getRuleString());
+			rs.close();
+			return result;
+		} catch (SQLException e) {
+			logger.log(Level.ERROR, sparql + "\n" + e.getMessage());
+			//e.printStackTrace();
+			return 0;
+		}
 	}
 	
-	public int calculatePossiblePositivesToBeCovered(Rule rule, int inputArg) throws SQLException {		
+	public int calculatePossiblePositivesToBeCovered(Rule rule, int inputArg) {		
 		int result = -1;	
 		String sparql = rule.possiblePositivesToBeCoveredQuery(inputArg);
-		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
-		if (rs.next()) 
-			result = rs.getInt(1);		
-
-		logger.log(Level.DEBUG,  "PossiblePositivesToBeCovered="+result+" from:"+rule.getRuleString());
-		rs.close();
-		return result;
+		try {
+			ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
+			if (rs.next()) 
+				result = rs.getInt(1);		
+	
+			logger.log(Level.DEBUG,  "PossiblePositivesToBeCovered="+result+" from:"+rule.getRuleString());
+			rs.close();
+			return result;
+		} catch (SQLException e) {
+			logger.log(Level.ERROR, sparql + "\n" + e.getMessage());
+			//e.printStackTrace();
+			return 0;
+		}
 	}
 	
-	public int calculateBodySize(Rule rule, int inputArg) throws SQLException {		
+	public int calculateBodySize(Rule rule, int inputArg) {		
 		int result = -1;	
 		String sparql = rule.bodySizeQuery();
-		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
-		if (rs.next()) 
-			result = rs.getInt(1);		
-
-		logger.log(Level.DEBUG,  "BodySize="+result+" from:"+rule.getRuleString());
-		rs.close();
-		return result;
+		if (sparql.equalsIgnoreCase("SELECT COUNTDISTINCT ?A ?B WHERE {?A <http://yago-knowledge.org/resource/diedIn> ?C . ?D <http://yago-knowledge.org/resource/livesIn> ?C . ?D <http://yago-knowledge.org/resource/wasBornOnDate> ?E . ?B <http://yago-knowledge.org/resource/wasCreatedOnDate> ?E }") ||
+			sparql.equalsIgnoreCase("SELECT COUNTDISTINCT ?A ?B WHERE {?A <http://yago-knowledge.org/resource/diedIn> ?C . ?D <http://yago-knowledge.org/resource/wasBornIn> ?C . ?D <http://yago-knowledge.org/resource/diedOnDate> ?E . ?B <http://yago-knowledge.org/resource/wasCreatedOnDate> ?E }") ||
+			sparql.equalsIgnoreCase("SELECT COUNTDISTINCT ?A ?B WHERE {?A <http://yago-knowledge.org/resource/directed> ?B . ?A <http://yago-knowledge.org/resource/diedIn> ?C . ?D <http://yago-knowledge.org/resource/wasBornIn> ?C . ?D <http://yago-knowledge.org/resource/diedOnDate> ?E . ?B <http://yago-knowledge.org/resource/startedOnDate> ?E }"))
+			return 0;
+		try {
+			ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
+			if (rs.next()) 
+				result = rs.getInt(1);		
+	
+			logger.log(Level.DEBUG,  "BodySize="+result+" from:"+rule.getRuleString());
+			rs.close();
+			return result;
+		} catch (SQLException e) {
+			logger.log(Level.ERROR, sparql + "\n" + e.getMessage());
+			//e.printStackTrace();
+			return 0;
+		}
 	}
 
 	public float[] calculateBodyAvgMultAndVar(Rule rule, int inputArg) throws SQLException {
@@ -131,10 +159,20 @@ public class QueryHandler
 	}
 	
 	public ArrayList<String> findConstants(Rule rule, int possiblePosToBeCoveredThershold, int positivesCoveredThreshold, float supportThreshold, int factsForHead, int inputArg,int numOfTries) throws SQLException {
+		int variable;
+		switch (inputArg) {
+			case 1:  variable = rule.getHead().getSecondArgument(); break;
+			case 2:  variable = rule.getHead().getFirstArgument(); break;
+			default: throw new IllegalArgumentException("Illegal inputArg="+inputArg+", it should be 1 or 2");
+		}
 		
-		logger.log(Level.INFO, "Finding constants for arg"+inputArg+" from rule "+rule.getRuleString());
+		return findConstantsForVariable(rule, possiblePosToBeCoveredThershold, positivesCoveredThreshold, supportThreshold, factsForHead, variable, numOfTries);	
+	}
+	
+	public ArrayList<String> findConstantsForVariable(Rule rule, int possiblePosToBeCoveredThershold, int positivesCoveredThreshold, float supportThreshold, int factsForHead, int variable,int numOfTries) throws SQLException {
+		logger.log(Level.INFO, "Finding constants for variable ?"+(char)variable+" from rule "+rule.getRuleString());
 		
-		String sparql = rule.findConstantsQuery(inputArg) + " LIMIT " + numOfTries;	
+		String sparql = rule.findConstantsQuery(variable) + " LIMIT " + numOfTries;	
 		
 		ArrayList<String> results = new ArrayList<String>();
 		float threshold = Math.min(possiblePosToBeCoveredThershold, supportThreshold*factsForHead);
@@ -145,7 +183,6 @@ public class QueryHandler
 		}
 
 		return results;	
-		
 	}
 	
 	public int calculateOverlap(Rule rule1, Rule rule2) throws SQLException {
@@ -225,12 +262,17 @@ public class QueryHandler
 	}
 	
 	public ResultSet retriveLiteralDistribution(Rule rule, int literalArg) throws SQLException {
-		
 		logger.log(Level.DEBUG, "Retrieving literal(?"+(char)literalArg+") distribution from rule: "+rule.getRuleString());
 		
-		String query = "SELECT ?"+(char)literalArg+" WHERE {"+ rule.getBodyPatterns() + " match " + rule.getHeadPattern() + "} ORDER BY ASC(?"+(char)literalArg+")";
-		return (ResultSet) stmt.executeQuery(query);
+		if (literalArg<65 || literalArg>=rule.getNextVariableNumber()) {
+			throw new IllegalArgumentException("Variable ?"+(char)literalArg+" doesn't exist in rule: "+rule.getRuleString());
+		}
 		
+		String body = rule.getBodyPatterns();
+		body = body.substring(0,body.length()-2);
+		
+		String query = "SELECT COUNT ?"+(char)literalArg+" WHERE {{"+ body + "} match {" + rule.getHeadPattern() + "}} ORDER BY ASC(?"+(char)literalArg+") DESC(?match)";
+		return (ResultSet) stmt.executeQuery(query);
 	}
 	
 }

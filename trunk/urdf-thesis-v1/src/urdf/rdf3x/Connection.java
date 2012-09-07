@@ -206,6 +206,7 @@ public final class Connection implements java.sql.Connection
          out.flush();
       } catch (java.io.IOException e) {
          throw new SQLException(e);
+    	  //writeLine(s); // retry
       }
    }
    /// Send a line to the server

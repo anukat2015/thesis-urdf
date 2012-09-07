@@ -63,6 +63,15 @@ public class Type implements Serializable
 		this.superType=superType;
 	}
 	
+	public boolean equalsOrChildOf(String typeName)
+	{
+		return typeName.equals(getName())|| this.isChildOf(typeName);
+	}
+	public boolean equalsOrChildOf(Type type)
+	{
+		return this.equals(type)|| this.isChildOf(type);
+	}
+	
 	public boolean isChildOf(String parentName)
 	{
 		if (this.superType==null)

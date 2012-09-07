@@ -176,34 +176,54 @@ public class HeadPredicate{
 
 		if (d<depth) {
 			if (bindOnArg==2) {
-				if(relationsInfo.arg2JoinOnArg1.get(this.headRelation)!=null && relationsInfo.arg2JoinOnArg1.get(this.headRelation).contains(bodyPred.getRelation())) {
+				//if(relationsInfo.arg2JoinOnArg1.get(this.headRelation)!=null && relationsInfo.arg2JoinOnArg1.get(this.headRelation).contains(bodyPred.getRelation())) {
+				if (relationsInfo.arg2JoinOnArg1.get(this.headRelation)!=null) { 
+					Relation rel = bodyPred.getRelation();
+					System.out.println(relationsInfo.arg2JoinOnArg1.getClass());
+					System.out.println(relationsInfo.arg2JoinOnArg1.get(this.headRelation).getClass());
+					HashSet<Relation> hs = relationsInfo.arg2JoinOnArg1.get(this.headRelation);
+				if (hs.contains(rel)) {
 					canCloseConnection=true;
 					candidateBodyRelations.get(d).add(bodyPred);
 					bodyPred.addRelation(this.headRelation, 2);
-				}
+				}}
 				if (relationsInfo.arg1JoinOnArg1.get(bodyPred.getRelation())!=null) {
-					for (int i=0,len=relationsInfo.arg1JoinOnArg1.get(bodyPred.getRelation()).size();i<len;i++) {
+					for (Relation relation: relationsInfo.arg1JoinOnArg1.get(bodyPred.getRelation())) {
+						newPredicate=createNewOrGetPredicate(d, relation);
+						if (findCandidatesFor1stArg(newPredicate,d+1,depth,1)) {
+							canCloseConnection=true;
+							candidateBodyRelations.get(d).add(bodyPred);
+							bodyPred.addRelation(relation, 1)	;			
+						}
+					}
+					/*for (int i=0,len=relationsInfo.arg1JoinOnArg1.get(bodyPred.getRelation()).size();i<len;i++) {
 						newPredicate=createNewOrGetPredicate(d, relationsInfo.arg1JoinOnArg1.get(bodyPred.getRelation()).get(i));
-
 						if (findCandidatesFor1stArg(newPredicate,d+1,depth,1)) {
 							canCloseConnection=true;
 							candidateBodyRelations.get(d).add(bodyPred);
 							bodyPred.addRelation(relationsInfo.arg1JoinOnArg1.get(bodyPred.getRelation()).get(i), 1)	;			
 						}
 
-					}
+					}*/
 				}
 
 				if (relationsInfo.arg1JoinOnArg2.get(bodyPred.getRelation())!=null){
-					for (int i=0,len=relationsInfo.arg1JoinOnArg2.get(bodyPred.getRelation()).size();i<len;i++) {
+					for (Relation relation: relationsInfo.arg1JoinOnArg2.get(bodyPred.getRelation())) {
+						newPredicate=createNewOrGetPredicate(d, relation);
+						if (findCandidatesFor1stArg(newPredicate,d+1,depth,1)) {
+							canCloseConnection=true;
+							candidateBodyRelations.get(d).add(bodyPred);
+							bodyPred.addRelation(relation, 1)	;			
+						}
+					}
+					/*for (int i=0,len=relationsInfo.arg1JoinOnArg2.get(bodyPred.getRelation()).size();i<len;i++) {
 						newPredicate=createNewOrGetPredicate(d, relationsInfo.arg1JoinOnArg2.get(bodyPred.getRelation()).get(i));
-
 						if (findCandidatesFor1stArg(newPredicate,d+1,depth,2)) {
 							canCloseConnection=true;
 							candidateBodyRelations.get(d).add(bodyPred);
 							bodyPred.addRelation(relationsInfo.arg1JoinOnArg2.get(bodyPred.getRelation()).get(i), 2)	;			
 						}
-					}
+					}*/
 				}
 			}
 
@@ -216,27 +236,41 @@ public class HeadPredicate{
 						bodyPred.addRelation(this.headRelation, 1);
 					}
 					if (relationsInfo.arg2JoinOnArg1.get(bodyPred.getRelation())!=null) {
-						for (int i=0,len=relationsInfo.arg2JoinOnArg1.get(bodyPred.getRelation()).size();i<len;i++) {
+						for (Relation relation: relationsInfo.arg2JoinOnArg1.get(bodyPred.getRelation())) {
+							newPredicate=createNewOrGetPredicate(d, relation);
+							if (findCandidatesFor1stArg(newPredicate,d+1,depth,1)) {
+								canCloseConnection=true;
+								candidateBodyRelations.get(d).add(bodyPred);
+								bodyPred.addRelation(relation, 1)	;			
+							}
+						}
+						/*for (int i=0,len=relationsInfo.arg2JoinOnArg1.get(bodyPred.getRelation()).size();i<len;i++) {
 							newPredicate=createNewOrGetPredicate(d, relationsInfo.arg2JoinOnArg1.get(bodyPred.getRelation()).get(i));
-
 							if (findCandidatesFor1stArg(newPredicate,d+1,depth,1))  {
 								canCloseConnection=true;
 								candidateBodyRelations.get(d).add(bodyPred);
 								bodyPred.addRelation(relationsInfo.arg2JoinOnArg1.get(bodyPred.getRelation()).get(i), 3)	;			
 							}
-						}
+						}*/
 					}
 
 					if (relationsInfo.arg2JoinOnArg2.get(bodyPred.getRelation())!=null) {
-						for (int i=0,len=relationsInfo.arg2JoinOnArg2.get(bodyPred.getRelation()).size();i<len;i++) {
+						for (Relation relation: relationsInfo.arg2JoinOnArg2.get(bodyPred.getRelation())) {
+							newPredicate=createNewOrGetPredicate(d, relation);
+							if (findCandidatesFor1stArg(newPredicate,d+1,depth,1)) {
+								canCloseConnection=true;
+								candidateBodyRelations.get(d).add(bodyPred);
+								bodyPred.addRelation(relation, 1)	;			
+							}
+						}
+						/*for (int i=0,len=relationsInfo.arg2JoinOnArg2.get(bodyPred.getRelation()).size();i<len;i++) {
 							newPredicate=createNewOrGetPredicate(d, relationsInfo.arg2JoinOnArg2.get(bodyPred.getRelation()).get(i));
-
 							if (findCandidatesFor1stArg(newPredicate,d+1,depth,2))  {
 								canCloseConnection=true;
 								candidateBodyRelations.get(d).add(bodyPred);
 								bodyPred.addRelation(relationsInfo.arg2JoinOnArg2.get(bodyPred.getRelation()).get(i), 4)	;			
 							}
-						}
+						}*/
 					}
 				}
 			}

@@ -116,7 +116,10 @@ public class Relation implements Serializable
  	}
  	
 	public String getSimpleName() {
- 		return this.name.substring(Math.max(name.lastIndexOf('/'), name.lastIndexOf('#'))+1, name.length()-1);
+		if  (this.isAuxiliary()) 
+			return getName();
+		else
+			return this.name.substring(Math.max(name.lastIndexOf('/'), name.lastIndexOf('#'))+1, name.length()-1);
  	}
 	
  	public Type getDomain(){

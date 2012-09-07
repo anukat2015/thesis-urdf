@@ -2,15 +2,11 @@ package urdf.ilp;
 
 
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import urdf.rdf3x.Connection;
@@ -39,10 +35,10 @@ public class RelationPreProcessor implements Serializable
 	private Hashtable<String,Relation> relations = new Hashtable<String,Relation>();
 	private Hashtable<String,Type> types = new Hashtable<String,Type>();
 	
-	private  HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg2=new HashMap<Relation,ArrayList<Relation>>();
-	private  HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1=new HashMap<Relation,ArrayList<Relation>>();
-	private  HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2=new HashMap<Relation,ArrayList<Relation>>();
-	private  HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1=new HashMap<Relation,ArrayList<Relation>>();
+	private  HashMap<Relation,HashSet<Relation>> arg1JoinOnArg2=new HashMap<Relation,HashSet<Relation>>();
+	private  HashMap<Relation,HashSet<Relation>> arg1JoinOnArg1=new HashMap<Relation,HashSet<Relation>>();
+	private  HashMap<Relation,HashSet<Relation>> arg2JoinOnArg2=new HashMap<Relation,HashSet<Relation>>();
+	private  HashMap<Relation,HashSet<Relation>> arg2JoinOnArg1=new HashMap<Relation,HashSet<Relation>>();
 	
 	private HashMap<String,Integer> dangerousRelations=new HashMap<String,Integer>();
 
@@ -209,13 +205,13 @@ public class RelationPreProcessor implements Serializable
 			j=i;
 			
 			if (arg1JoinOnArg2.get(iRelation)==null)
-				arg1JoinOnArg2.put(iRelation, new ArrayList<Relation>());
+				arg1JoinOnArg2.put(iRelation, new HashSet<Relation>());
 			if (arg1JoinOnArg1.get(iRelation)==null)
-				arg1JoinOnArg1.put(iRelation, new ArrayList<Relation>());
+				arg1JoinOnArg1.put(iRelation, new HashSet<Relation>());
 			if (arg2JoinOnArg2.get(iRelation)==null)
-				arg2JoinOnArg2.put(iRelation, new ArrayList<Relation>());
+				arg2JoinOnArg2.put(iRelation, new HashSet<Relation>());
 			if (arg2JoinOnArg1.get(iRelation)==null)
-				arg2JoinOnArg1.put(iRelation, new ArrayList<Relation>());
+				arg2JoinOnArg1.put(iRelation, new HashSet<Relation>());
 			
 			facts1 = iRelation.getSize();
 			
@@ -245,13 +241,13 @@ public class RelationPreProcessor implements Serializable
 				
 				if (sameFlag){
 					if (!arg1JoinOnArg1.containsKey(iRelation))
-						arg1JoinOnArg1.put(relations.get(i),new ArrayList<Relation>());
+						arg1JoinOnArg1.put(relations.get(i),new HashSet<Relation>());
 
 					if (!arg1JoinOnArg1.get(iRelation).contains(jRelation))
 						arg1JoinOnArg1.get(iRelation).add(jRelation);
 					
 					if (!arg2JoinOnArg2.containsKey(iRelation))
-						arg2JoinOnArg2.put(iRelation,new ArrayList<Relation>());
+						arg2JoinOnArg2.put(iRelation,new HashSet<Relation>());
 
 					if (!arg2JoinOnArg2.get(iRelation).contains(jRelation))
 						arg2JoinOnArg2.get(iRelation).add(jRelation);
@@ -296,16 +292,16 @@ public class RelationPreProcessor implements Serializable
 	
 	
 	
-	private void fillInJoinOnMap(int joinCase,HashMap<Relation,ArrayList<Relation>> map1,HashMap<Relation,ArrayList<Relation>> map2, Relation relation1,int arg1,Relation relation2, int arg2,int facts,  boolean sameFlag) throws SQLException {
+	private void fillInJoinOnMap(int joinCase,HashMap<Relation,HashSet<Relation>> map1,HashMap<Relation,HashSet<Relation>> map2, Relation relation1,int arg1,Relation relation2, int arg2,int facts,  boolean sameFlag) throws SQLException {
 		if (arg1==arg2){
 			if (fireOverlapQuery(joinCase, relation1, relation2, facts, tChecker.getSupportThreshold(),tChecker.getPossiblePosToBeCoveredThreshold())){
 				System.out.println(relation1.getName() + "\t joins \t" + relation2.getName());
 				if (!map1.containsKey(relation1))
-					map1.put(relation1,new ArrayList<Relation>());
+					map1.put(relation1,new HashSet<Relation>());
 				if (!map1.get(relation1).contains(relation2))
 					map1.get(relation1).add(relation2);					
 				if (!map1.containsKey(relation2))
-					map1.put(relation2,new ArrayList<Relation>());
+					map1.put(relation2,new HashSet<Relation>());
 				if (!map1.get(relation2).contains(relation1))
 					map1.get(relation2).add(relation1);									
 			}
@@ -314,12 +310,12 @@ public class RelationPreProcessor implements Serializable
 			if (fireOverlapQuery(joinCase, relation1,  relation2,  facts, tChecker.getSupportThreshold(),tChecker.getPossiblePosToBeCoveredThreshold())){
 				System.out.println(relation1.getName() + "\t joins \t" + relation2.getName());
 				if (!map1.containsKey(relation1))
-					map1.put(relation1,new ArrayList<Relation>());
+					map1.put(relation1,new HashSet<Relation>());
 				if (!map1.get(relation1).contains(relation2))
 					map1.get(relation1).add(relation2);
 				if (!sameFlag){
 					if (!map2.containsKey(relation2))
-						map2.put(relation2,new ArrayList<Relation>());
+						map2.put(relation2,new HashSet<Relation>());
 					if (!map2.get(relation2).contains(relation1))
 						map2.get(relation2).add(relation1);		
 				}

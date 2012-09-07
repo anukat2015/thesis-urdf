@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 
 import urdf.rdf3x.Connection;
@@ -40,10 +41,10 @@ public class RelationsInfo implements Serializable {
 	private Hashtable<String,Type> types;
 	public 	HashMap<String,Integer> dangerousRelations;
 	
-	public  HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg2;
-	public  HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1;
-	public  HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2;
-	public  HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1;
+	public  HashMap<Relation,HashSet<Relation>> arg1JoinOnArg2;
+	public  HashMap<Relation,HashSet<Relation>> arg1JoinOnArg1;
+	public  HashMap<Relation,HashSet<Relation>> arg2JoinOnArg2;
+	public  HashMap<Relation,HashSet<Relation>> arg2JoinOnArg1;
 
 	public static final Relation EQ = new Relation("=", null, null);
 	public static final Relation NEQ = new Relation("!=", null, null);
@@ -51,8 +52,8 @@ public class RelationsInfo implements Serializable {
 	public static final Relation LT = new Relation("<", null, null);
 	
 	public RelationsInfo(Hashtable<String,Relation> relations, Hashtable<String,Type> types, 
-			HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1,
-			HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1,
+			HashMap<Relation,HashSet<Relation>> arg1JoinOnArg2,HashMap<Relation,HashSet<Relation>> arg1JoinOnArg1,
+			HashMap<Relation,HashSet<Relation>> arg2JoinOnArg2,HashMap<Relation,HashSet<Relation>> arg2JoinOnArg1,
 			HashMap<String,Integer> dangerousRelations) {
 		
 		this.types = types;
@@ -67,8 +68,8 @@ public class RelationsInfo implements Serializable {
 	}
 	
 	public RelationsInfo(ArrayList<Relation> relations,ArrayList<Type> types, 
-			HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg1JoinOnArg1,
-			HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg2,HashMap<Relation,ArrayList<Relation>> arg2JoinOnArg1,
+			HashMap<Relation,HashSet<Relation>> arg1JoinOnArg2,HashMap<Relation,HashSet<Relation>> arg1JoinOnArg1,
+			HashMap<Relation,HashSet<Relation>> arg2JoinOnArg2,HashMap<Relation,HashSet<Relation>> arg2JoinOnArg1,
 			HashMap<String,Integer> dangerousRelations) {
 		
 		this.types=new Hashtable<String,Type>();
@@ -76,14 +77,10 @@ public class RelationsInfo implements Serializable {
 		
 	
 		for (int i=0, len=types.size();i<len;i++)
-		{
 			this.types.put(types.get(i).getName(), types.get(i));
-		}
 		
 		for (int i=0, len=relations.size();i<len;i++)
-		{
 			this.relations.put(relations.get(i).getName(), relations.get(i));
-		}
 		
 		this.arg1JoinOnArg1=arg1JoinOnArg1;
 		this.arg1JoinOnArg2=arg1JoinOnArg2;
@@ -210,25 +207,33 @@ public class RelationsInfo implements Serializable {
 	public void calculateMinAndMaxLiterals(Connection conn) throws SQLException {
 		Statement stmt = (Statement) conn.createStatement();
 		ResultSet rs;
+		System.out.println("Relations with Literal Range");
 		for (Relation relation: relations.values()) {
-			Type range = relation.getRange();
-			if (range.isChildOf("<http://yago-knowledge.org/resource/yagoLiteral"))
+			Type range = relation.getRange();				
+			if (range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoNumber>") ||
+				range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoQuantity>") ||
+				range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoGeoCoordinatePair>") ||
+				range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoGeoCoordinate>") ||
+				range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoString>") ||
+				range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoDate>")) 
+			{
+				System.out.println(relation.getName());
 				relation.setRangeIsLiteral(true);
-			if (range.isChildOf("<http://yago-knowledge.org/resource/yagoNumber>") ||
-				range.isChildOf("<http://yago-knowledge.org/resource/yagoQuantity>") /*||
-				range.isChildOf("<http://yago-knowledge.org/resource/yagoGeoCoordinatePair>") ||
-				range.isChildOf("<http://yago-knowledge.org/resource/yagoGeoCoordinate>") ||
-				range.isChildOf("<http://yago-knowledge.org/resource/yagoDate>")*/) {
-				String queryMin = "SELECT ?min WHERE {?x "+relation.getName()+" ?min} ORDER BY ASC(?min) LIMIT 1";
-				rs = (ResultSet) stmt.executeQuery(queryMin);
-				rs.first();
-				relation.setMinValue(rs.getFloat(1));
-				
-				String queryMax = "SELECT ?max WHERE {?x "+relation.getName()+" ?max} ORDER BY DESC(?max) LIMIT 1";
-				rs = (ResultSet) stmt.executeQuery(queryMax);
-				rs.first();
-				relation.setMinValue(rs.getFloat(1));
-				
+				if (range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoNumber>") || range.equalsOrChildOf("<http://yago-knowledge.org/resource/yagoQuantity>")) {
+					String queryMin = "SELECT ?min WHERE {?x "+relation.getName()+" ?min} ORDER BY ASC(?min) LIMIT 1";
+					
+					rs = (ResultSet) stmt.executeQuery(queryMin);
+					rs.first();
+					relation.setMinValue(rs.getFloat(1));
+					
+					String queryMax = "SELECT ?max WHERE {?x "+relation.getName()+" ?max} ORDER BY DESC(?max) LIMIT 1";
+					rs = (ResultSet) stmt.executeQuery(queryMax);
+					rs.first();
+					relation.setMaxValue(rs.getFloat(1));
+				}
+			}
+			else {
+				relation.setRangeIsLiteral(false);
 			}
 		}
 	}

@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import org.apache.bcel.generic.NEW;
+import org.apache.log4j.Category;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
@@ -27,6 +29,8 @@ public class RuleLearner {
 	ThresholdChecker tChecker;
 	RelationsInfo info;
 	
+	boolean joinOnLiteral = false;
+	
 	HeadPredicate head;
 	int FactsForHead;
 	int depth;
@@ -44,6 +48,8 @@ public class RuleLearner {
 	String[] typeConstantsForArg1;
 	String[] typeConstantsForArg2;
 	
+	RuleWithNumericLiteralLearner numConstLearner = null;
+	
 	private HashMap<String,Integer> headSizesWithConstants = new HashMap<String, Integer>();
 	
 	// constructor
@@ -58,6 +64,9 @@ public class RuleLearner {
 		this.gainMeasure = gainMeasure;
 		this.beamWidth = beamWidth;
 		this.tryConstants = tryConstants;
+		
+		numConstLearner = new RuleWithNumericLiteralLearner(queryHandler, tChecker, info);
+		numConstLearner.setNumberOfBuckets(10);
 	}
 
 
@@ -68,7 +77,7 @@ public class RuleLearner {
 		this.allowedRelations = head.getCandidateBodyRelations();
 		this.depth = depth;
 		this.inputArg = head.getInputArg();
-		System.out.println("!!!!!!inputarg="+inputArg);
+		System.out.println("Inputarg="+inputArg);
 		
 		rulesCheckedMap = new HashMap<Integer,HashSet<Rule>>();	
 		
@@ -87,7 +96,7 @@ public class RuleLearner {
 		
 		//postProcess(rulesTree);
 
-		logger.log(Level.INFO,"Positive examples for the head in total: "+FactsForHead);
+		logger.log(Level.DEBUG,"Positive examples for the head in total: "+FactsForHead);
 	
 	}
 	
@@ -97,31 +106,55 @@ public class RuleLearner {
 		
 		if (node.getRule().getConfidence() < tChecker.getStoppingThreshold()) {
 			
+			//if (node.getRule().getNumOfFreeVariables()<(depth-d+1)) {
+			//	refinePredicate(node,5,d,-1);//arg1joinOnArg1 and arg2joinOnArg2
+			//	refinePredicate(node,6,d,-1);//arg2JoinOnArg1 and arg2joinOnArg1
+			//}
+			
 			// first try to refine the head
-			if (inputArg==2) {
-				refinePredicate(node,3,d,-1);//arg2JoinOnArg1
-				refinePredicate(node,4,d,-1);//arg2JoinOnArg2
-			}
-			else {
+			if (inputArg==1) {		
 				refinePredicate(node,1,d,-1);//arg1JoinOnArg1
 				refinePredicate(node,2,d,-1);//arg1JoinOnArg2
 			}
+			if (inputArg==2) {				
+				refinePredicate(node,3,d,-1);//arg2JoinOnArg1
+				refinePredicate(node,4,d,-1);//arg2JoinOnArg2
+			}
+			/*if (inputArg==0) {				
+				refinePredicate(node,1,d,-1);//arg1JoinOnArg1
+				refinePredicate(node,2,d,-1);//arg1JoinOnArg2
+				refinePredicate(node,3,d,-1);//arg2JoinOnArg1
+				refinePredicate(node,4,d,-1);//arg2JoinOnArg2
+			}*/
+			
 
 			// second try to refine the predicates in the body
 			for (int i=0, len=node.getRule().getBodyLiterals().size();i<len;i++) {
 				// do not refine auxiliary relations 
-				if (node.getRule().getBodyLiterals().get(i).getRelation().isAuxiliary()) {
+				if (node.getRule().getBodyLiterals().get(i).getRelation().isAuxiliary())
 					continue;
+				
+				if (d>2) {
+					// TODO Try to do internal Joins with no New Variable:
+					//refinePredicate(node,7,d,i); //arg1JoinOnArg1 with given literal, arg2 with smth else in body
+					//refinePredicate(node,8,d,i); //arg1JoinOnArg2 with given literal, arg2 with smth else in body
+					//refinePredicate(node,9,d,i); //arg2JoinOnArg1 with given literal, arg1 with smth else in body
+					//refinePredicate(node,10,d,i);//arg2JoinOnArg2 with given literal, arg1 with smth else in body
+					
 				}
-
+				
+				if (node.getRule().getNumOfFreeVariables()<(depth-d+1)) {
+					refinePredicate(node,5,d,i);//arg1joinOnArg1 and arg2joinOnArg2
+					refinePredicate(node,6,d,i);//arg2JoinOnArg1 and arg2joinOnArg1
+				}
+					
 				refinePredicate(node,1,d,i);//arg1JoinOnArg1
 				refinePredicate(node,2,d,i);//arg1JoinOnArg2
 				refinePredicate(node,3,d,i);//arg2JoinOnArg1
 				refinePredicate(node,4,d,i);//arg2JoinOnArg2
 			}
 
-			if(node.getChildren()!=null && node.getChildren().size()>0)
-			{
+			if(node.getChildren()!=null && node.getChildren().size()>0) {
 				// if beam search on, compute gains for each child. Only the children with the highest gain will survive 
 				if (beamWidth > 0 && d > 1) {
 					eliminateChildrenOutOfBeam(node);
@@ -138,8 +171,12 @@ public class RuleLearner {
 	}
 	
 	private void refinePredicate(RuleTreeNode node, int joinCase, int d, int position) throws Exception {
+		Rule rule = node.getRule();
+		Literal literal=(position==-1?rule.getHead():rule.getBodyLiterals().get(position));
 		
-		logger.log(Level.INFO,"Refining predicate from rule: " + node.getRule().getRuleString());
+		logger.log(Level.DEBUG,"Refining predicate from rule (joinCase="+joinCase+" at "+literal.getRelationName()+"): " + rule.getRuleString());
+		System.out.println("Refining predicate from rule (joinCase="+joinCase+" at "+literal.getRelationName()+"): " + rule.getRuleString());
+		if (node.getParent()!=null) System.out.println(" **** " + node.getParent().getRule().getRuleString());
 
 		Rule newRule=null;
 		Rule freeRule=null;
@@ -151,7 +188,7 @@ public class RuleLearner {
 		int mode2 = 0;
 		int freeVar;
 		
-		ArrayList<Relation> candidateRelations;
+		HashSet<Relation> candidateRelations;
 		Literal newLiteral = null;
 		Literal freeLiteral = null;
 		
@@ -160,14 +197,15 @@ public class RuleLearner {
 		
 		boolean[] out;
 		
-		Rule rule = node.getRule();
-		Literal literal=(position==-1?rule.getHead():rule.getBodyLiterals().get(position));
+		if (!joinOnLiteral && literal.getRelation().isRangeLiteral() && (joinCase==3 || joinCase==4)) { 
+			logger.log(Level.DEBUG, "Tried to join new rule relation on a literal argument from "+literal.getRelationName());
+			return;
+		}
 		
 		if (allowFreeVars) 
 			candidateRelations = getJoinableRelations(joinCase, literal.getRelation()); // no restriction at all
 		else
 			candidateRelations = getRelationsFromAllowedRelations(d,joinCase, literal.getRelation()); // restriction according to depth
-		
 		
 		
 		switch(joinCase) {
@@ -176,6 +214,17 @@ public class RuleLearner {
 				mode1 = 1;
 				arg2 = rule.getNextVariableNumber();		
 				freeVar = 2;
+				if (literal.getRelation().getDomain().equalsOrChildOf(info.getTypeFromTypes("<http://yago-knowledge.org/resource/wordnet_location_100027167>"))) {
+					if (candidateRelations==null) candidateRelations = new HashSet<Relation>();
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasGDP>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasUnemployment>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasEconomicGrowth>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasHDI>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasPoverty>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasPopulation>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasInflation>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasArea>"));
+				}
 				break;			
 			case 2:				
 				arg2 = literal.getFirstArgument();
@@ -188,6 +237,17 @@ public class RuleLearner {
 				mode1 = 1;
 				arg2 = rule.getNextVariableNumber();	
 				freeVar = 2;
+				if (literal.getRelation().getRange().equalsOrChildOf(info.getTypeFromTypes("<http://yago-knowledge.org/resource/wordnet_location_100027167>"))) {
+					if (candidateRelations==null) candidateRelations = new HashSet<Relation>();
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasGDP>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasUnemployment>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasEconomicGrowth>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasHDI>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasPoverty>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasPopulation>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasInflation>"));
+					candidateRelations.add(info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasArea>"));
+				}
 				break;
 			case 4:			
 				arg2 = literal.getSecondArgument();
@@ -195,15 +255,29 @@ public class RuleLearner {
 				arg1 = rule.getNextVariableNumber();
 				freeVar = 1;
 				break;
+			case 5:
+				arg1 = literal.getFirstArgument();
+				mode1 = mode2 = 1;
+				arg2 = literal.getSecondArgument();		
+				freeVar = 0;
+				//System.out.println("===========Case5("+(char)arg1+","+(char)arg2+")");
+				break;	
+			case 6:
+				arg1 = literal.getSecondArgument();
+				mode1 = mode2 = 1;
+				arg2 = literal.getFirstArgument();		
+				freeVar = 0;
+				//System.out.println("===========Case6("+(char)arg1+","+(char)arg2+")");
+				break;	
 			default: throw new IllegalArgumentException("Join case should be 1,2,3 or 4. It's " + joinCase + "instead.");
-		}
+		}			
 		
 		if (candidateRelations!=null && candidateRelations.size()>0) {
-			for (int i=0,len=candidateRelations.size();i<len;i++) {
-								
-				Relation iCandidate = candidateRelations.get(i);
+			int i=0;
+			for (Relation iCandidate: candidateRelations) {
+				++i;
 				logger.log(Level.DEBUG, i+"th-CandidateRelation = "+iCandidate.getName());
-				
+		
 				canCloseConnection=false;
 				ruleStored=false;	
 				freeRule=null;
@@ -212,18 +286,51 @@ public class RuleLearner {
 				//if (iCandidate.getName().equals("hasUTCOffset") || iCandidate.getName().equals("bornOnDate") || iCandidate.getName().equals("isOfGenre")) {
 				//	continue;
 				//}
+				if (iCandidate.equals(literal.getRelation()) && (joinCase==5 || joinCase==6)) {
+					logger.log(Level.DEBUG, "Trying to join both args on same relation: "+iCandidate.getName());
+					continue;
+				}
 				
-				if (iCandidate.isRangeLiteral() && (joinCase==2 || joinCase==4)) {
+				if (iCandidate.isRangeLiteral() && (joinCase==2 || joinCase==4 || joinCase==5 || joinCase==6)) {
 					logger.log(Level.DEBUG, "Trying to join on literal from relation: "+iCandidate.getName());
 					continue;
 				}
 				
+				if (iCandidate.isRangeLiteral()) System.out.println("====== Candidate with Literal (joinCase="+joinCase+"): "+ iCandidate.getSimpleName() + "  MIN="+iCandidate.getMinValue()+" MAX="+iCandidate.getMaxValue());
+				
+	
 				
 				// STEP 1: WITH FREE VARIABLE	
 				newRule = rule.clone();
 				newLiteral = new Literal(iCandidate,arg1,mode1,arg2,mode2,freeVar);		
 				
 				out = considerElimination(newRule,rule,newLiteral,literal,d,position);
+				
+				// If candidate relation has numerical range, try to find best ranges
+				if (!out[0] && newRule!=null && newRule.bindsHeadVariables() && iCandidate.isRangeLiteral() && iCandidate.getMaxValue()!=Float.NaN && iCandidate.getMinValue()!=Float.NaN) {
+					if (joinCase==1 || joinCase==3) {
+						System.out.println("============Testing literal ranging"+newRule.getRuleString());
+						// Checks whether first argument is set to constant (Is contained in a EQ literal)
+						boolean extend = true;
+						for (Literal l: newRule.getBodyLiterals()) {
+							if (l.getRelation().equals(info.EQ)  && arg1==l.getFirstArgument()) {
+								extend = false;
+								break;
+							}
+						}
+						if (extend) {
+							newLiteral.setFreeVariable(0);
+							//checkExtendRuleWithLiteralRanging(node,newRule,arg2,d);
+							numConstLearner.evaluateRule(newRule, arg2);
+						}
+
+					} 
+					continue;	
+				}
+				
+				// Try to add constants to non-head variables
+				if (!out[0] && newRule!=null && newRule.bindsHeadVariables() && !iCandidate.isRangeLiteral())
+					checkConstantsAtBody(node, newRule, d);
 				
 				
 				if (out[0]) {
@@ -263,7 +370,7 @@ public class RuleLearner {
 				}
 				else {
 					if ((joinCase==1 || joinCase==3) && info.arg2JoinOnArg2.get(head.getHeadRelation())!=null &&
-							info.arg2JoinOnArg2.get(head.getHeadRelation()).contains(iCandidate))
+						 info.arg2JoinOnArg2.get(head.getHeadRelation()).contains(iCandidate))
 					{
 						// form the new Literal
 						newLiteral=new Literal(iCandidate,arg1,66);
@@ -271,7 +378,7 @@ public class RuleLearner {
 						canCloseConnection=true;
 					}
 					else if ((joinCase==2 || joinCase==4)&& info.arg2JoinOnArg1.get(head.getHeadRelation())!=null &&
-							info.arg2JoinOnArg1.get(head.getHeadRelation()).contains(iCandidate))
+							  info.arg2JoinOnArg1.get(head.getHeadRelation()).contains(iCandidate))
 					{
 						// form the new Literal
 						newLiteral=new Literal(iCandidate,66,arg2);
@@ -294,13 +401,8 @@ public class RuleLearner {
 								checkExtendRuleWithTypes(node, newRule, d);
 							
 							head.getHeadRelation().setConstantInArg(2);
-							if (newRule.bindsHeadVariables() && tryConstants &&!newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0)
+							if (newRule.bindsHeadVariables() && tryConstants && !newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0)
 								checkExtendRuleWithConstants(node,newRule,d);
-							
-							if (newRule.bindsHeadVariables() && iCandidate.isRangeLiteral() && iCandidate.getMaxValue()!=Float.NaN && iCandidate.getMinValue()!=Float.NaN) {
-								checkExtendRuleWithLiteralRanging(node,newRule,arg2,d);
-							}
-
 						}
 					}					
 					
@@ -336,14 +438,14 @@ public class RuleLearner {
 	 * out[1]: the rule should be skipped but considered for further change on arguments
 	 * @throws Exception 
 	 */
-	private boolean[] considerElimination(Rule newRule,Rule oldRule, Literal newLiteral,Literal literal, int d, int position) throws Exception {
+	private boolean[] considerElimination(Rule newRule,Rule oldRule, Literal newLiteral, Literal literal, int d, int position) throws Exception {
 		
-		logger.log(Level.INFO,"Considering elimintaion Rule: " +  newRule.getRuleString() + " NewLiteral: " + newLiteral.getSparqlPattern());
+		logger.log(Level.DEBUG,"Considering elimintaion Rule: " +  newRule.getRuleString() + " NewLiteral: " + newLiteral.getSparqlPattern());
 		
 		boolean[] out=new boolean[2];
 		
 		
-		if (dontConsiderRelation(literal,newLiteral, d)) {
+		if (dontConsiderRelation(literal,newLiteral, d) || dontConsiderRelation(oldRule,newLiteral,d)) {
 			out[0]=true;
 			out[1]=true;
 			return out;
@@ -353,7 +455,7 @@ public class RuleLearner {
 		// take care of non equalities
 		checkToAddAuxiliaryRelation(newRule);
 						
-		if (!(dontConsiderRelation(oldRule,newLiteral,d) || dontConsiderRelation(newRule, d))) {
+		if (!(/*dontConsiderRelation(oldRule,newLiteral,d) || */dontConsiderRelation(newRule, d))) {
 			out[0]=false;
 			out[1]=false;
 		}		
@@ -362,8 +464,8 @@ public class RuleLearner {
 			out[1]=true;			
 		}
 		
-		if (out[0]==true) logger.log(Level.INFO, "Rule shouldn't be considered at all");
-		if (out[1]==true) logger.log(Level.INFO, "Rule shoudld be skipped but but considered for further change on argumets");
+		if (out[0]==true) logger.log(Level.DEBUG, "Rule shouldn't be considered at all");
+		if (out[1]==true) logger.log(Level.DEBUG, "Rule shoudld be skipped but but considered for further change on argumets");
 
 		return out;
 	}
@@ -375,7 +477,7 @@ public class RuleLearner {
  	private boolean evaluateRule(RuleTreeNode node,Rule rule, int d) throws Exception{
 		boolean flag = false;
 		
-		logger.log(Level.INFO,"Evaluating Rule: "+rule.getRuleString());
+		logger.log(Level.DEBUG,"Evaluating Rule: "+rule.getRuleString());
 		
 		if (checkForSupportAndExactExamples(rule)) {				
 			// compute Gain and store
@@ -399,7 +501,7 @@ public class RuleLearner {
 		
 		boolean flag=false;
 		
-		logger.log(Level.INFO,"Evaluating Rule: " + rule.getRuleString() + "With FreeRule: " + freeRule.getRuleString() + "With BindRule: " + bindRule.getRuleString());
+		logger.log(Level.DEBUG,"Evaluating Rule: " + rule.getRuleString() + "With FreeRule: " + freeRule.getRuleString() + "With BindRule: " + bindRule.getRuleString());
 		
 		if (tChecker.checkComplementaryRule(rule, freeRule,bindRule, FactsForHead,inputArg)) {
 			if(rule.bindsHeadVariables()&& d>1 && rule.isGood()) 
@@ -420,7 +522,18 @@ public class RuleLearner {
 	
 
 // *************************** AUXILIARY METHODS *************************************
- 	private ArrayList<Relation> getRelationsFromAllowedRelations(int d,int joinCase, Relation relation){
+ 	private HashSet<Relation> getJoinableRelations(int joinCase, Relation relation) {
+		switch(joinCase) {
+			case 1: return info.arg1JoinOnArg1.get(relation); 			
+			case 2: return info.arg1JoinOnArg2.get(relation); 
+			case 3: return info.arg2JoinOnArg1.get(relation); 
+			case 4: return info.arg2JoinOnArg2.get(relation); 
+			case 5: return intersectSets(info.arg1JoinOnArg1.get(relation), info.arg2JoinOnArg2.get(relation));
+			case 6: return intersectSets(info.arg1JoinOnArg2.get(relation), info.arg2JoinOnArg1.get(relation));
+			default: throw new IllegalArgumentException("Join case should be a number between 1 and 4");
+		}
+	}
+	private HashSet<Relation> getRelationsFromAllowedRelations(int d,int joinCase, Relation relation){
 
 		if (allowedRelations.get(d-1)==null)
 			return null;
@@ -432,6 +545,7 @@ public class RuleLearner {
 					case 2: return bp.arg1JoinOnArg2;
 					case 3: return bp.arg2JoinOnArg1;
 					case 4: return bp.arg2JoinOnArg2;
+					case 5: case 6: return getJoinableRelations(joinCase, relation);
 				}
 			}
 		}
@@ -441,6 +555,8 @@ public class RuleLearner {
 	
 	private void checkExtendRuleWithTypes(RuleTreeNode node, Rule rule, int d) throws Exception
 	{
+		logger.log(Level.INFO, "Extending rule with type, rule = "+rule.getRuleString());
+		
 		Rule newRule, newRule2;
 		Literal lit;
 		int var;
@@ -504,6 +620,92 @@ public class RuleLearner {
 			
 		}
 	}
+	private void checkConstantsAtBody(RuleTreeNode node, Rule rule, int d) {
+		// Tries to apply constants no non-head variable
+		
+		int lastVar = rule.getNextVariableNumber()-1;
+		int position = Math.max(-1, rule.getBodySize()-1);
+		
+		// If body has any variable inexistent in the Head
+		if (lastVar > 66 && rule.getConstantInArg()==0) { 
+			HashSet<Integer> candidateVariables = new HashSet<Integer>();
+			// First add all variables (apart from head's)
+			for (Literal lit: rule.getBodyLiterals()) {
+				Relation rel = lit.getRelation();
+				if (!rel.isAuxiliary() && !rel.isRangeLiteral()) {
+					if (lit.getFreeVariable()==1)
+						candidateVariables.add(new Integer(lit.getFirstArgument()));
+					if (lit.getFreeVariable()==2)
+						candidateVariables.add(new Integer(lit.getSecondArgument()));
+				}
+			}
+			
+			System.out.println("..........CandidateVariables from: "+rule.getRuleString());
+			for (Integer i: candidateVariables) System.out.println((char)i.intValue());
+			
+			
+			float minAcc = tChecker.confidenceThreshold;
+			float minPos = Math.max(tChecker.positivesCoveredThreshold, tChecker.supportThreshold*rule.getHeadSize());
+			for (Integer i: candidateVariables) {
+				try {
+					ResultSet rs = queryHandler.retriveLiteralDistribution(rule, i.intValue());
+					String constant = null;
+					int match,pos=0,tot=0;
+					float acc;
+					while (rs.next()) {
+						match = rs.getInt(2);
+						// In the result set, match=1 comes always before match=0
+						if (match==1) {
+							pos = rs.getInt(3);				
+							if (pos >= minPos) {
+								constant = rs.getString(1);
+								System.out.println((char)i.intValue()+"="+constant+" has "+pos+" positives..");
+							}
+						} else {
+							if (constant!=null) { // If any match=1 already found before, it's expected that next constant is same with match=0, otherwise bodysize==positives -> acc=1
+								if (constant.equals(rs.getString(1))) {								
+									tot = pos+rs.getInt(3);
+									//System.out.println((char)i.intValue()+"="+constant+" has "+tot+" bodysize..");
+									acc = ((float)pos)/((float)tot);
+									//System.out.println((char)i.intValue()+"="+constant+" has "+acc+" accuracy..");		
+								} else { // bodysize==positives -> acc=1
+									tot = pos;
+									acc = 1;
+								}
+								if (acc>=minAcc) {
+									System.out.println(rule.getRuleString()+" "+(char)i.intValue()+"="+constant+"   (acc="+acc+"="+pos+"/"+tot+")");
+									Literal newLit = new Literal(info.EQ, i.intValue(), 1, -1, 0, constant);
+									Rule newRule = rule.clone();
+									newRule.addLiteral(newLit,position);
+									newRule.setBodySize(tot);
+									newRule.setPositivesCovered(pos);
+									newRule.setConfidence(acc);
+									newRule.setSupport((float)pos/(float)newRule.getHeadSize());			
+									checkGainFromBestAncestor(node, newRule);
+									newRule.setIsGood(true);
+									newRule.setIsTooGeneral(false);
+									System.out.println(newRule.printRule(false));
+									node.addChild(new RuleTreeNode(newRule, node, d));
+									System.out.println("Number of children from parent: "+node.getChildren().size());
+									RuleTreeNode r = node;
+									while (r!=null) {										
+										System.out.println("Parent: "+node.getRule().printRule(false));
+										r = r.getParent();
+									}
+								}
+								constant = null;
+							} 
+						}
+					}
+				} catch (SQLException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		
+		
+	}
 	private void checkExtendRuleWithConstants(RuleTreeNode node, Rule rule, int d) throws Exception {
 		Rule newRule;
 		Literal lit;
@@ -540,34 +742,43 @@ public class RuleLearner {
 	
 	private void checkExtendRuleWithLiteralRanging(RuleTreeNode node, Rule rule, int literalArg, int d) throws Exception {
 		
-		logger.log(Level.DEBUG, "Checking ranging of rule with Literal: "+rule.getRuleString());
+		logger.log(Level.INFO, "!!!!!!!!!!!! - Checking ranging of rule with Literal: "+rule.getRuleString());
 		
 		ResultSet rs = queryHandler.retriveLiteralDistribution(rule, literalArg);
 	
 		float minAcc = tChecker.confidenceThreshold;
 		float minPos = Math.max(tChecker.positivesCoveredThreshold, tChecker.supportThreshold*rule.getHeadSize());
+		minAcc/=2;
+		minPos/=2;
 		float first = Float.NaN;
 		float  last = Float.NaN;
 		float  curr = Float.NaN;
 		float lastAcc = 0;
+		int lastPos = 0, lastTot = 0;
 		int currPos=0, currNeg=0, currTot=0;
 		int  rowPos=0,  rowNeg=0,  rowTot=0;
 		float rowAcc = -1;
 		boolean firstRow = true;
+		int position = Math.max(-1, rule.getBodySize()-1);
 		while (rs.next()) {
 			float value = rs.getFloat(1);
 			boolean match = rs.getInt(2)==1;
 			int count = rs.getInt(3);
 			
+			System.out.println("first="+first+" last="+last);
+			System.out.println("value="+value+"  match="+match+"  count="+count);
+			
 			// got a new value
 			if (curr!=value && !firstRow) {
 				rowAcc = ((float) rowPos)/((float) rowTot);
 				if (rowAcc >= minAcc) {
-					if (first==Float.NaN) 
+					if (Float.isNaN(first)) 
 						first = curr;
 					else if ((currPos+rowPos)>=minPos/* && (curr-first)>=minRange*/)  {
 						last = curr;
 						lastAcc = ((float) currPos)/((float) currTot);
+						lastPos = currPos+rowPos;
+						lastTot = currTot+rowTot;
 					}
 					
 					currPos += rowPos;
@@ -576,13 +787,31 @@ public class RuleLearner {
 					
 					
 				} else {
-					if (first!=Float.NaN) {
+					if (!Float.isNaN(first)) {
 						int tempPos = currPos+rowPos;
 						int tempTot = currTot+rowTot;
 						float tempAcc = ((float) tempPos)/((float) tempTot);
 						if (tempAcc < minAcc) {
-							if (first!=Float.NaN && last!=Float.NaN)
+							if (!Float.isNaN(first) && !Float.isNaN(last)) {
 								System.out.println("[" + first + ".." + last + "] Acc="+lastAcc);
+								Rule newRule = rule.clone();
+								Literal gtLit = new Literal(info.GT, literalArg, 1, -1, 0, Float.toString(first));	
+								Literal ltLit = new Literal(info.LT, literalArg, 1, -1, 0, Float.toString(last));
+								gtLit.setConstNeedsQuotes(true);
+								ltLit.setConstNeedsQuotes(true);
+								newRule.addLiteral(gtLit,position);					
+								newRule.addLiteral(ltLit,position);
+								newRule.setBodySize(lastTot);
+								newRule.setConfidence(lastAcc);
+								newRule.setSupport(((float)lastPos)/((float)newRule.getHeadSize()));
+								newRule.setExamplesCovered(lastTot);
+								newRule.setPositivesCovered(lastPos);
+								checkGainFromBestAncestor(node, newRule);
+								newRule.setIsGood(true);
+								newRule.setIsTooGeneral(false);
+								System.out.println(newRule.getRuleString());
+								node.addChild(new RuleTreeNode(newRule, node, d));
+							}
 							first = last = Float.NaN;
 							currPos = currNeg = currTot = 0;
 						} else {
@@ -607,19 +836,36 @@ public class RuleLearner {
 				rowNeg = count;
 			rowTot += count;
 		}
-		if (first!=Float.NaN && last!=Float.NaN)
+		if (!Float.isNaN(first) && !Float.isNaN(last) && rowAcc>=minAcc && rowPos>=minPos) {
 			System.out.println("[" + first + ".." + last + "] Acc="+lastAcc);
+			Rule newRule = rule.clone();
+			Literal gtLit = new Literal(info.GT, literalArg, 1, -1, 0, Float.toString(first));	
+			Literal ltLit = new Literal(info.LT, literalArg, 1, -1, 0, Float.toString(last));
+			gtLit.setConstNeedsQuotes(true);
+			ltLit.setConstNeedsQuotes(true);
+			newRule.addLiteral(gtLit,position);					
+			newRule.addLiteral(ltLit,position);
+			newRule.setBodySize(lastTot);
+			newRule.setConfidence(lastAcc);
+			newRule.setSupport(((float)lastPos)/((float)newRule.getHeadSize()));
+			newRule.setExamplesCovered(lastTot);
+			newRule.setPositivesCovered(lastPos);
+			checkGainFromBestAncestor(node, newRule);
+			newRule.setIsGood(true);
+			newRule.setIsTooGeneral(false);
+			System.out.println(newRule.getRuleString());
+			node.addChild(new RuleTreeNode(newRule, node, d));
+		}
 		
 	}
 	
- 	private ArrayList<Relation> getJoinableRelations(int joinCase, Relation relation) {
-		switch(joinCase) {
-			case 1: return info.arg1JoinOnArg1.get(relation); 			
-			case 2: return info.arg1JoinOnArg2.get(relation); 
-			case 3: return info.arg2JoinOnArg1.get(relation); 
-			case 4: return info.arg2JoinOnArg2.get(relation); 
-			default: throw new IllegalArgumentException("Join case should be a number between 1 and 4");
+	private static HashSet<Relation> intersectSets(HashSet<Relation> set1, HashSet<Relation> set2) {
+		HashSet<Relation> result = new HashSet<Relation>();
+		for (Relation r: set1) {
+			if (set2.contains(r))
+				result.add(r);
 		}
+		return result;
 	}
  	
 	public void printRules() {
@@ -737,21 +983,26 @@ public class RuleLearner {
 				Literal jLiteral = literals.get(j);
 				
 				if(iLiteral.getRelation().equals(jLiteral.getRelation())) {
-					if (iLiteral.getFirstArgument() == jLiteral.getFirstArgument() && iLiteral.getSecondArgument() != jLiteral.getSecondArgument()) {
+					if (iLiteral.getFirstArgument() == jLiteral.getFirstArgument() && iLiteral.getSecondArgument() != jLiteral.getSecondArgument()) 
 						lit = new Literal(RelationsInfo.NEQ,iLiteral.getSecondArgument(),jLiteral.getSecondArgument());						
-					}
-					else if (iLiteral.getSecondArgument() == jLiteral.getSecondArgument() && iLiteral.getFirstArgument() != jLiteral.getFirstArgument()) {
+					else if (iLiteral.getSecondArgument() == jLiteral.getSecondArgument() && iLiteral.getFirstArgument() != jLiteral.getFirstArgument()) 
 						lit = new Literal(RelationsInfo.NEQ,iLiteral.getFirstArgument(),jLiteral.getFirstArgument());						
+					if (iLiteral.getRelation().isSymmetric()) { // If symmetric relation, also check arg1arg2 and arg2arg1
+						if (iLiteral.getFirstArgument() == jLiteral.getSecondArgument() && iLiteral.getSecondArgument() != jLiteral.getFirstArgument()) 
+							lit = new Literal(RelationsInfo.NEQ,iLiteral.getSecondArgument(),jLiteral.getSecondArgument());						
+						else if (iLiteral.getSecondArgument() == jLiteral.getFirstArgument() && iLiteral.getFirstArgument() != jLiteral.getSecondArgument()) 
+							lit = new Literal(RelationsInfo.NEQ,iLiteral.getFirstArgument(),jLiteral.getFirstArgument());						
+						
 					}
 					if (lit != null) {
-						for (int k=0; k < rule.getBodyLiterals().size()-1; k++) {
-							if (rule.getBodyLiterals().get(k).equals(lit)) {
+						for (Literal ruleLit: rule.getBodyLiterals()) {
+							if (ruleLit.equals(lit)) {
 								flag=true;
 								break;
 							}
 						}
 						if (!flag) {
-							rule.addLiteral(lit);
+							rule.addAuxiliaryLiteral(lit);
 						}
 						break;
 					}
@@ -848,11 +1099,12 @@ public class RuleLearner {
 			return true;
 	
 		// violate symmetric and functional property of relation
-		if (literal.getRelation().equals(newLiteral.getRelation()))// && proc.getRelationsForm(newLiteral.getRelation())==1)		
-			if (literal.getRelation().isFunction() && literal.getFirstArgument()==newLiteral.getFirstArgument()) {
+		if (literal.getRelation().equals(newLiteral.getRelation())) {// && proc.getRelationsForm(newLiteral.getRelation())==1)		
+			if ((literal.getRelation().isFunction() || literal.getRelation().isRangeLiteral()) && literal.getFirstArgument()==newLiteral.getFirstArgument()) {
 				logger.log(Level.DEBUG, "New Literal violates symmetric and functional property of relation");
 				return true; // avoid marriedTo on marriedTo
 			}
+		}
 				
 
 		
@@ -901,12 +1153,12 @@ public class RuleLearner {
 							return true;
 						}
 					if (ilit.getFirstArgument() == newLiteral.getSecondArgument() )
-						if (newLiteral.getRelation().getRange().isChildOf(ilit.getConstant())) {
-							logger.log(Level.DEBUG, "Eliminated: New Literal's seconsd argument is already fixed to a given type that doesn't match");
+						if (newLiteral.getRelation().getRange().isChildOf(ilit.getConstant())) 
 							continue;
+						else {
+							logger.log(Level.DEBUG, "Eliminated: New Literal's seconsd argument is already fixed to a given type that doesn't match");
+							return true;
 						}
-						else
-							return true;			
 				}
 			}
 			
@@ -1030,28 +1282,28 @@ public class RuleLearner {
 		if (overlap==rule2.getBodySize()) { // rule2 subset of rule1=> all children of rule2 are subset of rule1 
 			if (rule1.getConfidence()>rule2.getConfidence()) { // eliminate rule2
 				rule2.setIsGood(false);
-				logger.log(Level.INFO,"Eliminate Rule: " + rule2.getRuleString() + " because of Rule: " + rule1.getRuleString());
+				logger.log(Level.DEBUG,"Eliminate Rule: " + rule2.getRuleString() + " because of Rule: " + rule1.getRuleString());
 			}
 			node2.getMoreSpecialRules(array);
 
 			for (int j=0;j<array.size();j++){
 				if (rule1.getConfidence()>array.get(j).getConfidence()) {
 					array.get(j).setIsGood(false);
-					logger.log(Level.INFO,"Eliminate Rule: " + array.get(j).getRuleString() + " because of Rule: " + rule1.getRuleString());
+					logger.log(Level.DEBUG,"Eliminate Rule: " + array.get(j).getRuleString() + " because of Rule: " + rule1.getRuleString());
 				}
 			}
 		}
 		else if (overlap==rule1.getBodySize()) { // rule1 subset of rule2
 			if (rule1.getConfidence()<rule2.getConfidence())  {
 				rule1.setIsGood(false);
-				logger.log(Level.INFO,"Eliminate Rule: " + rule1.getRuleString() + " because of Rule: " + rule2.getRuleString());			
+				logger.log(Level.DEBUG,"Eliminate Rule: " + rule1.getRuleString() + " because of Rule: " + rule2.getRuleString());			
 			}
 			node1.getMoreSpecialRules(array);
 
 			for (int j=0;j<array.size();j++) {
 				if (rule2.getConfidence()>array.get(j).getConfidence())  {
 					array.get(j).setIsGood(false);
-					logger.log(Level.INFO,"Eliminate Rule: " + array.get(j).getRuleString() + " because of Rule: " + rule2.getRuleString());					
+					logger.log(Level.DEBUG,"Eliminate Rule: " + array.get(j).getRuleString() + " because of Rule: " + rule2.getRuleString());					
 				}
 			}
 		}
@@ -1078,14 +1330,14 @@ public class RuleLearner {
 			if (percent1>tChecker.getUpperOverlapThreshold()){
 				if (rule1.getConfidence()<rule2.getConfidence()){
 					rule1.setIsGood(false);
-					logger.log(Level.INFO,"Eliminate Rule: " + rule1.getRuleString() + " because of Rule: " + rule2.getRuleString());
+					logger.log(Level.DEBUG,"Eliminate Rule: " + rule1.getRuleString() + " because of Rule: " + rule2.getRuleString());
 				}
 				
 			}
 			if (rule1.isGood() && percent2>tChecker.getUpperOverlapThreshold()) {
 				if (rule1.getConfidence()>rule2.getConfidence()) {
 					rule2.setIsGood(false);			
-					logger.log(Level.INFO,"Eliminate Rule: " + rule2.getRuleString() + " because of Rule: "  + rule1.getRuleString());
+					logger.log(Level.DEBUG,"Eliminate Rule: " + rule2.getRuleString() + " because of Rule: "  + rule1.getRuleString());
 				}
 			}
 		}
@@ -1093,13 +1345,13 @@ public class RuleLearner {
 			if (percent2>tChecker.getUpperOverlapThreshold()) {
 				if (rule1.getConfidence()>rule2.getConfidence()) {
 					rule2.setIsGood(false);
-					logger.log(Level.INFO,"Eliminate Rule: " + rule2.getRuleString() + " because of Rule: " + rule1.getRuleString());
+					logger.log(Level.DEBUG,"Eliminate Rule: " + rule2.getRuleString() + " because of Rule: " + rule1.getRuleString());
 				}
 			}
 			if (rule2.isGood() && percent1>tChecker.getUpperOverlapThreshold()) {
 				if (rule1.getConfidence()<rule2.getConfidence()) {
 					rule1.setIsGood(false);					
-					logger.log(Level.INFO,"Eliminate Rule: " + rule1.getRuleString() + " because of Rule: " + rule2.getRuleString());
+					logger.log(Level.DEBUG,"Eliminate Rule: " + rule1.getRuleString() + " because of Rule: " + rule2.getRuleString());
 				}
 				
 			}
@@ -1131,6 +1383,7 @@ public class RuleLearner {
 		boolean onlyGenerals=false;	
 		ArrayList<Rule> usefulRules=new ArrayList<Rule>();
 		
+		System.out.println("Getting Rules of Tree");
 		rulesTree.getRulesOfTree(usefulRules,onlyGood, onlyGenerals, allowFreeVars);	
 		
 		return usefulRules;
@@ -1140,4 +1393,5 @@ public class RuleLearner {
 		return this.rulesTree;
 	}
 }
+
 

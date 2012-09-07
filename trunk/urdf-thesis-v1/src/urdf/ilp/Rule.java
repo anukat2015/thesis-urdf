@@ -60,44 +60,28 @@ public class Rule implements Cloneable{
 	//***************** GET METHODS WHICH CALCULATES VALUE IF NOT INITIALIZED ****************
  	public int getPossiblePositivesToBeCovered(QueryHandler qh) {
  		if (this.possiblePosToBeCovered < 0) {
- 			try {
-				this. possiblePosToBeCovered = qh.calculatePossiblePositivesToBeCovered(this, inputArg);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			this. possiblePosToBeCovered = qh.calculatePossiblePositivesToBeCovered(this, inputArg);
  		}
  		return this.possiblePosToBeCovered;
  	}
  	
 	public int getPositivesCovered(QueryHandler qh) {
  		if (this.positivesCovered < 0) {
- 			try {
-				this. positivesCovered = qh.calculatePositivesCovered(this, inputArg);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			this. positivesCovered = qh.calculatePositivesCovered(this, inputArg);
  		}
  		return this.positivesCovered;
 	}
 	
 	public int getExamplesCovered(QueryHandler qh) {
  		if (this.examplesCovered < 0) {
- 			try {
-				this. examplesCovered = qh.calculateExamplesCovered(this, inputArg);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			this. examplesCovered = qh.calculateExamplesCovered(this, inputArg);
  		}
  		return this.examplesCovered;
 	}
 	
 	public int getBodySize(QueryHandler qh) {
  		if (this.bodySize < 0) {
- 			try {
-				this. bodySize = qh.calculateBodySize(this, inputArg);
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			this. bodySize = qh.calculateBodySize(this, inputArg);
  		}
  		return this.bodySize;
 	}
@@ -346,6 +330,9 @@ public class Rule implements Cloneable{
 		return true;
 	}
 	
+	public void addAuxiliaryLiteral(Literal literal) {
+		this.bodyLiterals.add(literal);
+	}
 	/**
 	 * @param literal: the literal to be add to the rule
 	 * @param position: the index in bodyLiterals of the literal on which the new Literal is connected
@@ -580,8 +567,8 @@ public class Rule implements Cloneable{
 
 		for (int i=0,len=bodyLiterals.size();i<len;i++) {
 			
-			if (bodyLiterals.get(i).getRelation().isAuxiliary())
-				continue;
+			//if (bodyLiterals.get(i).getRelation().isAuxiliary())
+			//	continue;
 	
 			if (freeVariables.contains(bodyLiterals.get(i).getFirstArgument()))
 				bindedVariables.add(bodyLiterals.get(i).getFirstArgument());
@@ -594,8 +581,9 @@ public class Rule implements Cloneable{
 				freeVariables.add(bodyLiterals.get(i).getSecondArgument());
 		}
 		
+		// Count (free - binded)
 		for (int i=0, len=freeVariables.size();i<len;i++)
-			if (!bindedVariables.contains(freeVariables.get(i)))
+			if (!bindedVariables.contains(freeVariables.get(i)) && freeVariables.get(i)!=-1)
 				count++;
 		
 		this.numOfFreeVariables=count;
@@ -626,27 +614,23 @@ public class Rule implements Cloneable{
 			else
 				patterns += literal.getSparqlPattern();
 		}
-		boolean existNEQ = false;
+		//boolean existNEQ = false;
+		boolean existFilter = false;
 		if (firstAuxIndex >= 0) {
 			for (int i=firstAuxIndex; i<bodyLiterals.size(); i++) {
 				Literal literal = bodyLiterals.get(i);
 				if (literal.getRelation().isAuxiliary())
 					// If relation is EQ with a constant in second argument, substitute argument by variable instead of add filter clause
-					if (literal.getRelation().equals(RelationsInfo.EQ) && (literal.getSecondArgument() < 0)) {
-						patterns = patterns.replaceAll("\\"+literal.getFirstArgumentVariable(), literal.getConstant());
-					}
-					else
-						if (literal.getRelation().equals(RelationsInfo.NEQ)) {
-							if (existNEQ == true && literal.getConstant()==null) {
-								patterns = patterns.replaceAll("\\"+literal.getFirstArgumentVariable(), literal.getSecondArgumentVariable());
-							}
-							else {
-								patterns += literal.getSparqlPattern();							
-								existNEQ = true;
-							}
+					//if (literal.getRelation().equals(RelationsInfo.EQ) && (literal.getSecondArgument() < 0)) {
+					//	patterns = patterns.replaceAll("\\"+literal.getFirstArgumentVariable(), literal.getConstant());
+					//}
+					//else
+						if (!existFilter) {
+							patterns += "filter(" + literal.getSparqlPattern() + ") . ";
+							existFilter = true;
+						} else {
+							patterns = patterns.replace(" ) . ", " && " + literal.getSparqlPattern() + " ) .");
 						}
-						else
-							patterns += literal.getSparqlPattern();
 			}
 		}
 
@@ -691,16 +675,14 @@ public class Rule implements Cloneable{
 		return "SELECT COUNTDISTINCT ?A ?B WHERE {"+patterns+"}" ;
 	}
 	
-	public String findConstantsQuery(int constantInArg) {
-		String patterns = head.getSparqlPattern();
-		patterns += getBodyPatterns();
-		patterns = patterns.substring(0,patterns.length()-2);
-		String typeArg = "";
-		switch (constantInArg) {
-			case 1:  typeArg = head.getSecondArgumentVariable(); break;
-			case 2:  typeArg = head.getFirstArgumentVariable(); break;
-			default: throw new IllegalArgumentException("Illegal inputArg="+constantInArg+", it should be 1 or 2");
+	public String findConstantsQuery(int variable) {
+		if (variable<getNextVariableNumber()) {
+			String patterns = head.getSparqlPattern();
+			patterns += getBodyPatterns();
+			patterns = patterns.substring(0,patterns.length()-2);
+			return "SELECT COUNT ?"+(char)variable+" WHERE {"+patterns+"} ORDER BY DESC(COUNT)";
 		}
-		return "SELECT COUNT "+typeArg+" WHERE {"+patterns+"} ORDER BY DESC(COUNT)";
+		else 
+			throw new IllegalArgumentException("Variable ?"+(char)variable+" is not contained in the rule: "+getRuleString());
 	}
 }

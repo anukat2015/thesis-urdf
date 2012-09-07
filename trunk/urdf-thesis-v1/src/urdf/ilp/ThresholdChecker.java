@@ -156,7 +156,7 @@ public class ThresholdChecker
 	
 	private void calculateSpecialityRatio(Rule rule, int inputArg) throws Exception {
 		
-		logger.log(Level.INFO,"Calculating Speciality Ratio for " + rule.getRuleString());	
+		logger.log(Level.DEBUG,"Calculating Speciality Ratio for " + rule.getRuleString());	
 		
 		int bodySize = rule.getBodySize(queryHandler);
 		int examplesCovered = rule.getExamplesCovered(queryHandler);
@@ -203,8 +203,8 @@ public class ThresholdChecker
 			float bodyAvgMult = bodyAvgMultVarMult[0];
 			float bodyVarMult = (float)Math.sqrt((double)bodyAvgMultVarMult[1]);
 			
-			logger.log(Level.INFO,"headMult="+headAvgMult+" bodyMult="+bodyAvgMult);
-			logger.log(Level.INFO,"headVar="+headVarMult+" bodyVar="+bodyVarMult);
+			logger.log(Level.DEBUG,"headMult="+headAvgMult+" bodyMult="+bodyAvgMult);
+			logger.log(Level.DEBUG,"headVar="+headVarMult+" bodyVar="+bodyVarMult);
 			
 			if(headAvgMult+headVarMult>bodyAvgMult || headAvgMult-headVarMult<bodyAvgMult || bodyAvgMult+bodyVarMult>headAvgMult || bodyAvgMult-bodyVarMult<headAvgMult) {
 				logger.log(Level.DEBUG, "Rule is NOT too general, i.e. body Multiplicity is out of head Multiplicity bounds (avg +/- var)");
@@ -227,7 +227,7 @@ public class ThresholdChecker
 	// Calculate Confidence with the Improved formula
 	private void calculateConfidence(Rule rule, int inputArg, int positivesCovered) throws Exception
 	{
-		logger.log(Level.INFO,"Calculating confidence for "+rule.getRuleString());
+		logger.log(Level.DEBUG,"Calculating confidence for "+rule.getRuleString());
 		
 		float multHead,multHeadIdeal,missingPairsFromHead, nom, denom, ratio = 0, conf, idealExamplesCovered;
 		
@@ -284,16 +284,16 @@ public class ThresholdChecker
 		if (rule.getConfidence()>this.confidenceThreshold-0.15) {// check if rule is above confidence threshold without pruning
 			calculateSpecialityRatio(rule, inputArg);
 			if (rule.getConfidence()>this.confidenceThreshold) {
-				logger.log(Level.DEBUG, "Rule is good, i.e. RuleConfidence="+rule.getConfidence()+">"+confidenceThreshold);
+				logger.log(Level.INFO, "Rule is good, i.e. RuleConfidence="+rule.getConfidence()+">"+confidenceThreshold);
 				rule.setIsGood(true);
 			}
 			else {
-				logger.log(Level.DEBUG, "Rule is NOT good, i.e. RuleConfidence="+rule.getConfidence()+"<"+confidenceThreshold);
+				logger.log(Level.INFO, "Rule is NOT good, i.e. RuleConfidence="+rule.getConfidence()+"<"+confidenceThreshold);
 				rule.setIsGood(false);
 			}
 		}
 		else {
-			logger.log(Level.DEBUG, "Rule is NOT good, i.e. RuleConfidence="+rule.getConfidence()+"<"+confidenceThreshold);
+			logger.log(Level.INFO, "Rule is NOT good, i.e. RuleConfidence="+rule.getConfidence()+"<"+confidenceThreshold);
 			rule.setIsGood(false);
 		}
 		
@@ -301,22 +301,22 @@ public class ThresholdChecker
 
 	private void calculateAccuracy(Rule rule, int inputArg, int positivesCovered) throws Exception {
 		
-		logger.log(Level.INFO,"Calculating Accuracy for in rule "+rule.getRuleString());
+		logger.log(Level.DEBUG,"Calculating Accuracy for in rule "+rule.getRuleString());
 		
 		float  conf,nom,denom;
 		
 		int bodySize = rule.getBodySize(queryHandler);
 
 		conf = ((float)positivesCovered)/((float)bodySize);			
-		logger.log(Level.INFO,"Accuracy(positivesCovered/bodySize)="+conf+" from: "+rule.getRuleString());
+		logger.log(Level.DEBUG,"Accuracy(positivesCovered/bodySize)="+conf+" from: "+rule.getRuleString());
 		rule.setConfidence(conf);	
 
 		if (rule.getConfidence()>this.confidenceThreshold) {
-			logger.log(Level.DEBUG,"Rule is good, accuracy="+rule.getConfidence()+">"+this.confidenceThreshold);
+			logger.log(Level.INFO,"Rule is good, accuracy="+rule.getConfidence()+">"+this.confidenceThreshold);
 			rule.setIsGood(true);
 		}
 		else {
-			logger.log(Level.DEBUG,"Rule is NOT good, accuracy="+rule.getConfidence()+"<="+this.confidenceThreshold);
+			logger.log(Level.INFO,"Rule is NOT good, accuracy="+rule.getConfidence()+"<="+this.confidenceThreshold);
 			rule.setIsGood(false);
 		}
 		
