@@ -110,7 +110,7 @@ public final class Statement implements java.sql.Statement
 	         else
 	        	 logger.log(Level.WARN, "["+(t)+"ms,"+numberOfRows+"rows] "+query);
          }*/
-         logger.log(Level.INFO, "["+(t)+"ms] ");
+         logger.log(Level.DEBUG, "["+(t)+"ms] ");
          
          return new ResultSet(header,result.toArray(new String[0][]));
       }

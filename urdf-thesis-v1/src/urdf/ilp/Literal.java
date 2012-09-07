@@ -20,10 +20,12 @@ public class Literal implements Cloneable
 	private String constant=null;
 	private int freeVariable=0; // 0: no free variable in this literal 1: the firstArgument is a free variable 2: the secondArgument is a free variable
 	
+	private boolean constNeedsQuotes = false;
 	
-	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, int freeVariable) throws Exception {
+	
+	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, int freeVariable) {
 		if (firstArgument>0 && secondArgument>0 && (firstArgument<65 || firstArgument>90 ||secondArgument<65 || secondArgument>90))
-			throw new Exception("Argument numbers should be between 65 and 90 (arg1="+firstArgument+",arg2="+secondArgument+")");
+			throw new IllegalArgumentException("Argument numbers should be between 65 and 90 (arg1="+firstArgument+",arg2="+secondArgument+")");
 		this.relation=relation;
 		this.firstArgument = firstArgument;
 		this.firstMode=firstMode;
@@ -37,10 +39,10 @@ public class Literal implements Cloneable
 		this(relation, firstArgument, 1, secondArgument, 1, 0);
 	}
 	
-	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, String constant) throws Exception {
+	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, String constant) {
 		this(relation, firstArgument, firstMode, secondArgument, secondMode, 0);
 		if (!(relation.equals(RelationsInfo.EQ)||relation.equals(RelationsInfo.GT)||relation.equals(RelationsInfo.LT)))
-			throw new Exception("constant does not make sense for relation other than EQ,GT,LT");
+			throw new IllegalArgumentException("constant does not make sense for relation other than EQ,GT,LT");
 		this.constant=constant;
 	}
 	
@@ -110,6 +112,10 @@ public class Literal implements Cloneable
 	public int getFreeVariable(){
 		return this.freeVariable;
 	}
+	
+	public boolean constNeedsQuotes() {
+		return constNeedsQuotes;
+	}
 
 	//***************** SET METHODS *****************
 	public void setFirstArgument(int arg) {
@@ -135,12 +141,21 @@ public class Literal implements Cloneable
 		this.freeVariable=freeVariable;
 	}
 	
+	public void setConstNeedsQuotes(boolean constNeedsQuotes) {
+		this.constNeedsQuotes = constNeedsQuotes;
+	}
+	
 	public String getSparqlPattern() {
 		if (relation.isAuxiliary()) 
 			if (constant == null)
-				return "filter( ?" + (char)firstArgument + " "+relation.getName()+" ?"+ (char)secondArgument +" ) . ";
-			else
-				return "filter( ?" + (char)firstArgument + " "+relation.getName()+" "+ constant +" ) . ";
+				return " ?" + (char)firstArgument + " "+relation.getName()+" ?"+ (char)secondArgument +" ";
+			else {
+				if (constNeedsQuotes)
+					return " ?" + (char)firstArgument + " "+relation.getName()+" \""+ constant +"\" ";
+				else
+					return " ?" + (char)firstArgument + " "+relation.getName()+" "+ constant +" ";
+			}
+				
 		else
 			return getSparqlPattern(0);
 	}

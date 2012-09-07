@@ -73,11 +73,19 @@ public class LearningManager
 		//preprocessor=new RelationPreProcessor(conn,tChecker,relations,types,relationsForConstants);		
 		//info = preprocessor.getRelationsInfo();
 		
+
+		
 		info = RelationsInfo.readFromDisk();
+		for (Relation relation: info.getAllRelations().values()) 
+			if (relation.isRangeLiteral())
+				System.out.println("HasLiteralRange: "+relation.getName());
+
+		
 		//info.calculateMinAndMaxLiterals(conn);
 		//info.persist();
 
-		RelationsInfo.printRelations(info);
+
+		//RelationsInfo.printRelations(info);
 				
 		tChecker.setDangerousRelations(info.dangerousRelations);
 		

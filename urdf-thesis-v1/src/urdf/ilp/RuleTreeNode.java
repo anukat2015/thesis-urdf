@@ -159,10 +159,15 @@ public class RuleTreeNode {
 		if (rulesArray==null) 
 			rulesArray=new ArrayList<Rule>();
 			
+		System.out.println(this.depth + ") " + rule.getRuleString());
+		System.out.println("   Free="+rule.hasFreeVariables()+"\tBinds="+rule.bindsHeadVariables()+"\tGood="+rule.isGood()+"\tTooGeneral="+rule.isTooGeneral());
+		for (Literal l: rule.getBodyLiterals()) System.out.print(l.getFreeVariable() + " ");
+		System.out.println("["+rule.getNumOfFreeVariables()+"]");
 
 		if (this.parent!=null) {
-			if (allowFreeVars || !rule.hasFreeVariables()) {
-
+			
+			if (allowFreeVars || (!rule.hasFreeVariables() && rule.getNumOfFreeVariables()==0)) {
+				
 				if (!onlyGoodRules || rule.isGood()) {
 					if (onlyGeneralRules) {
 						if (rule.isTooGeneral()) {

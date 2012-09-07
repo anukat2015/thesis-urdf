@@ -3,6 +3,7 @@ package urdf.ilp;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * @author Christina Teflioudi *
@@ -10,10 +11,10 @@ import java.util.ArrayList;
 public class BodyPredicate 
 {
 	Relation relation;
-	public  ArrayList<Relation> arg1JoinOnArg2=new ArrayList<Relation>();
-	public  ArrayList<Relation> arg1JoinOnArg1=new ArrayList<Relation>();
-	public  ArrayList<Relation> arg2JoinOnArg2=new ArrayList<Relation>();
-	public  ArrayList<Relation> arg2JoinOnArg1=new ArrayList<Relation>();
+	public  HashSet<Relation> arg1JoinOnArg2=new HashSet<Relation>();
+	public  HashSet<Relation> arg1JoinOnArg1=new HashSet<Relation>();
+	public  HashSet<Relation> arg2JoinOnArg2=new HashSet<Relation>();
+	public  HashSet<Relation> arg2JoinOnArg1=new HashSet<Relation>();
 	
 	public BodyPredicate(Relation relation) {
 		this.relation=relation;

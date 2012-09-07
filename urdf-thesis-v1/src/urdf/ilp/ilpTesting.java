@@ -17,11 +17,15 @@ public class ilpTesting {
 		try {
 			float supportThreshold = 0.001f;
 			float confidenceThreshold = 0.10f;
+			
+			//float supportThreshold = 0.0002f;
+			//float confidenceThreshold = 0.02f;
+			
 			float specialityRatioThreshold = 0.15f;
 
 			int partitionNumber = 3;
 			int possiblePosToBeCovered = 1;
-			int positivesCovered = 2;
+			int positivesCovered = 3;
 			float functionThreshold = 0.98f;
 			float symmetryThreshold = 0.4f;
 			int smoothingMethod = 0;
@@ -31,7 +35,7 @@ public class ilpTesting {
 			HashMap<Integer, String> relationsForConstants = null;
 			int noise = 0;
 
-			int depth = 3;
+			int depth = 4;
 			boolean allowFreeVars = false;
 			boolean tryConstants = true;
 			boolean learnOnlyConstants = true;
@@ -60,12 +64,12 @@ public class ilpTesting {
 			*/
 			
 			// relations for yago2
-			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
+			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isCitizenOf>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/diedIn>"};
-			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/directed>"};
-			int[] inputArg={0};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/directed>"};
+			int[] inputArg={1};
 
 			// for inputArg=1
 			LearningManager lm = new LearningManager(args[0], partitionNumber,
