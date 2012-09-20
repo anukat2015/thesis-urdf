@@ -47,6 +47,7 @@ public class Rule implements Cloneable{
 	private boolean isGood = true;	// if the rule passes the confidence threshold and is better in accuracy than its parents, isGood=true
 	private boolean isInBeam = false;
 	private boolean isTooGeneral = false;
+	private boolean hasNumericConstant = false; // has Numeric constant on the last literal added
 	
 	private int numOfFreeVariables = 2;
 	
@@ -220,7 +221,12 @@ public class Rule implements Cloneable{
 	public String getConstant() {
 		return this.constant;
 	}
-
+	public boolean hasNumericConstant() {
+		return hasNumericConstant;
+	}
+	public Literal getLastBodyLiteral() {
+		return bodyLiterals.get(bodyLiterals.size()-1);
+	}
 
 	//***************** SET METHODS ****************
 	public void setConstantInArg(int arg) {
@@ -296,6 +302,9 @@ public class Rule implements Cloneable{
 	
 	public void setHasFreeVariables(boolean flag) {
 		this.hasFreeVariables=flag;
+	}
+	public void setHasNumericConstant(boolean hasNumericConstant) {
+		this.hasNumericConstant = hasNumericConstant;
 	}
 	
 	// *************** OTHER METHODS *****************
@@ -685,4 +694,6 @@ public class Rule implements Cloneable{
 		else 
 			throw new IllegalArgumentException("Variable ?"+(char)variable+" is not contained in the rule: "+getRuleString());
 	}
+
+
 }

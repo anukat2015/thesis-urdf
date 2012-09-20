@@ -275,5 +275,24 @@ public class QueryHandler
 		return (ResultSet) stmt.executeQuery(query);
 	}
 	
+	public ResultSet retrieveHeadOfNumericConstant(Rule rule, int literalArg) throws SQLException {
+		logger.log(Level.DEBUG, "Retrieving distribution on (?"+(char)literalArg+") from head: "+rule.getHeadPattern());
+		
+		ArrayList<Literal> bLits = rule.getBodyLiterals();
+		Literal prop = bLits.get(bLits.size()-1);
+		Literal head = rule.getHead();
+		if (prop.getSecondArgument()!=literalArg || (prop.getFirstArgument()!=head.getFirstArgument() && prop.getFirstArgument()!= head.getSecondArgument())){
+			throw new IllegalArgumentException("Variable ?"+(char)literalArg+" doesn't exist in head: "+rule.getHeadPattern());
+		}
+
+		String sparql = "SELECT COUNT ?"+(char)literalArg+" WHERE {"+rule.getHeadPattern()+prop.getSparqlPattern()+"} ORDER BY ASC(?"+(char)literalArg+")"; 
+
+		return (ResultSet) stmt.executeQuery(sparql);
+	}
+	
+	public ResultSet executeQuery(String query) throws SQLException {
+		return (ResultSet) stmt.executeQuery(query);
+	}
+	
 }
 
