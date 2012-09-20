@@ -161,6 +161,9 @@ public class RuleLearner {
 				}
 
 				if (d < depth) {
+					// Try to combine different numeric constants added in last extension
+					combineNumericConstants(node,d+1);
+					// Extend rule
 					for (int i=0,len=node.getChildren().size(); i<len; i++) {
 						extendRule(node.getChildren().get(i),d+1);
 					}
@@ -168,6 +171,26 @@ public class RuleLearner {
 
 			}
 		}		
+	}
+	
+	private void combineNumericConstants(RuleTreeNode node, int depth) throws Exception {
+		
+		logger.log(Level.INFO,"Combining numeric constant for multivariable regression");
+		
+		int numChildren = node.getChildren().size();
+		RuleTreeNode childA = null, childB = null;
+		for (int i=0; i<numChildren; i++) {
+			childA = node.getChild(i);
+			if (childA.getRule().hasNumericConstant()) {
+				for (int j=i+i; j<numChildren; j++) {
+					childB = node.getChild(j);
+					if (childB.getRule().hasNumericConstant()) {
+						logger.log(Level.INFO,"Combining numeric constant from:\n\t\t"+childA.getRule().getRuleString()+"\n\t\t"+childB.getRule().getRuleString());
+						numConstLearner.evaluateRule2D(childA,childB);
+					}
+				}
+			}
+		}
 	}
 	
 	private void refinePredicate(RuleTreeNode node, int joinCase, int d, int position) throws Exception {
@@ -321,7 +344,7 @@ public class RuleLearner {
 						if (extend) {
 							newLiteral.setFreeVariable(0);
 							//checkExtendRuleWithLiteralRanging(node,newRule,arg2,d);
-							numConstLearner.evaluateRule(newRule, arg2);
+							numConstLearner.evaluateRule(node,newRule, arg2);
 						}
 
 					} 

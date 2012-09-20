@@ -64,8 +64,8 @@ public class ilpTesting {
 			*/
 			
 			// relations for yago2
-			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
-			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isCitizenOf>"};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
+			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isCitizenOf>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/diedIn>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/directed>"};
