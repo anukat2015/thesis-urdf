@@ -31,24 +31,31 @@ weighthist <- function(x, y, w, numBuckets) {
 ### hyperdimensional euclidean distance
 distance <- function(x1,x2,n=2) sum(abs(x1-x2)^n)^(1/n);
 ### calculate N-dimensional Loess regression to points px, with (x,supp) as training data
-loessND <- function(px,x,supp,span) {
-	smoothed = array(0,length(px))
-	weights = array(0,length(x));
+suppND <- function(px,x,supp,span) {
+	smoothed = array(0,dim(px)[1])
+	weights = array(0,dim(x)[1]);
 	d = dim(x)[2]; 
-	normX = x;
-	for (j in 1:dim(x)[2]) normx[,j] = normx[,j]/(max(x[,j])-min(x[,j]));
 	
-	for (p in 1:length(px)) {
-		if (px[d]<min(x) || px[d]>max(x)) {
-			psupp[p] = NULL;
-		} else {			
-			dists = array(0,length(normX));
-			for (i in 1:dim(dists)[2]) dists[i] = distance(normX[i,],px[p,]);	
+	minX = array(0,d);
+	for (j in 1:dim(x)[2]) minX[j]=min(x[,j]);
+	
+	normX = x;
+	for (j in 1:dim(x)[2]) normX[,j] = (normX[,j]-minX[j])/(max(x[,j])-minX[j]);
+	normPX = px;
+	for (j in 1:dim(px)[2]) normPX[,j] = (normPX[,j]-minX[j])/(max(x[,j])-minX[j]);
+	
+	for (p in 1:dim(px)[1]) {
+		#if (px[d]<min(x) || px[d]>max(x)) {
+		#	psupp[p] = NULL;
+		#} else {			
+			dists = array(0,dim(normX)[1]);
 			
-			for (i in 1: length(x)) weights[i] = weightfunction(dists[i],span*d^(1/d)/2);
+			for (i in 1:dim(normX)[1]) dists[i] = distance(normX[i,],normPX[p,]);	
+			
+			for (i in 1: dim(normX)[1]) weights[i] = weightfunction(dists[i],span*d^(1/d)/2);
 			
 			smoothed[p] = sum(weights * supp); 
-		}
+		#}
 	}	
 	smoothed;
 }
@@ -155,6 +162,23 @@ createChiSqTable <- function (data, numBuckets, w=array(1,dim(data)[1])) {
 		output[row,col] = output[row,col] + w[i];
 	}
 	data.frame(output);
+}
+
+build2Dgrid <- function (x, resolution) {
+	points = resolution^2;
+	minx1 = min(x[,1]);
+	minx2 = min(x[,2]);
+	x1step = (max(x[,1])-minx1)/(resolution-1);
+	x2step = (max(x[,2])-minx2)/(resolution-1);
+	xgrid = matrix(0,points,2);
+	for (i in 0:(resolution-1)) {
+		for (j in 0:(resolution-1)) {
+			p = 1 + i*resolution + j;
+			xgrid[p,1] = minx1 + i*x1step;
+			xgrid[p,2] = minx2 + j*x2step;
+		}
+	}
+	xgrid;
 }
 
 
