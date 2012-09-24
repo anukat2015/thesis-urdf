@@ -1,9 +1,13 @@
 #setwd("/home/adeoliv/Documents/Thesis/r");
-setwd("/home/adeoliv/workspace/urdf-thesis/src/urdf/ilp/");
+setwd("C:/Users/ande01/workspace1/urdf-thesis/src/urdf/ilp/");
+#setwd("/home/adeoliv/workspace/urdf-thesis/src/urdf/ilp/");
+
 library("stats")
 library("entropy");
 library("outliers");
 library("scatterplot3d");
+library("rgl");
+library("aspace");
 
 
 
@@ -179,6 +183,35 @@ build2Dgrid <- function (x, resolution) {
 		}
 	}
 	xgrid;
+}
+
+simple1stDerivative <- function(x,y) {
+	yprime = array(0,length(y)-1);
+	x = (x-min(x))/(max(x)-min(x));
+	x = (x-min(x))/(max(x)-min(x));
+	for (i in  1:(length(y)-1)) {
+		yprime[i] = (y[i+1]-y[i])/(x[i+1]-x[i]);
+	}
+	yprime;
+}
+
+### Quick 2nd derivative calculation "O(n)"
+simple2ndDerivative <- function (x,y) {
+	diffs = 0;
+	yprime = simple1stDerivative(x,y);
+	for (i in 1:(length(yprime)-1)) {
+		diffs = diffs + abs(yprime[i+1]-yprime[i]);
+	}
+	diffs;
+}
+
+angleAvg <- function(x,y) {
+	sumAngles = 0;
+	yprime = simple1stDerivative(x,y);
+	for (i in 1:(length(yprime)-1)) {
+		sumAngles = sumAngles + abs(atan(yprime[i+1])-atan(yprime[i]));
+	}
+	sumAngles/(length(yprime)-1);
 }
 
 
