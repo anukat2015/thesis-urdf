@@ -1,13 +1,13 @@
 #setwd("/home/adeoliv/Documents/Thesis/r");
-setwd("C:/Users/ande01/workspace1/urdf-thesis/src/urdf/ilp/");
-#setwd("/home/adeoliv/workspace/urdf-thesis/src/urdf/ilp/");
+#setwd("C:/Users/ande01/workspace1/urdf-thesis/src/urdf/ilp/");
+setwd("/home/adeoliv/workspace/urdf-thesis/src/urdf/ilp/");
 
 library("stats")
 library("entropy");
 library("outliers");
 library("scatterplot3d");
 library("rgl");
-library("aspace");
+#library("aspace");
 
 
 
@@ -205,16 +205,98 @@ simple2ndDerivative <- function (x,y) {
 	diffs;
 }
 
-angleAvg <- function(x,y) {
+angleAvg1 <- function(x,y) {
 	sumAngles = 0;
 	yprime = simple1stDerivative(x,y);
 	for (i in 1:(length(yprime)-1)) {
 		sumAngles = sumAngles + abs(atan(yprime[i+1])-atan(yprime[i]));
 	}
-	sumAngles/(length(yprime)-1);
+	avgAngleRad = sumAngles/(length(yprime)-1);
+	avgAngleRad/(2*pi)*360
 }
 
+angleAvg <- function(x,y) {
+	sumAngles = 0;
+	for (i in 1:(length(y)-2)) {
+		arccosine = (x[i+1]-x[i])*(x[i+2]-x[i+1]) + (y[i+1]-y[i])*(y[i+2]-y[i+1])
+		sumAngles = sumAngles + abs(pi-acos(arccosine));
+	}
+	avgAngleRad = sumAngles/(length(y)-2);
+	avgAngleRad/(2*pi)*360
+}
 
+histogramize <- function(x,count,buckets,min,max) {
+	bucketwidth = (max-min)/buckets;
+	dist = array(0,buckets);
+	for (i in 1:length(x)) {
+		bucket = ceiling((x[i]-min) / bucketwidth);
+		if (bucket==0) bucket = 1;
+		dist[bucket] = dist[bucket] + count[i]; 
+	}
+	dist;
+}
+
+unihistogramize <- function(x,count,buckets,min,max) {
+	df = data.frame(x=x, c=count);
+	df = df[order(x),];
+	countsPerBucket = sum(count)/buckets;
+	separators = array(0,buckets);
+	histogram = array(0,buckets);
+	i=1;
+	counted=0;
+	for (c in 1:length(count)) {
+		counted = counted + df$c[c];
+		if (counted > i*countsPerBucket) {
+			histogram[i] = histogram[i] + df$c[c]; 
+			i = i+1;
+			separators[i] = df$x[c];
+		}
+	}
+	data.frame(sep=separators,count=histogram);
+}
+
+compareGroupDists <- function(x,count,group,buckets) {
+	min = min(x);
+	max = max(x);
+	rootDist = normalize(histogramize(x,count,buckets,min,max));
+	toplot = rootDist; toplot[length(toplot)+1] = toplot[length(toplot)];
+	#plot(rootDist,type="s");
+	#plot(histogramize(x[which(group==16)],count[which(group==16)],buckets,min,max)/histogramize(x,count,buckets,min,max),type="s",col="magenta");
+	#plot(histogramize(x[which(group==16)],count[which(group==16)],buckets,min,max)/histogramize(x,count,buckets,min,max),type="s",col="magenta");
+	plot(toplot,type="s");
+	leavesDist = matrix(0,length(unique(group)),length(rootDist));
+	kldiv = matrix(0,length(unique(group)),4);
+	colors = rainbow(length(unique(group)));
+	i=1;
+	for (g in unique(group)) {
+		leavesDist[i,] = normalize(histogramize(x[which(group==g)],count[which(group==g)],buckets,min,max));
+		toplot = leavesDist[i,]; toplot[length(toplot)+1] = toplot[length(toplot)];
+		#points(leavesDist[i,],type="s",col=g,lty=2);
+		if (g==10 || g==11 || g==16) points(toplot,type="s",col=g,lty=2);		
+			
+		kldiv[i,1] = g;
+		kldiv[i,2] = kldivergence(rootDist,leavesDist[i,]);
+		kldiv[i,3] = crossentropy(rootDist,leavesDist[i,]);
+		kldiv[i,4] = entropy(leavesDist[i,]);
+		i = i+1;
+	}
+	points(histogramize(x[which(group==16)],count[which(group==16)],buckets,min,max)/histogramize(x,count,buckets,min,max),type="s",col="magenta");
+	
+	
+	kldiv;
+}
+
+crossentropy <- function(x,y) {
+	-sum((x/sum(x)) * log((y+0.00001)/sum(y)));
+}
+
+kldivergence <- function(x,y) {
+	crossentropy(x,y) - entropy(x);
+}
+
+normalize <- function(x) {
+	x/sum(x);
+}
 
 
 
