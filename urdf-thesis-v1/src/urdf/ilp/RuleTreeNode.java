@@ -3,6 +3,7 @@ package urdf.ilp;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 import javatools.administrative.Announce.Level;
 
@@ -19,6 +20,7 @@ public class RuleTreeNode {
 	private ArrayList<RuleTreeNode> children;
 	private RuleTreeNode parent;
 	private int depth;
+	private HashMap<Integer,DataSet> variableDistributions;
 	
 	public RuleTreeNode(Rule rule, RuleTreeNode parent, int depth) {
 		this.rule=rule;
@@ -189,6 +191,10 @@ public class RuleTreeNode {
 			}
 		}
 		
+	}
+	
+	public void attachVariableDistribution(int variable, DataSet distribution) {
+		this.variableDistributions.put(new Integer(variable), distribution);
 	}
 	
 }

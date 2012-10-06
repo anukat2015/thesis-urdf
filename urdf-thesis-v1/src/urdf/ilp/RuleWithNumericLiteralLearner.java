@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -32,6 +33,7 @@ public class RuleWithNumericLiteralLearner {
 	private double[] span = {0.75};
 	private double[] entropyRatioThreshold = {0.97};
 	private double[] accuracyThreshold = {1.0};
+	private int[] supportThreshold = {1};
 	private double[] outliers = {0.25};
 	private int[] plotResolution = {100};
 	private int[] numBuckets = {100};
@@ -47,7 +49,11 @@ public class RuleWithNumericLiteralLearner {
 		this.info = info;
 		this.queryHandler = queryHandler;
 		this.tChecker = tChecker;
-		this.accuracyThreshold[0] = tChecker.confidenceThreshold;		
+		if (tChecker!=null){
+			this.accuracyThreshold[0] = tChecker.confidenceThreshold;
+			this.supportThreshold[0] = tChecker.positivesCoveredThreshold;
+		}
+		
 	}
 	
 	public void setSpan(double span) {
@@ -192,6 +198,7 @@ public class RuleWithNumericLiteralLearner {
 		numBuckets[0] = 100;
 		accuracyThreshold[0] = 0.35;
 		double headSize[] = {rule.getHeadSize()};
+		supportThreshold[0] = Math.max(supportThreshold[0], (int) Math.ceil(headSize[0]*tChecker.supportThreshold));
 		
 		if (ds.totalSupport()<numBuckets[0] || ds.size()<numBuckets[0]/2)
 			return false;
@@ -199,7 +206,7 @@ public class RuleWithNumericLiteralLearner {
 		System.out.println("Positives:" + ds.totalSupport() + " Facts:" + ds.totalWeight() + " Points:" + ds.size());
 		System.out.println(ds.toString());
 			
-		numBuckets[0] = 100;
+		numBuckets[0] = 25;
 		
 		
 		
@@ -218,6 +225,7 @@ public class RuleWithNumericLiteralLearner {
 	    caller.addDoubleArray("span", span);
 	    caller.addDoubleArray("entropyThreshold", entropyRatioThreshold);
 	    caller.addDoubleArray("accuracyThreshold", accuracyThreshold);
+	    caller.addIntArray("supportThreshold", supportThreshold);
 	    caller.addDoubleArray("outliers", outliers);
 	    caller.addStringArray("title", title);
 	    caller.addIntArray("numTestPoints",plotResolution);
@@ -246,17 +254,107 @@ public class RuleWithNumericLiteralLearner {
 			    
 		rule.setIsGood(true);
 		rule.setHasNumericConstant(true);
-		node.addChild(new RuleTreeNode(rule, node, node.getDepth()+1));
+		RuleTreeNode newNode = new RuleTreeNode(rule, node, node.getDepth()+1);
+		newNode.attachVariableDistribution(literalArg, ds);
+		node.addChild(newNode);
 		
 		return true;
 		
 	}
 	
 	public static void main(String[] args) throws Exception {
-		Connection connPartition = Driver.connect("src/rdf3x.properties");
+		Connection connPartition = Driver.connect("src/rdf3x-data91.properties");
 		QueryHandler qh = new QueryHandler(connPartition);
-		//RuleWithNumericLiteralLearner nl = new RuleWithNumericLiteralLearner(qh, null, null);
-		//nl.
+		
+		//String query = "select count ?inc ?v1 ?v2 ?v3 ?v4 ?v5 ?v6 ?v7 ?v8 ?v9 ?v10 ?v11 ?v12 ?v13 ?v14 ?v15 ?v16 where {?p <http://data-gov.tw.rpi.edu/vocab/p/91/pincp> ?inc . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/sex> ?v1. ?p <http://data-gov.tw.rpi.edu/vocab/p/91/st> ?v2. ?p <http://data-gov.tw.rpi.edu/vocab/p/91/sch> ?v3 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/rel> ?v4. ?p <http://data-gov.tw.rpi.edu/vocab/p/91/racwht> ?v5 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/racblk> ?v6 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/racasn> ?v7 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/qtrbir> ?v8 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/oc> ?v9 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/nativity> ?v10 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/mar> ?v11 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/lanp> ?v12 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/esr> ?v13 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/cit> ?v14 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/dphy> ?v15 . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/schl> ?v16} order by asc(?inc)";
+		String query = "select count ?vps ?age where  {?p <http://data-gov.tw.rpi.edu/vocab/p/91/pwgtp> ?age . ?p <http://data-gov.tw.rpi.edu/vocab/p/91/pincp> ?vps} order by desc(?vps) asc(?age)";
+		ResultSet rs = qh.executeQuery(query);
+		
+		
+		BufferedWriter bw = new BufferedWriter(new FileWriter(new File("/var/tmp/wei-inc.csv")));
+		long t=System.currentTimeMillis();
+		while (rs!=null && rs.next()) {
+			bw.write(rs.getRowString()+"\n");
+		}
+		System.out.println("Done");
+		bw.close();
+		System.out.println(System.currentTimeMillis()-t);
+		
+		/*RuleWithNumericLiteralLearner learner = new RuleWithNumericLiteralLearner(qh, null, null);
+		DataSet ds = learner.extractRegressionDataSet(rs);
+		
+		/*try {
+			rs = queryHandler.retrieveHeadOfNumericConstant(rule, literalArg);
+			dsHead = extractDataDistribution(rs);
+		} catch (IllegalArgumentException e) {}
+		*//*
+		
+		double[] span = {0.75};
+		double[] entropyRatioThreshold = {0.97};
+		double[] accuracyThreshold = {1.0};
+		double[] outliers = {0.25};
+		int[] plotResolution = {100};
+		int[] numBuckets = {100};
+		span[0] = 0.75;
+		entropyRatioThreshold[0] = 0.97;
+		outliers[0] = 0.0;
+		plotResolution[0] = 100;
+		numBuckets[0] = 100;
+		accuracyThreshold[0] = 0.35;
+
+		
+		//if (ds.totalSupport()<numBuckets[0] || ds.size()<numBuckets[0]/2)
+		//	return;
+		
+		System.out.println("Positives:" + ds.totalSupport() + " Facts:" + ds.totalWeight() + " Points:" + ds.size());
+		System.out.println(ds.toString());
+			
+		numBuckets[0] = 10;
+		
+		
+		
+		String[] title = new String[1];
+		title[0] = query;
+		
+		RCaller caller = new RCaller();
+	    caller.setRscriptExecutable("/home/adeoliv/Downloads/R-2.15.1/bin/Rscript");
+	    caller.cleanRCode();
+	    caller.R_source("/home/adeoliv/workspace/urdf-thesis/src/urdf/ilp/utils.r");
+		caller.addDoubleArray("x", ds.getX(0));
+	    caller.addDoubleArray("y", ds.getY());
+	    caller.addDoubleArray("w", ds.getWeights());
+	    caller.addDoubleArray("s", ds.getSupports());
+	    //if (dsHead!=null) {
+		//    caller.addDoubleArray("xHead", dsHead.getX(0));
+		//    caller.addDoubleArray("wHead", dsHead.getWeights());
+	    //}
+    	//caller.addDoubleArray("headSize", headSize);
+	    caller.addDoubleArray("span", span);
+	    caller.addDoubleArray("entropyThreshold", entropyRatioThreshold);
+	    caller.addDoubleArray("accuracyThreshold", accuracyThreshold);
+	    caller.addDoubleArray("outliers", outliers);
+	    caller.addStringArray("title", title);
+	    caller.addIntArray("numTestPoints",plotResolution);
+	    caller.addIntArray("numBuckets",numBuckets);
+	     
+
+	    File file = caller.startPlot();
+	    
+	    caller.R_source("/home/adeoliv/workspace/urdf-thesis/src/urdf/ilp/rcaller.r");
+	    //caller.runAndReturnResult("ratio");
+	    //double[] ratio = caller.getParser().getAsDoubleArray("ratio");
+	    //System.out.println(ratio[0]);
+	    caller.endPlot();
+	    caller.showPlot(file);
+	    
+	    caller.runOnly();
+	    
+	    File plot = new File("/home/adeoliv/Desktop/plot.png");
+	    FileUtils.copyFile(file, plot);
+
+	    
+		
+		return;*/
 	}
 	
 
