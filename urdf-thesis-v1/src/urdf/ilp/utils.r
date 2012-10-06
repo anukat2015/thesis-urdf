@@ -229,9 +229,13 @@ histogramize <- function(x,count,buckets,min,max) {
 	bucketwidth = (max-min)/buckets;
 	dist = array(0,buckets);
 	for (i in 1:length(x)) {
-		bucket = ceiling((x[i]-min) / bucketwidth);
-		if (bucket==0) bucket = 1;
-		dist[bucket] = dist[bucket] + count[i]; 
+		#print(c(x[i], min, bucketwidth));
+		bucket = ceiling((x[i]-min)/bucketwidth);
+		#print(bucket);
+		if (length(bucket)>0 && !is.na(bucket)) {
+			if (bucket==0) bucket=1;
+			dist[bucket] = dist[bucket] + count[i];
+		}
 	}
 	dist;
 }
@@ -255,42 +259,170 @@ unihistogramize <- function(x,count,buckets,min,max) {
 	data.frame(sep=separators,count=histogram);
 }
 
-compareGroupDists <- function(x,count,group,buckets) {
+compareGroupDists <- function(x,count,group,buckets,xlab="x",ylab="y",divThreshold=0.35, plot=FALSE) {
 	min = min(x);
 	max = max(x);
-	rootDist = normalize(histogramize(x,count,buckets,min,max));
-	toplot = rootDist; toplot[length(toplot)+1] = toplot[length(toplot)];
-	#plot(rootDist,type="s");
-	#plot(histogramize(x[which(group==16)],count[which(group==16)],buckets,min,max)/histogramize(x,count,buckets,min,max),type="s",col="magenta");
-	#plot(histogramize(x[which(group==16)],count[which(group==16)],buckets,min,max)/histogramize(x,count,buckets,min,max),type="s",col="magenta");
-	plot(toplot,type="s");
-	leavesDist = matrix(0,length(unique(group)),length(rootDist));
-	kldiv = matrix(0,length(unique(group)),4);
+	rootDist = histogramize(x,count,buckets,min,max);
+	rootSupp = sum(rootDist);
+	
+	if (plot==TRUE) {
+		toplot = normalize(rootDist); toplot[length(toplot)+1] = toplot[length(toplot)];
+		plot(toplot,type="s",xlab=xlab,ylab=ylab);
+	}
+	
+	leavesDist = matrix(0,length(rootDist),length(unique(group)));
+	col=array(0,length(unique(group)));
+	groupProperties = data.frame(group=col,kldiv=col,crossent=col,entropy=col,supp=col,i=col);
 	colors = rainbow(length(unique(group)));
+	legend = array(0,1);
+	legendcolors = array(0,1);
+	ilegend = i;
 	i=1;
 	for (g in unique(group)) {
-		leavesDist[i,] = normalize(histogramize(x[which(group==g)],count[which(group==g)],buckets,min,max));
-		toplot = leavesDist[i,]; toplot[length(toplot)+1] = toplot[length(toplot)];
-		#points(leavesDist[i,],type="s",col=g,lty=2);
-		if (g==10 || g==11 || g==16) points(toplot,type="s",col=g,lty=2);		
-			
-		kldiv[i,1] = g;
-		kldiv[i,2] = kldivergence(rootDist,leavesDist[i,]);
-		kldiv[i,3] = crossentropy(rootDist,leavesDist[i,]);
-		kldiv[i,4] = entropy(leavesDist[i,]);
+		print(paste("  (",g,")"));
+		leavesDist[,i] = histogramize(x[which(group==g)],count[which(group==g)],buckets,min,max);
+		kldiv = kldivergence(rootDist,leavesDist[,i]);
+		
+		if (plot==TRUE) {
+			toplot = normalize(leavesDist[,i]); toplot[length(toplot)+1] = toplot[length(toplot)];
+			if (kldiv >= divThreshold) {
+				points(toplot,type="s",col=colors[i]);
+				legend[ilegend] = kldiv;
+				legendcolors[ilegend] = colors[i];
+				ilegend = ilegend+1;
+			} else {
+				points(toplot,type="s",col=rgb(0.8,0.8,0.8,0.2));
+			}
+		}
+		
+		groupProperties$group[i] = g;
+		groupProperties$kldiv[i] = kldiv;
+		groupProperties$crossent[i] = crossentropy(rootDist,leavesDist[,i]);
+		groupProperties$entropy[i] = entropy(leavesDist[,i]);
+		groupProperties$supp[i] = sum(leavesDist[,i]);
+		groupProperties$i[i] = i;
+		
+		print(paste("   kldiv =",groupProperties$kldiv[i]));
+		print(paste("     acc =",groupProperties$supp[i]/rootSupp));
+		
+		
 		i = i+1;
 	}
-	points(histogramize(x[which(group==16)],count[which(group==16)],buckets,min,max)/histogramize(x,count,buckets,min,max),type="s",col="magenta");
 	
-	
-	kldiv;
+	if (plot==TRUE) {
+		legend("topright",legend=groupProperties$kldiv,col=colors,cex=0.7,pch=15,lty=2);
+	}
+
+	list(props=groupProperties[order(groupProperties$kldiv,decreasing=TRUE),],dist=leavesDist);
 }
 
+combineTwoGroups <- function (dataset, i1, i2, g1, g2, numBuckets=100, min, max, divThreshold=0.3, suppThreshold=25) {
+	#if (g1==NULL) {
+	#	g1 = compareGroupDists(dataset[,1],dataset[,dim(dataset)[2]],dataset[,i1],numBuckets,xlab=colnames(dataset)[1],ylab=colnames(dataset)[i1]);
+	#} 
+	#if (g2==NULL) {
+	#	g2 = compareGroupDists(dataset[,1],dataset[,dim(dataset)[2]],dataset[,i2],numBuckets,xlab=colnames(dataset)[1],ylab=colnames(dataset)[i2]);
+	#}
+	
+	row=1;
+	for (const1 in g1$props$i) {
+		constg1 = g1$props$group[const1];
+		if (g1$props$kldiv[which(g1$props$group==constg1)]) {
+			subset = dataset[which(dataset[,i1]==constg1),];
+			col=1;
+			for (const2 in g2$props$i) {
+				constg2 = g2$props$group[const2];
+				if (g2$props$kldiv[which(g2$props$group==constg2)]) {
+					finalset = subset[which(subset[,i2]==constg2),]
+					dist = histogramize(finalset[,1],finalset[,dim(dataset)[2]],buckets=numBuckets,min=min,max=max);
+					kl1 = kldivergence(dist,g1$dist[,const1]);
+					kl2 = kldivergence(dist,g2$dist[,const2]);
+					
+					minkl = min(kl1,kl2);
+					maxacc = 0.0;
+					maxacc = max(max(dist/g1$dist[,const1]),max(dist/g2$dist[,const2]));
+					#print(paste(constg1,"and",constg2,"passed average threshold: kldiv1 =",kl1,"kldiv1 =",kl2));
+					if (minkl >= divThreshold) {
+						if (length(maxacc)>0 && maxacc>=0.4) {
+							print(paste(constg1,"and",constg2," kldiv =",minkl));
+							plot(dist/max(dist),type="s",lty=2,col=c(rgb(.5,.5,.5,.5)),ylim=c(0,1));points(dist/g1$dist[,const1],type="s",col="red");points(dist/g2$dist[,const2],type="s",col="blue");
+							
+							for (i in 1:10000000){}
+						}
+					}
+					col = col+1;
+				}
+			}
+			
+			row = row+1;
+		}
+	}
+}
+
+
+
+lookForSimilarConstants <- function(comparisonResult, divThreshold, simThreshold) {
+	props = comparisonResult$props;
+	dists = comparisonResult$dist;
+	divergence = matrix(0,max(props$group),max(props$group));
+	for (i in 1:(length(props$i)-1)) {
+		for (j in (i+1):length(props$i)) {
+			if (length(props$kldiv[i])>0 && !is.na(props$kldiv[i]) && props$kldiv[i]>divThreshold) {
+				kldiv1 = kldivergence(dists[,props$i[i]] , dists[,props$i[j]]);	
+				if (length(kldiv1)>0 && !is.na(kldiv1) && kldiv1<simThreshold) {
+					print(paste(props$group[i],"is similar to",props$group[j],"kldiv =",kldiv1));
+				}	
+			}
+		}
+	}
+	divergence;	
+}
+
+evaluateDataSet <- function(dataset, avgdivThreshold=0.1) {
+	numCol = dim(dataset)[2]
+	count = dataset[,numCol];
+	x = dataset[,1];
+	xmin = min(x);
+	xmax = max(x);
+	names = colnames(dataset);
+	
+	groups = array(list(NULL),numCol-1);
+	
+	for (i in 2:(numCol-1)) {
+		print(paste("[",names[i],"]"));
+		igroup = compareGroupDists(x,count,dataset[,i],100,xlab=names[1],ylab=names[i],0.2);
+		#savePlot(paste("/home/adeoliv/Desktop/income-",names[i]),type="png");
+		simThreshold = min(0.05,max(igroup$props$kldiv)/dim(igroup$props)[1]);
+		isim = lookForSimilarConstants(igroup,avgdivThreshold,simThreshold);
+		
+		groups[[i]] = igroup;
+	}
+	
+	print("Combining properties");
+	for (i in 2:(numCol-2)) {
+		iAvgDiv = mean(groups[[i]]$props$kldiv);
+		if (iAvgDiv >= avgdivThreshold) {
+			for (j in (i+1):(numCol-1)) {
+				jAvgDiv = mean(groups[[j]]$props$kldiv);
+				if (jAvgDiv >= avgdivThreshold) {
+					print(paste(colnames(dataset)[i],"with",colnames(dataset)[j]));
+					combineTwoGroups(df,i,j,groups[[i]],groups[[j]],numBuckets=100,min=xmin,max=xmax);
+				} 
+			}
+		}
+	}	
+	
+	#compareGroupDists(dataset, numBuckets=100, i1=14, i2=17, divThreshold=0.3, suppThreshold=25)
+}
+
+
 crossentropy <- function(x,y) {
-	-sum((x/sum(x)) * log((y+0.00001)/sum(y)));
+	-sum((normalize(x)) * log(normalize(y)));
 }
 
 kldivergence <- function(x,y) {
+	x = x + 1;
+	y = y + 1;
 	crossentropy(x,y) - entropy(x);
 }
 
@@ -299,6 +431,44 @@ normalize <- function(x) {
 }
 
 
+
+
+
+combineTwoGroupsStandAlone <-function (dataset, numBuckets=100, i1=14, i2=17, divThreshold=0.3, suppThreshold=25) {
+	count = dataset[,dim(dataset)[2]];
+	x = dataset[,1];
+	xmin = min(x);
+	xmax = max(x);
+	
+	#for (g in c(14,17)) {
+	g1 = compareGroupDists(x,count,dataset[,i1],numBuckets,xlab=colnames(dataset)[1],ylab=colnames(dataset)[i1]);
+	g2 = compareGroupDists(x,count,dataset[,i2],numBuckets,xlab=colnames(dataset)[1],ylab=colnames(dataset)[i2]);
+	
+	result = matrix(0,length(g1$props$group),length(g2$props$group));
+	
+	row=1;
+	for (constg1 in g1$props$group) {
+		if (g1$props$kldiv[which(g1$props$group==constg1)]) {
+			subset = dataset[which(dataset[,i1]==constg1),];
+			col=1;
+			for (constg2 in g2$props$group) {
+				if (g2$props$kldiv[which(g2$props$group==constg2)]) {
+					finalset = subset[which(subset[,i2]==constg2),]
+					dist = histogramize(finalset[,1],finalset[,dim(dataset)[2]],buckets=numBuckets,min=xmin,max=xmax);
+					kl1 = kldivergence(dist,g1$dist[constg1]);
+					kl2 = kldivergence(dist,g2$dist[constg2]);
+					result[row,col] = min(kl1,kl2);
+					col = col+1;
+				}
+			}
+			
+			row = row+1;
+		}
+	}
+	
+	#}
+	result;
+}
 
 
 
