@@ -52,6 +52,14 @@ public final class ResultSet implements java.sql.ResultSet
 	   //throw new SQLFeatureNotSupportedException();
 	   row=-1;
    }
+   
+   public String getRowString() {
+	   String[] rowString = data[this.row];
+	   String result = "";
+	   for (String s: rowString)
+		   result += s + " ";
+	   return result;
+   }
    // Cancel all updates
    public void cancelRowUpdates() throws SQLException { throw new SQLFeatureNotSupportedException(); }
    // Clear all warnings
@@ -147,10 +155,14 @@ public final class ResultSet implements java.sql.ResultSet
 	   String f = getString(columnIndex).replaceAll("\"", "");
 	   try {
 		   return Float.parseFloat(f);
-	   }catch (NumberFormatException e) {
+	   }catch (NumberFormatException e) { }
+	   try {
+		   return Float.parseFloat(f.substring(0,f.indexOf('-')));
+	   } catch (NumberFormatException e) {} catch (StringIndexOutOfBoundsException e) {} 
+	   try {
 		   return Float.parseFloat(f.substring(0,f.indexOf('#')));
-		   
-	   }
+	   } catch (StringIndexOutOfBoundsException e1) {} catch (NumberFormatException e1) {}
+	   return Float.NaN;
    }
    // Get an entry as float
    public float getFloat(String columnLabel) throws SQLException { return getFloat(findColumn(columnLabel)); }
