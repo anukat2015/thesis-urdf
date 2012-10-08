@@ -2,6 +2,7 @@ package urdf.ilp;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 
 import org.apache.log4j.Level;
@@ -292,6 +293,18 @@ public class QueryHandler
 	
 	public ResultSet executeQuery(String query) throws SQLException {
 		return (ResultSet) stmt.executeQuery(query);
+	}
+	
+	public ResultSet retrieveDistribution(Literal x, HashSet<Literal> props) throws SQLException {
+		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelation());
+		
+		String patterns = x.getSparqlPattern();
+		for (Literal l: props) 
+			patterns += l.getSparqlPattern();
+		
+		String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" WHERE {"+patterns+"} ORDER BY ASC(?"+(char)x.getSecondArgument()+")";
+		
+		return (ResultSet) stmt.executeQuery(sparql);
 	}
 	
 }
