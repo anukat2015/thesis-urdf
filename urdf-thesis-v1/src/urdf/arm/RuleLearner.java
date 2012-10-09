@@ -35,6 +35,8 @@ public class RuleLearner {
 		
 		HashSet<Relation> candidateRelations = info.arg1JoinOnArg1.get(rootRelation);
 		
+		// For Root
+		
 		for (Relation r : candidateRelations) {
 			AssociationRuleNode newNode = root.clone();
 			if (newNode.addItem(r)) {

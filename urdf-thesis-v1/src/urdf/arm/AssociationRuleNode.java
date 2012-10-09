@@ -1,16 +1,22 @@
 package urdf.arm;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashSet;
 
 import urdf.ilp.Literal;
+import urdf.ilp.QueryHandler;
 import urdf.ilp.Relation;
+import urdf.rdf3x.ResultSet;
 
 public class AssociationRuleNode {
 	private static AssociationRuleNode root;
 	private static HashSet<AssociationRuleNode> existentItems;
-	private static Relation numericalProperty;
-	private static Histogram histogram;
+	private static HashSet<Relation> candidates;
+	private static Relation rootRelation;
+	private static Literal rootLiteral;
+	private static Histogram histogram = null;
+	private static final int numOfBuckets =  100;
 	
 	private float kldivRoot;
 	
@@ -30,15 +36,27 @@ public class AssociationRuleNode {
 	private float mean;
 	
 	private int nextVariable;
+	private int level;
 	
 	public AssociationRuleNode(Relation numericalProperty) {
-		isGood = false;
-		this.numericalProperty = numericalProperty;
+		this.isGood = false;
+		this.level = 0;
+		this.nextVariable = (int) 'A';
+		this.support = 0;
+		this.totalCount = 0;
+		this.mean = Float.NaN;
+		this.kldivRoot = Float.NaN;
+		this.entropy = Float.NaN;
+		this.rootRelation = numericalProperty;
+		this.rootLiteral = new Literal(rootRelation, nextVariable++, nextVariable++);
+		this.literals = new HashSet<Literal>();
+		this.items = new HashSet<Relation>();
+
 	}
 	
 	public void addParent(AssociationRuleNode node) {
 		if (existentItems.contains(node)) {
-			if (node.items.size()==(this.items.size()-1)) {
+			if (node.items.size()==(this.items.size()-1) && node.level==(this.level-1)) {
 				if (this.items.containsAll(node.items)) {
 					this.parents.add(node);
 					return;
@@ -56,7 +74,7 @@ public class AssociationRuleNode {
 	}
 	
 	public void addChild(AssociationRuleNode node){
-		if (node.items.size()==(this.items.size()+1)) {
+		if (node.items.size()==(this.items.size()+1) && node.level==(this.level+1)) {
 			if (node.items.containsAll(this.items)) {
 				this.children.add(node);
 				this.existentItems.add(node);	
@@ -79,10 +97,35 @@ public class AssociationRuleNode {
 	}
 	
 	public boolean addItem(Relation item) {
-		return this.items.add(item);
+		boolean success = this.items.add(item);
+		if (success) {
+			level++;
+			return success;
+		} else 
+			throw new IllegalArgumentException("Relation "+item.getName()+" could not be added");
 	}
+
 	
+	public void queryNodeProperties(QueryHandler qh) {
+		try {
+			ResultSet rs = qh.retrieveDistribution(rootLiteral, literals);
+			if (level==0 && histogram==null) {
+				rs.first();
+				float min = rs.getFloat(1);
+				rs.last();
+				float max = rs.getFloat(1);
+				histogram = new Histogram(min, max, numOfBuckets);
+			}
+			while (rs.next()) {
+				
+			}
 	
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
 	@Override
 	public boolean equals(Object o) {
@@ -96,9 +139,10 @@ public class AssociationRuleNode {
 	
 	@Override 
 	public AssociationRuleNode clone() {
-		AssociationRuleNode newNode = new AssociationRuleNode(this.numericalProperty);
+		AssociationRuleNode newNode = new AssociationRuleNode(this.rootRelation);
 		newNode.items = (HashSet<Relation>) this.items.clone();
 		newNode.literals = (HashSet<Literal>) this.literals.clone();
+		newNode.nextVariable = this.nextVariable;
 		
 		return newNode;
 		
