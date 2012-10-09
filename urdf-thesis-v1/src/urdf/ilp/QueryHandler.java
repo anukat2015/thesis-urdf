@@ -299,8 +299,10 @@ public class QueryHandler
 		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelation());
 		
 		String patterns = x.getSparqlPattern();
-		for (Literal l: props) 
-			patterns += l.getSparqlPattern();
+		if (props!= null || props.isEmpty()) {
+			for (Literal l: props) 
+				patterns += l.getSparqlPattern();
+		}
 		
 		String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" WHERE {"+patterns+"} ORDER BY ASC(?"+(char)x.getSecondArgument()+")";
 		
