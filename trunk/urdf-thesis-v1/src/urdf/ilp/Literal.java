@@ -35,7 +35,7 @@ public class Literal implements Cloneable
 		
 	}
 	
-	public Literal(Relation relation, int firstArgument, int secondArgument) throws Exception {
+	public Literal(Relation relation, int firstArgument, int secondArgument) {
 		this(relation, firstArgument, 1, secondArgument, 1, 0);
 	}
 	
