@@ -2,6 +2,7 @@ package urdf.ilp;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 
 
@@ -295,16 +296,30 @@ public class QueryHandler
 		return (ResultSet) stmt.executeQuery(query);
 	}
 	
-	public ResultSet retrieveDistribution(Literal x, HashSet<Literal> props) throws SQLException {
-		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelation());
+	public ResultSet retrieveDistribution(Literal x, Collection<Literal> collection) throws SQLException {
+		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelationName());
 		
-		String patterns = x.getSparqlPattern();
-		if (props!= null || props.isEmpty()) {
-			for (Literal l: props) 
-				patterns += l.getSparqlPattern();
+		String patterns = x.getSparqlPatternWithConstant();
+		if (collection!= null || collection.isEmpty()) {
+			for (Literal l: collection) 
+				patterns += l.getSparqlPatternWithConstant();
 		}
 		
 		String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" WHERE {"+patterns+"} ORDER BY ASC(?"+(char)x.getSecondArgument()+")";
+		
+		return (ResultSet) stmt.executeQuery(sparql);
+	}
+	
+	public ResultSet retrieveGroupDistribution(Literal x, Literal group) throws SQLException {
+		logger.log(Level.DEBUG, "Retrieving group distribution on "+x.getRelationName()+" by "+group.getRelationName());
+		
+		String patterns = x.getSparqlPatternWithConstant();
+		if (x.getFirstArgument() == group.getFirstArgument()) 
+			patterns += group.getSparqlPatternWithConstant();
+		else
+			throw new IllegalArgumentException("Literals should be joined by first argument");
+		
+		String sparql = "SELECT COUNT ?"+(char)group.getSecondArgument()+" ?"+(char)x.getSecondArgument()+" WHERE {"+patterns+"} ORDER BY ASC(?"+(char)group.getSecondArgument()+")";
 		
 		return (ResultSet) stmt.executeQuery(sparql);
 	}

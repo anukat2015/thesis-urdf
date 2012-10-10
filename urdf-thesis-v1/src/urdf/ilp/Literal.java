@@ -41,8 +41,8 @@ public class Literal implements Cloneable
 	
 	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, String constant) {
 		this(relation, firstArgument, firstMode, secondArgument, secondMode, 0);
-		if (!(relation.equals(RelationsInfo.EQ)||relation.equals(RelationsInfo.GT)||relation.equals(RelationsInfo.LT)))
-			throw new IllegalArgumentException("constant does not make sense for relation other than EQ,GT,LT");
+		//if (!(relation.equals(RelationsInfo.EQ)||relation.equals(RelationsInfo.GT)||relation.equals(RelationsInfo.LT)))
+		//	throw new IllegalArgumentException("constant does not make sense for relation other than EQ,GT,LT");
 		this.constant=constant;
 	}
 	
@@ -158,6 +158,17 @@ public class Literal implements Cloneable
 				
 		else
 			return getSparqlPattern(0);
+	}
+	
+	public String getSparqlPatternWithConstant() {
+		if (constant == null)
+			return " ?" + (char)firstArgument + " "+relation.getName()+" ?"+ (char)secondArgument +" ";
+		else {
+			if (constNeedsQuotes)
+				return " ?" + (char)firstArgument + " "+relation.getName()+" \""+ constant +"\" ";
+			else
+				return " ?" + (char)firstArgument + " "+relation.getName()+" "+ constant +" ";
+		}
 	}
 	
 	public String getSparqlPattern(int inputArg) {
