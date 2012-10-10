@@ -3,6 +3,29 @@ package urdf.arm;
 
 public class ArrayTools {
 
+	static void print(int[] x) {
+		for (int xi: x) System.out.print(xi+"\t");
+		System.out.println();
+	}
+	
+	static void print(float[] x) {
+		for (float xi: x) System.out.print(xi+"\t");
+		System.out.println();
+	}
+	
+	static int sum(int[] x) {
+		int result = 0;
+		for (int i=0; i<x.length; i++) 
+			result += x[i];
+		return result;
+	}
+	
+	static float sum(float[] x) {
+		float result = 0;
+		for (int i=0; i<x.length; i++) 
+			result += x[i];
+		return result;
+	}
 	
 	static float[] sum(float[] x, float[] y) {
 		if (x.length != y.length) 

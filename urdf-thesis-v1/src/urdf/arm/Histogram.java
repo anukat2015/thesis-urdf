@@ -1,10 +1,8 @@
 package urdf.arm;
 
-import java.util.ArrayList;
-
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-public class Histogram {
+public class Histogram implements Cloneable{
 	private int[] count;
 	private float[] normalized;
 	
@@ -16,14 +14,19 @@ public class Histogram {
 	private int totalCount = 0;
 	
 	public Histogram(float min, float max, int numberOfBuckets) {
-		boundaries = new float[numberOfBuckets-1];
-		count = new int[numberOfBuckets];
+		this.min = min;
+		this.max = max;
+		this.numberOfBuckets = numberOfBuckets;
+		this.boundaries = new float[this.numberOfBuckets-1];
+		this.count = new int[numberOfBuckets];
+		this.normalized = new float[numberOfBuckets];
 		bucketWidth = (max-min)/((float)numberOfBuckets);
 		float boundary = min;
-		for (int i=0; i<numberOfBuckets; i++) {
+		for (int i=0; i<(numberOfBuckets-1); i++) {
 			boundary += bucketWidth;
 			boundaries[i] = boundary;
 		}
+		this.reset();
 	}
 	
 	public Histogram(float x[], int[] y, int numberOfBuckets) {
@@ -41,27 +44,41 @@ public class Histogram {
 		loadData(x, y);
 	}
 	
+	public void reset(){ 
+		Arrays.fill(count, 0);
+		Arrays.fill(normalized, 0);
+		totalCount = 0;
+	}
+	
+	public void addDataPoint(float x, int y) {
+		int bucket = -1;
+		if (x<=max && x>=min) {
+			bucket = (int) Math.ceil((x-min)/bucketWidth);
+			if (bucket>=numberOfBuckets) 
+				bucket = numberOfBuckets-1;
+			if (bucket < 0)
+				bucket = 0;
+			totalCount += y;
+			count[bucket] += y;
+			normalized[bucket] += y;
+		} else {
+			throw new IllegalArgumentException("Point "+x+" is out of bounds ["+min+","+max+"]");
+		}
+
+	}
+	
 	public int[] loadData(float[] x, int[] y) {
 		if (x.length != y.length) 
 			throw new IllegalArgumentException("Both arrays must be of same size");
 		
-		Arrays.fill(count, 0);
-		Arrays.fill(normalized, 0);
-		totalCount = 0;
+		this.reset();
 		
 		for (int i=0; i<x.length; i++) {
-			int bucket = -1;
-			if (x[i]<max && x[i]>=min) {
-				bucket = (int) Math.ceil((x[i]-min)/bucketWidth);
-			} else {
-				if (x[i]==max) 
-					bucket = numberOfBuckets-1;
-				else
-					continue;
+			try {
+				addDataPoint(x[i], y[i]);
+			} catch (IllegalArgumentException e) {
+				
 			}
-			totalCount += y[i];
-			count[bucket] += y[i];
-			normalized[bucket] += y[i];
 		}
 		
 		for (int i=0; i<numberOfBuckets; i++) {
@@ -77,6 +94,10 @@ public class Histogram {
 	
 	public float[] getNormalizedDistribution() {
 		return normalized;
-		
+	}
+	
+	@Override
+	public Histogram clone() {
+		return new Histogram(this.min, this.max, this.numberOfBuckets);
 	}
 }
