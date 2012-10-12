@@ -12,6 +12,7 @@ public class Histogram implements Cloneable{
 	private float max;
 	private float bucketWidth; 
 	private int totalCount = 0;
+	private double xMean = 0;
 	
 	public Histogram(float min, float max, int numberOfBuckets) {
 		this.min = min;
@@ -48,6 +49,7 @@ public class Histogram implements Cloneable{
 		Arrays.fill(count, 0);
 		Arrays.fill(normalized, 0);
 		totalCount = 0;
+		xMean = 0;
 	}
 	
 	public void addDataPoint(float x, int y) {
@@ -59,6 +61,7 @@ public class Histogram implements Cloneable{
 			if (bucket < 0)
 				bucket = 0;
 			totalCount += y;
+			xMean += y*x;
 			count[bucket] += y;
 			normalized[bucket] += y;
 		} else {
@@ -90,6 +93,10 @@ public class Histogram implements Cloneable{
 	
 	public int[] getDistribution() {
 		return count;
+	}
+	
+	public float getMean() {
+		return ((float)xMean)/((float)totalCount);
 	}
 	
 	public float[] getNormalizedDistribution() {

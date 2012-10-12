@@ -339,11 +339,22 @@ combineTwoGroups <- function (dataset, i1, i2, g1, g2, numBuckets=100, min, max,
 					kl2 = kldivergence(dist,g2$dist[,const2]);
 					
 					minkl = min(kl1,kl2);
+					maxkl = max(kl1,kl2);
 					maxacc = 0.0;
 					maxacc = max(max(dist/g1$dist[,const1]),max(dist/g2$dist[,const2]));
+					minacc = 0.0;
+					minacc = min(max(dist/g1$dist[,const1]),max(dist/g2$dist[,const2]));
 					#print(paste(constg1,"and",constg2,"passed average threshold: kldiv1 =",kl1,"kldiv1 =",kl2));
-					if (minkl >= divThreshold) {
-						if (length(maxacc)>0 && maxacc>=0.4) {
+					if (maxkl >= divThreshold) {
+						print(paste("(",constg1,",",constg2,")","kl1 = ",kl1," kl2 =",kl2));
+						if (maxkl > 1.0) {
+							plot(normalize(dist),type="s",ylim=c(0,1));
+							points(normalize(g1$dist[,const1]),type="s",col="red");
+							points(normalize(g2$dist[,const2]),type="s",col="blue");
+							#for (w in 1:10000000) {}
+							savePlot(paste("/var/tmp/",constg1,"-",constg2,sep=""),type="png");
+						}
+						if (length(maxacc)>0 && !is.na(maxacc) && !is.nan(maxacc) && maxacc>=0.4) {
 							print(paste(constg1,"and",constg2," kldiv =",minkl));
 							plot(dist/max(dist),type="s",lty=2,col=c(rgb(.5,.5,.5,.5)),ylim=c(0,1));points(dist/g1$dist[,const1],type="s",col="red");points(dist/g2$dist[,const2],type="s",col="blue");
 							
@@ -399,18 +410,19 @@ evaluateDataSet <- function(dataset, avgdivThreshold=0.1) {
 	}
 	
 	print("Combining properties");
-	for (i in 2:(numCol-2)) {
+	i=14;j=17;
+	#for (i in 2:(numCol-2)) {
 		iAvgDiv = mean(groups[[i]]$props$kldiv);
 		if (iAvgDiv >= avgdivThreshold) {
-			for (j in (i+1):(numCol-1)) {
+			#for (j in (i+1):(numCol-1)) {
 				jAvgDiv = mean(groups[[j]]$props$kldiv);
 				if (jAvgDiv >= avgdivThreshold) {
 					print(paste(colnames(dataset)[i],"with",colnames(dataset)[j]));
 					combineTwoGroups(df,i,j,groups[[i]],groups[[j]],numBuckets=100,min=xmin,max=xmax);
 				} 
-			}
+			#}
 		}
-	}	
+	#}	
 	
 	#compareGroupDists(dataset, numBuckets=100, i1=14, i2=17, divThreshold=0.3, suppThreshold=25)
 }

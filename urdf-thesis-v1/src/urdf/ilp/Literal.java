@@ -46,6 +46,12 @@ public class Literal implements Cloneable
 		this.constant=constant;
 	}
 	
+	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, String constant, boolean constantNeedsQuotes) {
+		this(relation, firstArgument, firstMode, secondArgument, secondMode, 0);
+		this.constant=constant;
+		this.constNeedsQuotes = constantNeedsQuotes;
+	}
+	
 	public Literal clone()
 	{
 		Literal cloned;
