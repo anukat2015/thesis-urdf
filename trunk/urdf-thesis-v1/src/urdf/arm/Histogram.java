@@ -3,16 +3,17 @@ package urdf.arm;
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 public class Histogram implements Cloneable{
-	private int[] count;
-	private float[] normalized;
+	protected int[] count;
+	protected float[] normalized;
 	
-	private float[] boundaries;
-	private int numberOfBuckets;
-	private float min;
-	private float max;
+	protected float[] boundaries;
+	protected int numberOfBuckets;
+	protected float min = Float.NaN;
+	protected float max=  Float.NaN;
 	private float bucketWidth; 
-	private int totalCount = 0;
-	private double xMean = 0;
+	protected int totalCount = 0;
+	protected double xMean = 0;
+
 	
 	public Histogram(float min, float max, int numberOfBuckets) {
 		this.min = min;
@@ -52,14 +53,20 @@ public class Histogram implements Cloneable{
 		xMean = 0;
 	}
 	
+	public int getBucket(float x) {
+		int bucket = (int) Math.ceil((x-min)/bucketWidth);
+		if (bucket>=numberOfBuckets) 
+			return numberOfBuckets-1;
+		if (bucket < 0)
+			return 0;
+		
+		return bucket;
+	}
+	
 	public void addDataPoint(float x, int y) {
 		int bucket = -1;
 		if (x<=max && x>=min) {
-			bucket = (int) Math.ceil((x-min)/bucketWidth);
-			if (bucket>=numberOfBuckets) 
-				bucket = numberOfBuckets-1;
-			if (bucket < 0)
-				bucket = 0;
+			bucket = getBucket(x);
 			totalCount += y;
 			xMean += y*x;
 			count[bucket] += y;
