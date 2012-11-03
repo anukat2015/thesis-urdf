@@ -185,5 +185,14 @@ public class Literal implements Cloneable
 		}
 	}
 	
+	public String getRuleLiteralString() {
+		String output =  relation.getSimpleName() + "(" + (char)firstArgument + ",";
+		if (constant!=null && secondArgument==-1) 
+			output += constant; 
+		else
+			output += (char)secondArgument;
+		return output += ")";
+	}
+	
 
 }

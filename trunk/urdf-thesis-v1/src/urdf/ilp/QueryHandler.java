@@ -310,6 +310,33 @@ public class QueryHandler
 		return (ResultSet) stmt.executeQuery(sparql);
 	}
 	
+	public ResultSet retrieveMultiGroupDistribution(Literal x, Collection<Literal> collection) throws SQLException {
+		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelationName());
+		
+		String patterns = x.getSparqlPatternWithConstant();
+		String projection = "";
+		String orderby = "";
+		if (collection!= null || collection.isEmpty()) {
+			for (Literal l: collection) {
+				patterns += l.getSparqlPatternWithConstant();
+				
+				if (l.getFirstArgument()==x.getFirstArgument()) {
+					projection += ", ?" + (char)l.getSecondArgument();
+					orderby += "asc("+(char)l.getSecondArgument()+") ";
+				} else {
+					projection += ", ?" + (char)l.getFirstArgument();
+					orderby += "asc("+(char)l.getFirstArgument()+") ";
+				}
+				
+				
+			}
+		}
+		
+		String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" "+projection+" WHERE {"+patterns+"} ORDER BY "+orderby+"ASC(?"+(char)x.getSecondArgument()+")";
+		
+		return (ResultSet) stmt.executeQuery(sparql);
+	}
+	
 	public ResultSet retrieveGroupDistribution(Literal x, Literal group) throws SQLException {
 		logger.log(Level.DEBUG, "Retrieving group distribution on "+x.getRelationName()+" by "+group.getRelationName());
 		
