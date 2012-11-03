@@ -3,6 +3,7 @@ package urdf.arm;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 
@@ -38,7 +39,10 @@ public class RuleLearner {
 		this.rootRelation = rootRelation;
 	}
 	
-	public void learn( ) throws SQLException {
+	public void learn( ) throws SQLException, IOException {
+		
+		long t1 = System.currentTimeMillis();
+		
 		root = new AssociationRuleNode(rootRelation);
 		
 		
@@ -207,7 +211,7 @@ public class RuleLearner {
 		*/
 		
 		candidateRelations.add(new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/sex>", 		null, null));
-		//candidateRelations.add(new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/st>", 		null, null));
+		candidateRelations.add(new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/st>", 		null, null));
 		candidateRelations.add(new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/sch>", 		null, null));
 		candidateRelations.add(new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/rel>", 		null, null));
 		candidateRelations.add(new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/racwht>", 	null, null));
@@ -240,19 +244,20 @@ public class RuleLearner {
 			root.addChild(newNode);
 			nextLevel.add(newNode);
 			
-			//System,out.println("\n\n"+newNode+"\n\t"+newNode.getInfo());
+			System.out.println("\n\n"+newNode+"\n\t"+newNode.getInfo());
 			//ArrayTools.print(newNode.getDistribution());
 			for (AssociationRuleNode n: newNode.getConstants()) {
-				//System,out.println(n+"\n\t"+n.getInfo());
+				System.out.println(n+"\n\t"+n.getInfo());
 				//ArrayTools.print(n.getDistribution());
 			}
 		}
+		root.analizeNode();
 		
 		LinkedList<AssociationRuleNode> level = nextLevel;
 		nextLevel = new LinkedList<AssociationRuleNode>();
 		maxLevels = 5;
 		//System,out.println("Starting level 2 =)\tNumber of ");
-		for (int depth=1; depth<maxLevels; depth++) {
+		for (int depth=1; depth<maxLevels; depth++) {		
 			Object[] leaves = level.toArray();
 			for (int i=0; i<(leaves.length-1); i++) {
 				AssociationRuleNode iNode = (AssociationRuleNode) leaves[i];
@@ -262,13 +267,13 @@ public class RuleLearner {
 						//System,out.println("Joining "+iNode.getRelationSetNames()+" with "+jNode.getRelationSetNames());
 						try {
 							
-							AssociationRuleNode newNode = AssociationRuleNode.joinNodes(iNode, jNode);
+							AssociationRuleNode newNode = AssociationRuleNode.joinNodes(iNode, jNode, queryHandler);
 							////System,out.println("\n"+newNode);
 							newNode.addParent(iNode);
 							newNode.addParent(jNode);
 							jNode.addChild(newNode);
 							iNode.addChild(newNode);	
-							//newNode.queryNodeProperties(queryHandler);
+							newNode.queryNodeProperties(queryHandler);
 							////System,out.println("\t"+newNode.getInfo());
 							nextLevel.add(newNode);
 							
@@ -277,27 +282,58 @@ public class RuleLearner {
 									for (AssociationRuleNode jConst: jNode.getConstants()) {
 										if (!jConst.isPruned())
 											try {
-												AssociationRuleNode newConstNode = AssociationRuleNode.joinNodes(iConst, jConst);
-												//System,out.println(newConstNode);
-												newConstNode.addParent(iConst);
-												newConstNode.addParent(jConst);
-												newNode.addConstant(newConstNode);
-												newConstNode.queryNodeProperties(queryHandler);	
-												//System,out.println("\t"+newConstNode.getInfo());
+												AssociationRuleNode newConstNode = AssociationRuleNode.joinNodes(iConst, jConst, queryHandler);
+												newConstNode.queryNodeProperties(queryHandler);
+												int[] indepHipotheses = AssociationRuleNode.independentJoinDitribution(iConst, jConst);
+												float indepMeasure = ArrayTools.chisqDivergence(ArrayTools.laplaceSmooth(indepHipotheses), ArrayTools.laplaceSmooth(newConstNode.getDistribution()));
+												if (indepMeasure >= 30.00) {																										
+													newConstNode.addParent(iConst);
+													newConstNode.addParent(jConst);
+													newNode.addConstant(newConstNode);
+													//newConstNode.queryNodeProperties(queryHandler);
+													//newConstNode.extractHistogramInformation();
+													
+													/*newConstNode.analizeNode();
+													System.out.println(newConstNode);
+													System.out.println("\t"+newConstNode.getInfo());
+													*/
+												} 
+												//else System.out.println("Join is independent!");
 															
-											} catch (IllegalArgumentException e) {
-												//System,out.println(e.getMessage());
+											} catch (IllegalArgumentException e1) {
+												//System.out.println("[Exception]: "+e1.getMessage());
 											}
 									}
 							}
-							newNode.queryNodeProperties(queryHandler);
-							//System,out.println("\n"+newNode);
-							//System,out.println("\t"+newNode.getInfo());
+							//newNode.queryNodeProperties(queryHandler);
+							
+							/*
+							newNode.analizeNode();
+							System.out.println("\n"+newNode);
+							System.out.println("\t"+newNode.getInfo());
+							*/
 							
 						} catch (IllegalArgumentException e) {
-							//System,out.println(e.getMessage());
+							//System.out.println("[Exception]: "+e.getMessage());
 						}
 					}
+				}
+			}
+			
+			System.out.println("|||| LEVEL"+depth+" ||||");
+			for (AssociationRuleNode node : nextLevel) {
+				for (AssociationRuleNode nodeConst : node.getConstants()) {
+					nodeConst.analizeNode();
+					if (!nodeConst.isPruned()) {
+						System.out.println(nodeConst);
+						System.out.println("\t"+nodeConst.getInfo());
+					}
+						
+				}
+				node.analizeNode();
+				if (!node.isPruned()) {
+					System.out.println("\t"+node);
+					System.out.println("\t\t"+node.getInfo());
 				}
 			}
 
@@ -305,7 +341,18 @@ public class RuleLearner {
 			nextLevel = new LinkedList<AssociationRuleNode>();
 		}
 		
-		AssociationRuleNode.searchRules(root);
+		long t2 = System.currentTimeMillis();
+		System.out.println(t2-t1);
+		
+		System.out.println("!!!!!!!!!!!!!!!!!!!!!!! Printing rules");
+		Collection<String> rules;
+		rules = AssociationRuleNode.searchRules(root);
+		rules = AssociationRuleNode.searchDistRules(root,false,false);
+		
+		System.out.println("Now just the rules");
+		for (String rule: rules) {
+			System.out.println(rule);
+		}
 		
 	}
 	

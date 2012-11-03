@@ -1,5 +1,7 @@
 package urdf.arm;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,6 +9,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.TreeSet;
 
+import rcaller.RCaller;
+
+import urdf.ilp.HeadPredicate;
 import urdf.ilp.Literal;
 import urdf.ilp.QueryHandler;
 import urdf.ilp.Relation;
@@ -20,7 +25,7 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 	private static HashSet<Relation> candidates;
 	private static Relation rootRelation;
 	private static Literal rootLiteral;
-	private static final int numOfBuckets = 100;
+	private static final int numOfBuckets = 25;
 
 	private float kldivRoot;
 	private float chisqdivRoot;
@@ -51,13 +56,22 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 
 	private int nextVariable;
 	private int level;
+	
+	private static RCaller caller = new RCaller();
+	
+	private static Collection<String> resultRules = new HashSet<String>();
 
 	// Thresholds
-	private static final float kldivThreshold = (float) 0.25;
+	private static final float kldivThreshold = (float) 0.15;
 	private static final float chisqThreshold = (float) 0.3;
-	private static final int supportThreshold = 25;
+	private static final float indepThreshold = (float) 0.05;
+	private static final int supportThreshold = 100;
+	private static final int bucketSupportThreshold = 5;
 
 	public AssociationRuleNode(Relation numericalProperty) {
+
+
+		
 		this.isGood = false;
 		this.pruned = false;
 		this.level = 0;
@@ -86,6 +100,7 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 			root = this;
 			existentItems = new ArrayList<AssociationRuleNode>();
 			existentItems.add(this);
+			resultRules = new HashSet<String>();
 		}
 
 	}
@@ -203,11 +218,12 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 					int count = rs.getInt(3);
 
 					if (!lastGroup.equals(groupConst)) {
-						if (newConst != null)
+						if (newConst != null) {
 							newConst.extractHistogramInformation();
+							newConst.analizeNode();
+						}
 						newConst = this.clone();
-						newConst.setConstant(groupLiteral.getRelation(),
-								groupConst);
+						newConst.setConstant(groupLiteral.getRelation(), groupConst);
 						for (AssociationRuleNode parent : parents)
 							newConst.addParent(parent);
 						this.addConstant(newConst);
@@ -218,7 +234,9 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 					newConst.histogram.addDataPoint(x, count);
 				}
 				newConst.extractHistogramInformation();
+				newConst.analizeNode();
 				this.extractHistogramInformation();
+				this.analizeNode();
 			}
 		}
 
@@ -231,25 +249,39 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 			float min = rs.getFloat(1);
 			rs.last();
 			float max = rs.getFloat(1);
-			histogram = new Histogram(min, max, numOfBuckets);
+			//histogram = new Histogram(min, max, numOfBuckets);
+			histogram = new VHistogram(rs, min, max, numOfBuckets);
+		} 
+		else {
+			histogram.reset();
+			rs.beforeFirst();
+			while (rs.next()) {
+				float x = rs.getFloat(1);
+				int count = rs.getInt(2);
+				histogram.addDataPoint(x, count);
+			}
 		}
-		histogram.reset();
+		/*histogram.reset();
 		rs.beforeFirst();
 		while (rs.next()) {
 			float x = rs.getFloat(1);
 			int count = rs.getInt(2);
 			histogram.addDataPoint(x, count);
-		}
+		}*/
+		
 		extractHistogramInformation();
 	}
-
-	private void extractHistogramInformation() {
+	
+	public void extractHistogramInformation() {
 		this.distribution = histogram.getDistribution();
 		this.mean = histogram.getMean();
 		this.entropy = ArrayTools.entropy(this.distribution);
 		this.kldivRoot = ArrayTools.klDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(root.distribution));
 		this.chisqdivRoot = ArrayTools.chisqDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(root.distribution));
 		this.support = ArrayTools.sum(this.distribution);
+	}
+	
+	public void analizeNode() {
 		for (AssociationRuleNode parent : parents) {
 			float kldiv = ArrayTools.klDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(parent.distribution));
 			kldivParents.put(parent, kldiv);
@@ -284,7 +316,6 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 			for (AssociationRuleNode c : this.constants)
 				c.pruned = true;
 		}
-
 	}
 
 	public boolean canJoin(Object o) {
@@ -396,37 +427,123 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 		return Float.compare(this.kldivRoot, o.kldivRoot);
 	}
 	
-	
+	public static Collection<String> searchDistRules(AssociationRuleNode node, boolean high, boolean low) throws IOException { 
+		for (AssociationRuleNode child: node.children) {
+			for (AssociationRuleNode constant: child.getConstants()) {
+				if (!constant.isPruned()) {
+					int bucket = root.histogram.getBucket(root.histogram.getMean());
+					int count = 0;
+					for (int i=0; i<bucket; i++)
+						count += constant.distribution[i];
+					
+					String rule = "";
+					for (Relation r: constant.getRelations()) 
+						rule +=  constant.getLiteral(r).getRuleLiteralString();
+					
+					double rootMean = root.histogram.getMean();
+					double mean = node.histogram.getMean();
+					double factor = 1.5;
+					double minPercentage = 0.90;
+					double diffLow = ((double)(constant.support - count))/ ((double)constant.support) ;
+					double diffHigh = ((double)(constant.support - count  - constant.distribution[bucket]))/ ((double)constant.support) ;
+					if ((mean <= rootMean/2 && diffHigh <= (1-minPercentage)) || (mean <= rootMean*2 && diffLow >= minPercentage)) {
+						
+						if (mean <= rootMean/factor && diffHigh <= (1-minPercentage) && low==false) {
+							rule = "hasLowIncome(A) <- " + rule;
+							low = true;
+							high = false;
+							resultRules.add(rule);
+							ArrayTools.plot(ArrayTools.normalize(constant.distribution), ArrayTools.normalize(root.distribution), rule);
+						}						
+						if (mean >= rootMean*factor && diffLow >= minPercentage && high==false) {					
+							rule = "hasHighIncome(A) <- " + rule;
+							high = true;
+							low = false;			
+							resultRules.add(rule);
+							ArrayTools.plot(ArrayTools.normalize(constant.distribution), ArrayTools.normalize(root.distribution), rule);
+						}
+					}		
+					else {
+						high = false;
+						low = false;
+					}
+				}
+			}
+			searchDistRules(child,high,low);
+		}
+		return resultRules;
+	}
 
-	public static Collection<Rule> searchRules(AssociationRuleNode node) {
-		Collection<Rule> results = new HashSet<Rule>();
+	public static Collection<String> searchRules(AssociationRuleNode node) throws IOException {
+		
 		
 		for (AssociationRuleNode child: node.children) {
-			if (!child.pruned) {
-				System.out.println("\n"+child+"\n\t"+child.getInfo());
-			}
-			for (AssociationRuleNode constant: child.getConstants()) {
-				
-				for (AssociationRuleNode p: child.parents) {
-					float[] acc = ArrayTools.divide(constant.distribution, p.distribution);
-					float kldiv = ArrayTools.klDivergence(ArrayTools.laplaceSmooth(constant.distribution), ArrayTools.laplaceSmooth(p.distribution));
-					float maxacc = ArrayTools.max(acc);
-					if (maxacc > 0.3 && kldiv > kldivThreshold)  {
-						System.out.println("\t\t"+constant+"\n\t\t\t"+constant.getInfo());
-						System.out.println(p);
-						System.out.println(constant);
-						ArrayTools.print(acc);
-					}
 
+			for (AssociationRuleNode constant: child.getConstants()) {
+				if (!constant.isPruned()) {
+					//System.out.println("\t\t"+constant+"\n\t\t\t"+constant.getInfo());
+					for (AssociationRuleNode p: constant.parents) {
+						if (!p.isPruned()) {
+							
+							float[] acc = ArrayTools.divide(constant.distribution, p.distribution);
+							float kldiv = ArrayTools.klDivergence(ArrayTools.laplaceSmooth(constant.distribution), ArrayTools.laplaceSmooth(p.distribution));
+							
+							boolean isGood = false;
+							if (kldiv > kldivThreshold) {
+								for (int i=0; i<acc.length; i++) {
+									if (acc[i]>0.5 && constant.distribution[i]>bucketSupportThreshold) {
+										isGood = true;
+										break;
+									}
+								}
+							}
+							//float maxacc = ArrayTools.max(acc);
+							
+							if (isGood)  {
+							//if (maxacc > 0.1 && kldiv > kldivThreshold/4)  {
+								String rule = "";
+								Literal head;
+								for (Relation r: constant.getRelations()) {
+									if (p.getLiteral(r)==null) {
+										rule = constant.getLiteral(r).getRuleLiteralString() + " <- " + rule;
+										head = constant.getLiteral(r); 
+									} else
+										rule +=  constant.getLiteral(r).getRuleLiteralString();
+								}
+								resultRules.add(rule);
+								System.out.println(rule);
+								System.out.println(constant.getInfo());
+								ArrayTools.print(acc);
+								ArrayTools.print(constant.distribution);
+								/*if (constant.parents.size()>=2) {
+									for (AssociationRuleNode p2: constant.parents) {
+										if (!p.equals(p2)) {
+											try {
+												int[] prediction = AssociationRuleNode.independentJoinDitribution(p, p2); 
+												ArrayTools.print(prediction);
+												float kldivIndep = ArrayTools.klDivergence(ArrayTools.laplaceSmooth(constant.distribution), ArrayTools.laplaceSmooth(prediction));
+												float cvIndep = ArrayTools.chisqDivergence(ArrayTools.laplaceSmooth(constant.distribution), ArrayTools.laplaceSmooth(prediction));
+												float indepMeasure = ArrayTools.indepMeasure(ArrayTools.laplaceSmooth(constant.distribution), ArrayTools.laplaceSmooth(prediction));
+												System.out.println("kldiv="+kldivIndep+" chisq="+cvIndep+" indep="+indepMeasure);
+											} catch (IllegalArgumentException e) {}
+										}
+									}
+								}*/
+								
+								ArrayTools.plot(acc, ArrayTools.normalize(constant.distribution), rule);
+								
+							}
+						}
+					}
 				}
 			}
 			searchRules(child);
 		}
 
-		return results;
+		return resultRules;
 	}
 	
-	public static AssociationRuleNode joinNodes(AssociationRuleNode node1,AssociationRuleNode node2) {
+	public static AssociationRuleNode joinNodes(AssociationRuleNode node1,AssociationRuleNode node2, QueryHandler qh) throws SQLException {
 		AssociationRuleNode newNode = node1.clone();
 
 		if (node1.level != node2.level)
@@ -452,13 +569,49 @@ public class AssociationRuleNode implements Comparable<AssociationRuleNode>{
 
 		
 		if (!existentItems.contains(newNode)) {
+			//existentItems.add(newNode);
 			return newNode;
+			/*newNode.queryNodeProperties(qh);
+			indepMeasure = ArrayTools.indepMeasure(ArrayTools.laplaceSmooth(indepHipotheses), ArrayTools.laplaceSmooth(newNode.distribution));
+			if (indepMeasure < indepThreshold) 
+				throw new IllegalArgumentException("New node is independent from parent nodes "+newNode);
+			else {
+				return newNode;
+			}*/
 		} else {
 			AssociationRuleNode existent = existentItems.get(existentItems.indexOf(newNode));
+			int[] indepHipotheses = independentJoinDitribution(node1, node2);
+			float indepMeasure = ArrayTools.indepMeasure(ArrayTools.laplaceSmooth(indepHipotheses), ArrayTools.laplaceSmooth(existent.distribution));
+			if (indepMeasure < indepThreshold) 
+				throw new IllegalArgumentException("New node is independent from parent nodes "+newNode);
+			
 			existent.addParent(node1);
 			existent.addParent(node2);
+			//node1.addChild(existent);
+			//node2.addChild(existent);
+			existent.analizeNode();
 			throw new IllegalArgumentException("Join of nodes result in an already existant node "+newNode);
 		}
+	}
+	
+	public static AssociationRuleNode getCommonParent(AssociationRuleNode node1,AssociationRuleNode node2) {
+		for (AssociationRuleNode p1: node1.parents) {
+			if (node2.parents.contains(p1))
+				return p1;
+		}
+		return null;
+	}
+	
+	public static int[] independentJoinDitribution(AssociationRuleNode node1,AssociationRuleNode node2) {
+		AssociationRuleNode commonParent = AssociationRuleNode.getCommonParent(node1, node2);
+		if (commonParent==null)
+			throw new IllegalArgumentException("Nodes cannot be joined. There's no common parent");
+		
+		float[] pNode1GivenParent = ArrayTools.divide(node1.distribution, commonParent.distribution);
+		float[] pNode2GivenParent = ArrayTools.divide(node2.distribution, commonParent.distribution);
+		
+		return ArrayTools.round(ArrayTools.multiply(ArrayTools.multiply(pNode1GivenParent, pNode2GivenParent),commonParent.distribution));
+				
 	}
 
 }
