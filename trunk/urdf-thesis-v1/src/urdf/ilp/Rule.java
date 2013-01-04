@@ -2,6 +2,7 @@ package urdf.ilp;
 
 
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
@@ -12,7 +13,8 @@ import javatools.administrative.Announce.Level;
  * @author Christina Teflioudi
  *
  */
-public class Rule implements Cloneable{
+public class Rule implements Cloneable, Serializable{
+	private static final long serialVersionUID = 1L;
 	
 	private Literal head;
 	private int inputArg;
@@ -310,32 +312,42 @@ public class Rule implements Cloneable{
 	// *************** OTHER METHODS *****************
   	
 	@Override
-	public boolean equals(Object obj) {
-		Rule r = (Rule) obj;
-		return this.equals(r);
+	public int hashCode() {
+		int code = 0;
+		for (Literal l: bodyLiterals) {
+			code += l.hashCode();
+		}
+		code *= head.hashCode();
+		return code;
 	}
 	
-	public boolean equals(Rule rule) {
-		boolean flag=false;
-		if (!this.head.equals(rule.head))
-			return false;
-		
-		if (this.bodyLiterals.size()!=rule.bodyLiterals.size())
-			return false;
-		
-		for (int i=0,len=this.bodyLiterals.size();i<len;i++) {
-			
-			flag=false;
-			for (int j=0;j<rule.bodyLiterals.size();j++) {
-				if(this.bodyLiterals.get(i).equals(rule.bodyLiterals.get(j))) {
-					flag=true;
-					break;
-				}
-			}
-			if (!flag)
+	
+	@Override
+	public boolean equals(Object obj) {
+		try {
+			Rule rule = (Rule) obj;
+			boolean flag=false;
+			if (!this.head.equals(rule.head))
 				return false;
 			
-		}	
+			if (this.bodyLiterals.size()!=rule.bodyLiterals.size())
+				return false;
+			
+			for (int i=0,len=this.bodyLiterals.size();i<len;i++) {
+				
+				flag=false;
+				for (int j=0;j<rule.bodyLiterals.size();j++) {
+					if(this.bodyLiterals.get(i).equals(rule.bodyLiterals.get(j))) {
+						flag=true;
+						break;
+					}
+				}
+				if (!flag)
+					return false;
+				
+			}	
+		} catch (ClassCastException e) {
+		}
 		return true;
 	}
 	
@@ -409,7 +421,7 @@ public class Rule implements Cloneable{
 	public String getExamplesStats() {
 		String s = "N+(c): "+positivesCovered+
 				 // " E+(c): "+possiblePosToBeCovered+
-				 // " N(c): "+examplesCovered+
+				  " N(c): "+examplesCovered+
 				  " B(c): "+bodySize+
 				  " E+: "+headSize;
 		return s;

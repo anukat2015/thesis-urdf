@@ -1,0 +1,24 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/directed>
+ 
+directed(A,B)<-wroteMusicFor(A,C)directed(D,C)wroteMusicFor(D,B)
+confidence: 0.19927096 support: 0.004294993 specialityRatio: 0.0
+N+(c): 164 B(c): 823 E+: 38184
+directed(A,B)<-actedIn(A,C)created(D,C)produced(D,B)(B,<http://yago-knowledge.org/resource/Lucky_Stars>)
+confidence: 0.121212125 support: 0.8 specialityRatio: 0.0
+N+(c): 4 B(c): 33 E+: 5
+directed(A,B)<-actedIn(A,B)(B,<http://yago-knowledge.org/resource/Lucky_Stars>)
+confidence: 0.15 support: 0.6 specialityRatio: 0.0
+N+(c): 3 B(c): 20 E+: 5
+directed(A,B)<-edited(A,C)actedIn(D,C)edited(D,B)
+confidence: 0.35371178 support: 0.0021213074 specialityRatio: 0.0
+N+(c): 81 B(c): 229 E+: 38184
+directed(A,B)<-edited(A,C)directed(D,C)wroteMusicFor(D,B)
+confidence: 0.16064256 support: 0.0010475592 specialityRatio: 0.0
+N+(c): 40 B(c): 249 E+: 38184
+directed(A,B)<-edited(A,C)directed(D,C)edited(D,B)
+confidence: 0.36156112 support: 0.012858789 specialityRatio: 0.0
+N+(c): 491 B(c): 1358 E+: 38184
+directed(A,B)<-isMarriedTo(A,C)isMarriedTo(C,D)edited(D,B)
+confidence: 0.22247191 support: 0.002592709 specialityRatio: 0.0
+N+(c): 99 B(c): 445 E+: 38184
+time elapsed for whole partition: 947806

@@ -1,0 +1,639 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/livesIn>
+ 
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Los_Angeles>)
+confidence: 0.47058824 support: 0.043243244 specialityRatio: 0.0
+N+(c): 8 B(c): 17 E+: 185
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Baltimore>)
+confidence: 0.65217394 support: 0.29411766 specialityRatio: 0.0
+N+(c): 15 B(c): 23 E+: 51
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Montreal>)
+confidence: 0.20689656 support: 0.125 specialityRatio: 0.0
+N+(c): 6 B(c): 29 E+: 48
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Chicago>)
+confidence: 0.115384616 support: 0.047244094 specialityRatio: 0.0
+N+(c): 6 B(c): 52 E+: 127
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Pittsburgh>)
+confidence: 0.5 support: 0.06818182 specialityRatio: 0.0
+N+(c): 3 B(c): 6 E+: 44
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Des_Moines,_Iowa>)
+confidence: 1.0 support: 0.21428572 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 14
+livesIn(A,B)<-isLeaderOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Allentown,_Pennsylvania>)
+confidence: 0.75 support: 0.75 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 4
+livesIn(A,B)<-isLeaderOf(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 1.0 support: 0.04379562 specialityRatio: 0.0
+N+(c): 6 B(c): 6 E+: 137
+livesIn(A,B)<-diedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.5555556 support: 0.16666667 specialityRatio: 0.0
+N+(c): 10 B(c): 18 E+: 60
+livesIn(A,B)<-diedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.36363637 support: 0.21621622 specialityRatio: 0.0
+N+(c): 8 B(c): 22 E+: 37
+livesIn(A,B)<-diedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 1.0 support: 0.23333333 specialityRatio: 0.0
+N+(c): 7 B(c): 7 E+: 30
+livesIn(A,B)<-diedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Lewes,_Delaware>)
+confidence: 0.6666667 support: 0.5714286 specialityRatio: 0.0
+N+(c): 4 B(c): 6 E+: 7
+livesIn(A,B)<-diedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 0.75 support: 0.33333334 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 9
+livesIn(A,B)<-diedIn(A,C)isPoliticianOf(A,B)=(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.9444444 support: 0.1878453 specialityRatio: 0.0
+N+(c): 34 B(c): 36 E+: 181
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.17818181 support: 0.175 specialityRatio: 0.0
+N+(c): 49 B(c): 275 E+: 280
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.13108614 support: 0.09695291 specialityRatio: 0.0
+N+(c): 35 B(c): 267 E+: 361
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.06321839 support: 0.065476194 specialityRatio: 0.0
+N+(c): 11 B(c): 174 E+: 168
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Italy>)
+confidence: 0.08695652 support: 0.1388889 specialityRatio: 0.0
+N+(c): 10 B(c): 115 E+: 72
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.071428575 support: 0.04347826 specialityRatio: 0.0
+N+(c): 10 B(c): 140 E+: 230
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.094736844 support: 0.027108435 specialityRatio: 0.0
+N+(c): 9 B(c): 95 E+: 332
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.16666667 support: 0.104477614 specialityRatio: 0.0
+N+(c): 7 B(c): 42 E+: 67
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Poland>)
+confidence: 0.10714286 support: 0.22222222 specialityRatio: 0.0
+N+(c): 6 B(c): 56 E+: 27
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.11363637 support: 0.06097561 specialityRatio: 0.0
+N+(c): 5 B(c): 44 E+: 82
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Norway>)
+confidence: 0.09803922 support: 0.20833333 specialityRatio: 0.0
+N+(c): 5 B(c): 51 E+: 24
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.030120483 support: 0.03649635 specialityRatio: 0.0
+N+(c): 5 B(c): 166 E+: 137
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Austria>)
+confidence: 0.125 support: 0.09756097 specialityRatio: 0.0
+N+(c): 4 B(c): 32 E+: 41
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sri_Lanka>)
+confidence: 0.10344828 support: 0.07692308 specialityRatio: 0.0
+N+(c): 3 B(c): 29 E+: 39
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Slovakia>)
+confidence: 0.6 support: 0.15 specialityRatio: 0.0
+N+(c): 3 B(c): 5 E+: 20
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Romania>)
+confidence: 0.037037037 support: 0.09090909 specialityRatio: 0.0
+N+(c): 3 B(c): 81 E+: 33
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Russia>)
+confidence: 0.024193548 support: 0.04 specialityRatio: 0.0
+N+(c): 3 B(c): 124 E+: 75
+livesIn(A,B)<-diedIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Hungary>)
+confidence: 0.14285715 support: 0.15 specialityRatio: 0.0
+N+(c): 3 B(c): 21 E+: 20
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Chicago>)
+confidence: 0.110738255 support: 0.25984251 specialityRatio: 0.0
+N+(c): 33 B(c): 298 E+: 127
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.6666667 support: 0.36666667 specialityRatio: 0.0
+N+(c): 22 B(c): 33 E+: 60
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.875 support: 0.7 specialityRatio: 0.0
+N+(c): 21 B(c): 24 E+: 30
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 0.6666667 support: 0.8888889 specialityRatio: 0.0
+N+(c): 8 B(c): 12 E+: 9
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Boise,_Idaho>)
+confidence: 0.25925925 support: 0.25925925 specialityRatio: 0.0
+N+(c): 7 B(c): 27 E+: 27
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Castle,_Delaware>)
+confidence: 0.5833333 support: 0.6363636 specialityRatio: 0.0
+N+(c): 7 B(c): 12 E+: 11
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Lewes,_Delaware>)
+confidence: 0.46153846 support: 0.85714287 specialityRatio: 0.0
+N+(c): 6 B(c): 13 E+: 7
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.22222222 support: 0.16216215 specialityRatio: 0.0
+N+(c): 6 B(c): 27 E+: 37
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Baltimore>)
+confidence: 0.043165468 support: 0.11764706 specialityRatio: 0.0
+N+(c): 6 B(c): 139 E+: 51
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Bucharest>)
+confidence: 0.04 support: 0.2 specialityRatio: 0.0
+N+(c): 5 B(c): 125 E+: 25
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Albuquerque,_New_Mexico>)
+confidence: 0.13157895 support: 0.2173913 specialityRatio: 0.0
+N+(c): 5 B(c): 38 E+: 23
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Chennai>)
+confidence: 0.034188036 support: 0.121212125 specialityRatio: 0.0
+N+(c): 4 B(c): 117 E+: 33
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Kuala_Lumpur>)
+confidence: 0.16 support: 0.36363637 specialityRatio: 0.0
+N+(c): 4 B(c): 25 E+: 11
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Cleveland>)
+confidence: 0.06451613 support: 0.21052632 specialityRatio: 0.0
+N+(c): 4 B(c): 62 E+: 19
+livesIn(A,B)<-created(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.11764706 support: 0.02919708 specialityRatio: 0.0
+N+(c): 4 B(c): 34 E+: 137
+livesIn(A,B)<-created(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.022522522 support: 0.013850415 specialityRatio: 0.0
+N+(c): 5 B(c): 222 E+: 361
+livesIn(A,B)<-created(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Spain>)
+confidence: 0.15789473 support: 0.035714287 specialityRatio: 0.0
+N+(c): 3 B(c): 19 E+: 84
+livesIn(A,B)<-holdsPoliticalPosition(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.53333336 support: 0.05839416 specialityRatio: 0.0
+N+(c): 8 B(c): 15 E+: 137
+livesIn(A,B)<-holdsPoliticalPosition(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.2 support: 0.013043478 specialityRatio: 0.0
+N+(c): 3 B(c): 15 E+: 230
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.19354838 support: 0.09972299 specialityRatio: 0.0
+N+(c): 36 B(c): 186 E+: 361
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.22758621 support: 0.11785714 specialityRatio: 0.0
+N+(c): 33 B(c): 145 E+: 280
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.42424244 support: 0.060869563 specialityRatio: 0.0
+N+(c): 14 B(c): 33 E+: 230
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.16666667 support: 0.04761905 specialityRatio: 0.0
+N+(c): 8 B(c): 48 E+: 168
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.22580644 support: 0.021084337 specialityRatio: 0.0
+N+(c): 7 B(c): 31 E+: 332
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Israel>)
+confidence: 0.22222222 support: 0.125 specialityRatio: 0.0
+N+(c): 6 B(c): 27 E+: 48
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.33333334 support: 0.06097561 specialityRatio: 0.0
+N+(c): 5 B(c): 15 E+: 82
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.1724138 support: 0.03649635 specialityRatio: 0.0
+N+(c): 5 B(c): 29 E+: 137
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Italy>)
+confidence: 0.2173913 support: 0.06944445 specialityRatio: 0.0
+N+(c): 5 B(c): 23 E+: 72
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Japan>)
+confidence: 0.26666668 support: 0.026666667 specialityRatio: 0.0
+N+(c): 4 B(c): 15 E+: 150
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Hungary>)
+confidence: 0.375 support: 0.15 specialityRatio: 0.0
+N+(c): 3 B(c): 8 E+: 20
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Poland>)
+confidence: 0.25 support: 0.11111111 specialityRatio: 0.0
+N+(c): 3 B(c): 12 E+: 27
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.13636364 support: 0.04477612 specialityRatio: 0.0
+N+(c): 3 B(c): 22 E+: 67
+livesIn(A,B)<-worksAt(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Canada>)
+confidence: 0.125 support: 0.01875 specialityRatio: 0.0
+N+(c): 3 B(c): 24 E+: 160
+livesIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Mumbai>)
+confidence: 0.16666667 support: 0.05263158 specialityRatio: 0.0
+N+(c): 3 B(c): 18 E+: 57
+livesIn(A,B)<-isMarriedTo(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Greece>)
+confidence: 0.5555556 support: 0.1923077 specialityRatio: 0.0
+N+(c): 5 B(c): 9 E+: 26
+livesIn(A,B)<-isMarriedTo(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.23529412 support: 0.017391304 specialityRatio: 0.0
+N+(c): 4 B(c): 17 E+: 230
+livesIn(A,B)<-isMarriedTo(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.23076923 support: 0.017857144 specialityRatio: 0.0
+N+(c): 3 B(c): 13 E+: 168
+livesIn(A,B)<-isMarriedTo(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Spain>)
+confidence: 0.42857143 support: 0.035714287 specialityRatio: 0.0
+N+(c): 3 B(c): 7 E+: 84
+livesIn(A,B)<-wasBornIn(A,C)isPoliticianOf(A,B)=(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.9 support: 0.09944751 specialityRatio: 0.0
+N+(c): 18 B(c): 20 E+: 181
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.13333334 support: 0.20714286 specialityRatio: 0.0
+N+(c): 58 B(c): 435 E+: 280
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.14551084 support: 0.20434782 specialityRatio: 0.0
+N+(c): 47 B(c): 323 E+: 230
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.21634616 support: 0.32846716 specialityRatio: 0.0
+N+(c): 45 B(c): 208 E+: 137
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.053908356 support: 0.11080332 specialityRatio: 0.0
+N+(c): 40 B(c): 742 E+: 361
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Italy>)
+confidence: 0.067226894 support: 0.22222222 specialityRatio: 0.0
+N+(c): 16 B(c): 238 E+: 72
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.13333334 support: 0.14925373 specialityRatio: 0.0
+N+(c): 10 B(c): 75 E+: 67
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.05 support: 0.05357143 specialityRatio: 0.0
+N+(c): 9 B(c): 180 E+: 168
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.1632653 support: 0.09756097 specialityRatio: 0.0
+N+(c): 8 B(c): 49 E+: 82
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.040229887 support: 0.021084337 specialityRatio: 0.0
+N+(c): 7 B(c): 174 E+: 332
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Russia>)
+confidence: 0.04117647 support: 0.093333334 specialityRatio: 0.0
+N+(c): 7 B(c): 170 E+: 75
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Israel>)
+confidence: 0.12765957 support: 0.125 specialityRatio: 0.0
+N+(c): 6 B(c): 47 E+: 48
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Brazil>)
+confidence: 0.049586777 support: 0.115384616 specialityRatio: 0.0
+N+(c): 6 B(c): 121 E+: 52
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Pakistan>)
+confidence: 0.10169491 support: 0.08219178 specialityRatio: 0.0
+N+(c): 6 B(c): 59 E+: 73
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Canada>)
+confidence: 0.056074765 support: 0.0375 specialityRatio: 0.0
+N+(c): 6 B(c): 107 E+: 160
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Norway>)
+confidence: 0.046296295 support: 0.20833333 specialityRatio: 0.0
+N+(c): 5 B(c): 108 E+: 24
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Spain>)
+confidence: 0.07575758 support: 0.05952381 specialityRatio: 0.0
+N+(c): 5 B(c): 66 E+: 84
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Iran>)
+confidence: 0.11764706 support: 0.14814815 specialityRatio: 0.0
+N+(c): 4 B(c): 34 E+: 27
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Greece>)
+confidence: 0.042105265 support: 0.15384616 specialityRatio: 0.0
+N+(c): 4 B(c): 95 E+: 26
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Soviet_Union>)
+confidence: 0.11764706 support: 0.2 specialityRatio: 0.0
+N+(c): 4 B(c): 34 E+: 20
+livesIn(A,B)<-wasBornIn(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Macau>)
+confidence: 0.8 support: 0.26666668 specialityRatio: 0.0
+N+(c): 4 B(c): 5 E+: 15
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Philadelphia>)
+confidence: 0.026578072 support: 0.34285715 specialityRatio: 0.0
+N+(c): 24 B(c): 903 E+: 70
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Baltimore>)
+confidence: 0.040567953 support: 0.39215687 specialityRatio: 0.0
+N+(c): 20 B(c): 493 E+: 51
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Indianapolis>)
+confidence: 0.11801242 support: 0.33333334 specialityRatio: 0.0
+N+(c): 19 B(c): 161 E+: 57
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.20224719 support: 0.3 specialityRatio: 0.0
+N+(c): 18 B(c): 89 E+: 60
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Tokyo>)
+confidence: 0.028142588 support: 0.22058824 specialityRatio: 0.0
+N+(c): 15 B(c): 533 E+: 68
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Houston>)
+confidence: 0.044982698 support: 0.22033899 specialityRatio: 0.0
+N+(c): 13 B(c): 289 E+: 59
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Mumbai>)
+confidence: 0.057522126 support: 0.22807017 specialityRatio: 0.0
+N+(c): 13 B(c): 226 E+: 57
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Macau>)
+confidence: 0.375 support: 0.8 specialityRatio: 0.0
+N+(c): 12 B(c): 32 E+: 15
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.10891089 support: 0.2972973 specialityRatio: 0.0
+N+(c): 11 B(c): 101 E+: 37
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Hong_Kong>)
+confidence: 0.024122806 support: 0.32352942 specialityRatio: 0.0
+N+(c): 11 B(c): 456 E+: 34
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Milwaukee>)
+confidence: 0.049327355 support: 0.52380955 specialityRatio: 0.0
+N+(c): 11 B(c): 223 E+: 21
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Kolkata>)
+confidence: 0.051813472 support: 0.3448276 specialityRatio: 0.0
+N+(c): 10 B(c): 193 E+: 29
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Amsterdam>)
+confidence: 0.029411765 support: 0.21428572 specialityRatio: 0.0
+N+(c): 9 B(c): 306 E+: 42
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Minneapolis>)
+confidence: 0.033210333 support: 0.24324325 specialityRatio: 0.0
+N+(c): 9 B(c): 271 E+: 37
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Calgary>)
+confidence: 0.035019454 support: 0.20454545 specialityRatio: 0.0
+N+(c): 9 B(c): 257 E+: 44
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.40888888 support: 0.32857144 specialityRatio: 0.0
+N+(c): 92 B(c): 225 E+: 280
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.27027026 support: 0.083102494 specialityRatio: 0.0
+N+(c): 30 B(c): 111 E+: 361
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.45 support: 0.07826087 specialityRatio: 0.0
+N+(c): 18 B(c): 40 E+: 230
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.23913044 support: 0.065476194 specialityRatio: 0.0
+N+(c): 11 B(c): 46 E+: 168
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.33333334 support: 0.08955224 specialityRatio: 0.0
+N+(c): 6 B(c): 18 E+: 67
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.21875 support: 0.05109489 specialityRatio: 0.0
+N+(c): 7 B(c): 32 E+: 137
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Austria>)
+confidence: 0.3529412 support: 0.14634146 specialityRatio: 0.0
+N+(c): 6 B(c): 17 E+: 41
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.26086956 support: 0.018072288 specialityRatio: 0.0
+N+(c): 6 B(c): 23 E+: 332
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Hungary>)
+confidence: 0.5555556 support: 0.25 specialityRatio: 0.0
+N+(c): 5 B(c): 9 E+: 20
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.45454547 support: 0.06097561 specialityRatio: 0.0
+N+(c): 5 B(c): 11 E+: 82
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Russia>)
+confidence: 0.114285715 support: 0.053333335 specialityRatio: 0.0
+N+(c): 4 B(c): 35 E+: 75
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Poland>)
+confidence: 0.375 support: 0.11111111 specialityRatio: 0.0
+N+(c): 3 B(c): 8 E+: 27
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Israel>)
+confidence: 0.44444445 support: 0.083333336 specialityRatio: 0.0
+N+(c): 4 B(c): 9 E+: 48
+livesIn(A,B)<-hasAcademicAdvisor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Norway>)
+confidence: 0.6 support: 0.125 specialityRatio: 0.0
+N+(c): 3 B(c): 5 E+: 24
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.26666668 support: 0.18571429 specialityRatio: 0.0
+N+(c): 52 B(c): 195 E+: 280
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.1588785 support: 0.10119048 specialityRatio: 0.0
+N+(c): 17 B(c): 107 E+: 168
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.10377359 support: 0.060941827 specialityRatio: 0.0
+N+(c): 22 B(c): 212 E+: 361
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.3783784 support: 0.12173913 specialityRatio: 0.0
+N+(c): 28 B(c): 74 E+: 230
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.37209302 support: 0.11678832 specialityRatio: 0.0
+N+(c): 16 B(c): 43 E+: 137
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.5294118 support: 0.1097561 specialityRatio: 0.0
+N+(c): 9 B(c): 17 E+: 82
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Italy>)
+confidence: 0.20512821 support: 0.11111111 specialityRatio: 0.0
+N+(c): 8 B(c): 39 E+: 72
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Spain>)
+confidence: 0.47058824 support: 0.0952381 specialityRatio: 0.0
+N+(c): 8 B(c): 17 E+: 84
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Austria>)
+confidence: 0.26086956 support: 0.14634146 specialityRatio: 0.0
+N+(c): 6 B(c): 23 E+: 41
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.072463766 support: 0.015060241 specialityRatio: 0.0
+N+(c): 5 B(c): 69 E+: 332
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.25 support: 0.11940298 specialityRatio: 0.0
+N+(c): 8 B(c): 32 E+: 67
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Russia>)
+confidence: 0.09677419 support: 0.04 specialityRatio: 0.0
+N+(c): 3 B(c): 31 E+: 75
+livesIn(A,B)<-isKnownFor(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Israel>)
+confidence: 0.14285715 support: 0.0625 specialityRatio: 0.0
+N+(c): 3 B(c): 21 E+: 48
+livesIn(A,B)<-isPoliticianOf(A,B)
+confidence: 0.034410406 support: 0.003926827 specialityRatio: 0.0
+N+(c): 82 B(c): 2383 E+: 20882
+livesIn(A,B)<-isPoliticianOf(A,B)=(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.9220779 support: 0.3922652 specialityRatio: 0.0
+N+(c): 71 B(c): 77 E+: 181
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.9411765 support: 0.26666668 specialityRatio: 0.0
+N+(c): 16 B(c): 17 E+: 60
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.8333333 support: 0.33333334 specialityRatio: 0.0
+N+(c): 10 B(c): 12 E+: 30
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Castle,_Delaware>)
+confidence: 0.6666667 support: 0.36363637 specialityRatio: 0.0
+N+(c): 4 B(c): 6 E+: 11
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Salt_Lake_City>)
+confidence: 0.3 support: 0.09375 specialityRatio: 0.0
+N+(c): 3 B(c): 10 E+: 32
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Madison,_Wisconsin>)
+confidence: 0.25 support: 0.15789473 specialityRatio: 0.0
+N+(c): 3 B(c): 12 E+: 19
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/New_York_City>)
+confidence: 0.032967035 support: 0.016129032 specialityRatio: 0.0
+N+(c): 3 B(c): 91 E+: 186
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Cambridge,_Massachusetts>)
+confidence: 0.09677419 support: 0.1875 specialityRatio: 0.0
+N+(c): 3 B(c): 31 E+: 16
+livesIn(A,B)<-graduatedFrom(A,C)diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 0.75 support: 0.33333334 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 9
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Indianapolis>)
+confidence: 0.41935483 support: 0.22807017 specialityRatio: 0.0
+N+(c): 13 B(c): 31 E+: 57
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.61904764 support: 0.21666667 specialityRatio: 0.0
+N+(c): 13 B(c): 21 E+: 60
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Philadelphia>)
+confidence: 0.102564104 support: 0.17142858 specialityRatio: 0.0
+N+(c): 12 B(c): 117 E+: 70
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Houston>)
+confidence: 0.22727273 support: 0.16949153 specialityRatio: 0.0
+N+(c): 10 B(c): 44 E+: 59
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Chicago>)
+confidence: 0.06 support: 0.070866145 specialityRatio: 0.0
+N+(c): 9 B(c): 150 E+: 127
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Milwaukee>)
+confidence: 0.2 support: 0.42857143 specialityRatio: 0.0
+N+(c): 9 B(c): 45 E+: 21
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Los_Angeles>)
+confidence: 0.11111111 support: 0.043243244 specialityRatio: 0.0
+N+(c): 8 B(c): 72 E+: 185
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/New_York_City>)
+confidence: 0.028673835 support: 0.043010753 specialityRatio: 0.0
+N+(c): 8 B(c): 279 E+: 186
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Minneapolis>)
+confidence: 0.17073171 support: 0.1891892 specialityRatio: 0.0
+N+(c): 7 B(c): 41 E+: 37
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Cincinnati>)
+confidence: 0.13333334 support: 0.42857143 specialityRatio: 0.0
+N+(c): 6 B(c): 45 E+: 14
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Tulsa,_Oklahoma>)
+confidence: 0.42857143 support: 0.3529412 specialityRatio: 0.0
+N+(c): 6 B(c): 14 E+: 17
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Cleveland>)
+confidence: 0.10169491 support: 0.31578946 specialityRatio: 0.0
+N+(c): 6 B(c): 59 E+: 19
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Macau>)
+confidence: 0.625 support: 0.33333334 specialityRatio: 0.0
+N+(c): 5 B(c): 8 E+: 15
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Calgary>)
+confidence: 0.3846154 support: 0.11363637 specialityRatio: 0.0
+N+(c): 5 B(c): 13 E+: 44
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/San_Antonio>)
+confidence: 0.2777778 support: 0.3125 specialityRatio: 0.0
+N+(c): 5 B(c): 18 E+: 16
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Louisville,_Kentucky>)
+confidence: 0.22222222 support: 0.4 specialityRatio: 0.0
+N+(c): 4 B(c): 18 E+: 10
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Erie,_Pennsylvania>)
+confidence: 0.30769232 support: 0.36363637 specialityRatio: 0.0
+N+(c): 4 B(c): 13 E+: 11
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/St._Louis,_Missouri>)
+confidence: 0.08163265 support: 0.16666667 specialityRatio: 0.0
+N+(c): 4 B(c): 49 E+: 24
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Karachi>)
+confidence: 0.17391305 support: 0.114285715 specialityRatio: 0.0
+N+(c): 4 B(c): 23 E+: 35
+livesIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Baltimore>)
+confidence: 0.078431375 support: 0.078431375 specialityRatio: 0.0
+N+(c): 4 B(c): 51 E+: 51
+livesIn(A,B)<-graduatedFrom(A,C)isPoliticianOf(A,B)=(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.9 support: 0.09944751 specialityRatio: 0.0
+N+(c): 18 B(c): 20 E+: 181
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.2613909 support: 0.3892857 specialityRatio: 0.0
+N+(c): 109 B(c): 417 E+: 280
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.3445946 support: 0.22173913 specialityRatio: 0.0
+N+(c): 51 B(c): 148 E+: 230
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.38016528 support: 0.33576643 specialityRatio: 0.0
+N+(c): 46 B(c): 121 E+: 137
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.058455113 support: 0.077562325 specialityRatio: 0.0
+N+(c): 28 B(c): 479 E+: 361
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.25396827 support: 0.0952381 specialityRatio: 0.0
+N+(c): 16 B(c): 63 E+: 168
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Italy>)
+confidence: 0.27659574 support: 0.18055555 specialityRatio: 0.0
+N+(c): 13 B(c): 47 E+: 72
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Canada>)
+confidence: 0.18571429 support: 0.08125 specialityRatio: 0.0
+N+(c): 13 B(c): 70 E+: 160
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.29411766 support: 0.12195122 specialityRatio: 0.0
+N+(c): 10 B(c): 34 E+: 82
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Austria>)
+confidence: 0.29411766 support: 0.24390244 specialityRatio: 0.0
+N+(c): 10 B(c): 34 E+: 41
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Romania>)
+confidence: 0.24324325 support: 0.27272728 specialityRatio: 0.0
+N+(c): 9 B(c): 37 E+: 33
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.21052632 support: 0.11940298 specialityRatio: 0.0
+N+(c): 8 B(c): 38 E+: 67
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Russia>)
+confidence: 0.12903225 support: 0.10666667 specialityRatio: 0.0
+N+(c): 8 B(c): 62 E+: 75
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Greece>)
+confidence: 0.33333334 support: 0.23076923 specialityRatio: 0.0
+N+(c): 6 B(c): 18 E+: 26
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Israel>)
+confidence: 0.18181819 support: 0.125 specialityRatio: 0.0
+N+(c): 6 B(c): 33 E+: 48
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Poland>)
+confidence: 0.21428572 support: 0.22222222 specialityRatio: 0.0
+N+(c): 6 B(c): 28 E+: 27
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.23076923 support: 0.018072288 specialityRatio: 0.0
+N+(c): 6 B(c): 26 E+: 332
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Spain>)
+confidence: 0.22727273 support: 0.05952381 specialityRatio: 0.0
+N+(c): 5 B(c): 22 E+: 84
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Pakistan>)
+confidence: 0.11627907 support: 0.06849315 specialityRatio: 0.0
+N+(c): 5 B(c): 43 E+: 73
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Philippines>)
+confidence: 0.0952381 support: 0.2857143 specialityRatio: 0.0
+N+(c): 4 B(c): 42 E+: 14
+livesIn(A,B)<-graduatedFrom(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Belgium>)
+confidence: 0.114285715 support: 0.13793103 specialityRatio: 0.0
+N+(c): 4 B(c): 35 E+: 29
+livesIn(A,B)<-isCitizenOf(A,C)hasGDP(C,D)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Macau>)
+confidence: 0.8333333 support: 0.33333334 specialityRatio: 0.0
+N+(c): 5 B(c): 6 E+: 15
+livesIn(A,B)<-isCitizenOf(A,C)hasGDP(C,D)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Chi%C5%9Fin%C4%83u>)
+confidence: 0.75 support: 0.14285715 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 21
+livesIn(A,B)<-isCitizenOf(A,C)hasGDP(C,D)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Montevideo>)
+confidence: 0.11111111 support: 0.6 specialityRatio: 0.0
+N+(c): 3 B(c): 27 E+: 5
+livesIn(A,B)<-isCitizenOf(A,C)hasGDP(C,D)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Athens>)
+confidence: 0.075 support: 0.1764706 specialityRatio: 0.0
+N+(c): 3 B(c): 40 E+: 17
+livesIn(A,B)<-isCitizenOf(A,B)
+confidence: 0.05854801 support: 0.04669093 specialityRatio: 0.0
+N+(c): 975 B(c): 16653 E+: 20882
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.056693383 support: 0.5290859 specialityRatio: 0.0
+N+(c): 191 B(c): 3369 E+: 361
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.11784512 support: 0.5 specialityRatio: 0.0
+N+(c): 140 B(c): 1188 E+: 280
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.1403302 support: 0.5173913 specialityRatio: 0.0
+N+(c): 119 B(c): 848 E+: 230
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.14748201 support: 0.5985401 specialityRatio: 0.0
+N+(c): 82 B(c): 556 E+: 137
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.05361596 support: 0.2559524 specialityRatio: 0.0
+N+(c): 43 B(c): 802 E+: 168
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/England>)
+confidence: 0.03617571 support: 0.084337346 specialityRatio: 0.0
+N+(c): 28 B(c): 774 E+: 332
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Canada>)
+confidence: 0.04797048 support: 0.1625 specialityRatio: 0.0
+N+(c): 26 B(c): 542 E+: 160
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Pakistan>)
+confidence: 0.12206573 support: 0.3561644 specialityRatio: 0.0
+N+(c): 26 B(c): 213 E+: 73
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Italy>)
+confidence: 0.04121864 support: 0.31944445 specialityRatio: 0.0
+N+(c): 23 B(c): 558 E+: 72
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Sweden>)
+confidence: 0.09859155 support: 0.25609756 specialityRatio: 0.0
+N+(c): 21 B(c): 213 E+: 82
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Spain>)
+confidence: 0.053254437 support: 0.21428572 specialityRatio: 0.0
+N+(c): 18 B(c): 338 E+: 84
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Switzerland>)
+confidence: 0.08465608 support: 0.23880596 specialityRatio: 0.0
+N+(c): 16 B(c): 189 E+: 67
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Japan>)
+confidence: 0.04918033 support: 0.1 specialityRatio: 0.0
+N+(c): 15 B(c): 305 E+: 150
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Greece>)
+confidence: 0.068627454 support: 0.53846157 specialityRatio: 0.0
+N+(c): 14 B(c): 204 E+: 26
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Russia>)
+confidence: 0.03508772 support: 0.18666667 specialityRatio: 0.0
+N+(c): 14 B(c): 399 E+: 75
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Israel>)
+confidence: 0.09848485 support: 0.27083334 specialityRatio: 0.0
+N+(c): 13 B(c): 132 E+: 48
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Austria>)
+confidence: 0.06703911 support: 0.29268292 specialityRatio: 0.0
+N+(c): 12 B(c): 179 E+: 41
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Norway>)
+confidence: 0.036585364 support: 0.375 specialityRatio: 0.0
+N+(c): 9 B(c): 246 E+: 24
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Romania>)
+confidence: 0.04945055 support: 0.27272728 specialityRatio: 0.0
+N+(c): 9 B(c): 182 E+: 33
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Hungary>)
+confidence: 0.06122449 support: 0.45 specialityRatio: 0.0
+N+(c): 9 B(c): 147 E+: 20
+livesIn(A,B)<-influences(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.23214285 support: 0.046428572 specialityRatio: 0.0
+N+(c): 13 B(c): 56 E+: 280
+livesIn(A,B)<-influences(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/France>)
+confidence: 0.08955224 support: 0.035714287 specialityRatio: 0.0
+N+(c): 6 B(c): 67 E+: 168
+livesIn(A,B)<-influences(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/United_Kingdom>)
+confidence: 0.10752688 support: 0.02770083 specialityRatio: 0.0
+N+(c): 10 B(c): 93 E+: 361
+livesIn(A,B)<-influences(A,C)isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Austria>)
+confidence: 0.16666667 support: 0.07317073 specialityRatio: 0.0
+N+(c): 3 B(c): 18 E+: 41
+time elapsed for whole partition: 61434

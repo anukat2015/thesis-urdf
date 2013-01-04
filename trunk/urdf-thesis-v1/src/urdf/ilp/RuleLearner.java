@@ -329,6 +329,7 @@ public class RuleLearner {
 				
 				out = considerElimination(newRule,rule,newLiteral,literal,d,position);
 				
+				// +++++++++++++++++++++++++++
 				// If candidate relation has numerical range, try to find best ranges
 				if (!out[0] && newRule!=null && newRule.bindsHeadVariables() && iCandidate.isRangeLiteral() && iCandidate.getMaxValue()!=Float.NaN && iCandidate.getMinValue()!=Float.NaN) {
 					if (joinCase==1 || joinCase==3) {
@@ -350,10 +351,13 @@ public class RuleLearner {
 					} 
 					continue;	
 				}
+				// ----------------------------
 				
+				// +++++++++++++++++++++++++++
 				// Try to add constants to non-head variables
 				if (!out[0] && newRule!=null && newRule.bindsHeadVariables() && !iCandidate.isRangeLiteral())
 					checkConstantsAtBody(node, newRule, d);
+				// ----------------------------
 				
 				
 				if (out[0]) {
@@ -422,6 +426,7 @@ public class RuleLearner {
 							bindRule=newRule;
 							if (newRule.bindsHeadVariables() && newRule.isTooGeneral() && newRule.isGood())
 								checkExtendRuleWithTypes(node, newRule, d);
+							
 							
 							head.getHeadRelation().setConstantInArg(2);
 							if (newRule.bindsHeadVariables() && tryConstants && !newRule.isTooGeneral() && head.getHeadRelation().getConstantInArg()!=0 && inputArg!=0)

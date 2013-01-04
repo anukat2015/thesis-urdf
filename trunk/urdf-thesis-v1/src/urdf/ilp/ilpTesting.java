@@ -25,7 +25,7 @@ public class ilpTesting {
 
 			int partitionNumber = 3;
 			int possiblePosToBeCovered = 1;
-			int positivesCovered = 3;
+			int positivesCovered = 25;
 			float functionThreshold = 0.98f;
 			float symmetryThreshold = 0.4f;
 			int smoothingMethod = 0;
@@ -63,9 +63,12 @@ public class ilpTesting {
 			 int[] inputArg =   {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1};
 			*/
 			
+			
+			// relations for DBpedia
+			String[] relationsToBeLearned={"<http://dbpedia.org/ontology/isPartOf>"};
 			// relations for yago2
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/livesIn>"};
-			String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isCitizenOf>"};
+			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isCitizenOf>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/isPoliticianOf>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/diedIn>"};
 			//String[] relationsToBeLearned={"<http://yago-knowledge.org/resource/directed>"};

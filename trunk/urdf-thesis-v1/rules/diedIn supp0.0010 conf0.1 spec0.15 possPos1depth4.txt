@@ -1,0 +1,366 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/diedIn>
+ 
+diedIn(A,B)<-directed(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.21428572 support: 0.017361112 specialityRatio: 0.0
+N+(c): 15 B(c): 70 E+: 864
+diedIn(A,B)<-directed(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Rome>)
+confidence: 0.1724138 support: 0.008012821 specialityRatio: 0.0
+N+(c): 5 B(c): 29 E+: 624
+diedIn(A,B)<-directed(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Copenhagen>)
+confidence: 0.31578946 support: 0.04477612 specialityRatio: 0.0
+N+(c): 6 B(c): 19 E+: 134
+diedIn(A,B)<-directed(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.33333334 support: 0.013513514 specialityRatio: 0.0
+N+(c): 6 B(c): 18 E+: 444
+diedIn(A,B)<-directed(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Prague>)
+confidence: 0.25 support: 0.032608695 specialityRatio: 0.0
+N+(c): 3 B(c): 12 E+: 92
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.18181819 support: 0.18181819 specialityRatio: 0.0
+N+(c): 6 B(c): 33 E+: 33
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.6666667 support: 0.25 specialityRatio: 0.0
+N+(c): 6 B(c): 9 E+: 24
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Lewes,_Delaware>)
+confidence: 0.8333333 support: 0.3846154 specialityRatio: 0.0
+N+(c): 5 B(c): 6 E+: 13
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 0.6 support: 0.25 specialityRatio: 0.0
+N+(c): 3 B(c): 5 E+: 12
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.13513513 support: 0.005787037 specialityRatio: 0.0
+N+(c): 5 B(c): 37 E+: 864
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Bucharest>)
+confidence: 0.5714286 support: 0.032 specialityRatio: 0.0
+N+(c): 4 B(c): 7 E+: 125
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.30769232 support: 0.14814815 specialityRatio: 0.0
+N+(c): 4 B(c): 13 E+: 27
+diedIn(A,B)<-livesIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Geneva>)
+confidence: 0.6666667 support: 0.074074075 specialityRatio: 0.0
+N+(c): 4 B(c): 6 E+: 54
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Chicago>)
+confidence: 0.25984251 support: 0.110738255 specialityRatio: 0.0
+N+(c): 33 B(c): 127 E+: 298
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.36666667 support: 0.6666667 specialityRatio: 0.0
+N+(c): 22 B(c): 60 E+: 33
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.7 support: 0.875 specialityRatio: 0.0
+N+(c): 21 B(c): 30 E+: 24
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 0.8888889 support: 0.6666667 specialityRatio: 0.0
+N+(c): 8 B(c): 9 E+: 12
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Boise,_Idaho>)
+confidence: 0.25925925 support: 0.25925925 specialityRatio: 0.0
+N+(c): 7 B(c): 27 E+: 27
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Castle,_Delaware>)
+confidence: 0.6363636 support: 0.5833333 specialityRatio: 0.0
+N+(c): 7 B(c): 11 E+: 12
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Baltimore>)
+confidence: 0.11764706 support: 0.043165468 specialityRatio: 0.0
+N+(c): 6 B(c): 51 E+: 139
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Lewes,_Delaware>)
+confidence: 0.85714287 support: 0.46153846 specialityRatio: 0.0
+N+(c): 6 B(c): 7 E+: 13
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.16216215 support: 0.22222222 specialityRatio: 0.0
+N+(c): 6 B(c): 37 E+: 27
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Albuquerque,_New_Mexico>)
+confidence: 0.2173913 support: 0.13157895 specialityRatio: 0.0
+N+(c): 5 B(c): 23 E+: 38
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Bucharest>)
+confidence: 0.2 support: 0.04 specialityRatio: 0.0
+N+(c): 5 B(c): 25 E+: 125
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Stockholm>)
+confidence: 0.2 support: 0.017777778 specialityRatio: 0.0
+N+(c): 4 B(c): 20 E+: 225
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Chennai>)
+confidence: 0.121212125 support: 0.034188036 specialityRatio: 0.0
+N+(c): 4 B(c): 33 E+: 117
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Kuala_Lumpur>)
+confidence: 0.36363637 support: 0.16 specialityRatio: 0.0
+N+(c): 4 B(c): 11 E+: 25
+diedIn(A,B)<-livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Cleveland>)
+confidence: 0.21052632 support: 0.06451613 specialityRatio: 0.0
+N+(c): 4 B(c): 19 E+: 62
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dresden>)
+confidence: 0.3448276 support: 0.18518518 specialityRatio: 0.0
+N+(c): 10 B(c): 29 E+: 54
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Munich>)
+confidence: 0.33333334 support: 0.038022812 specialityRatio: 0.0
+N+(c): 10 B(c): 30 E+: 263
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/New_York_City>)
+confidence: 0.1923077 support: 0.0080515295 specialityRatio: 0.0
+N+(c): 10 B(c): 52 E+: 1242
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Naples>)
+confidence: 0.1875 support: 0.05263158 specialityRatio: 0.0
+N+(c): 3 B(c): 16 E+: 57
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Florence>)
+confidence: 0.19444445 support: 0.072916664 specialityRatio: 0.0
+N+(c): 7 B(c): 36 E+: 96
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Berlin>)
+confidence: 0.11111111 support: 0.009090909 specialityRatio: 0.0
+N+(c): 3 B(c): 27 E+: 330
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.4117647 support: 0.015765766 specialityRatio: 0.0
+N+(c): 7 B(c): 17 E+: 444
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Beijing>)
+confidence: 0.6666667 support: 0.042105265 specialityRatio: 0.0
+N+(c): 4 B(c): 6 E+: 95
+diedIn(A,B)<-hasChild(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Philadelphia>)
+confidence: 0.2 support: 0.016460905 specialityRatio: 0.0
+N+(c): 4 B(c): 20 E+: 243
+diedIn(A,B)<-holdsPoliticalPosition(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Mexico_City>)
+confidence: 0.375 support: 0.028571429 specialityRatio: 0.0
+N+(c): 6 B(c): 16 E+: 210
+diedIn(A,B)<-holdsPoliticalPosition(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Montevideo>)
+confidence: 0.54545456 support: 0.24 specialityRatio: 0.0
+N+(c): 6 B(c): 11 E+: 25
+diedIn(A,B)<-holdsPoliticalPosition(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Tehran>)
+confidence: 0.41666666 support: 0.05154639 specialityRatio: 0.0
+N+(c): 5 B(c): 12 E+: 97
+diedIn(A,B)<-holdsPoliticalPosition(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Boston>)
+confidence: 0.2 support: 0.012096774 specialityRatio: 0.0
+N+(c): 3 B(c): 15 E+: 248
+diedIn(A,B)<-holdsPoliticalPosition(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/London>)
+confidence: 0.10714286 support: 0.0025839794 specialityRatio: 0.0
+N+(c): 3 B(c): 28 E+: 1161
+diedIn(A,B)<-worksAt(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Geneva>)
+confidence: 0.6 support: 0.055555556 specialityRatio: 0.0
+N+(c): 3 B(c): 5 E+: 54
+diedIn(A,B)<-worksAt(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Oslo>)
+confidence: 0.27272728 support: 0.035714287 specialityRatio: 0.0
+N+(c): 3 B(c): 11 E+: 84
+diedIn(A,B)<-worksAt(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.2 support: 0.0034722222 specialityRatio: 0.0
+N+(c): 3 B(c): 15 E+: 864
+diedIn(A,B)<-worksAt(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dublin>)
+confidence: 0.5 support: 0.025423728 specialityRatio: 0.0
+N+(c): 3 B(c): 6 E+: 118
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.14285715 support: 0.012731481 specialityRatio: 0.0
+N+(c): 11 B(c): 77 E+: 864
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dresden>)
+confidence: 0.24324325 support: 0.16666667 specialityRatio: 0.0
+N+(c): 9 B(c): 37 E+: 54
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Beijing>)
+confidence: 0.4 support: 0.042105265 specialityRatio: 0.0
+N+(c): 4 B(c): 10 E+: 95
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Munich>)
+confidence: 0.2195122 support: 0.03422053 specialityRatio: 0.0
+N+(c): 9 B(c): 41 E+: 263
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.2413793 support: 0.015765766 specialityRatio: 0.0
+N+(c): 7 B(c): 29 E+: 444
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Naples>)
+confidence: 0.18181819 support: 0.07017544 specialityRatio: 0.0
+N+(c): 4 B(c): 22 E+: 57
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Mexico_City>)
+confidence: 0.2777778 support: 0.023809524 specialityRatio: 0.0
+N+(c): 5 B(c): 18 E+: 210
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Copenhagen>)
+confidence: 0.23809524 support: 0.03731343 specialityRatio: 0.0
+N+(c): 5 B(c): 21 E+: 134
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Charleston,_West_Virginia>)
+confidence: 0.6 support: 0.1764706 specialityRatio: 0.0
+N+(c): 3 B(c): 5 E+: 17
+diedIn(A,B)<-isMarriedTo(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Athens>)
+confidence: 0.15 support: 0.019736841 specialityRatio: 0.0
+N+(c): 3 B(c): 20 E+: 152
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Rome>)
+confidence: 0.2631579 support: 0.024038462 specialityRatio: 0.0
+N+(c): 15 B(c): 57 E+: 624
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.10619469 support: 0.013888889 specialityRatio: 0.0
+N+(c): 12 B(c): 113 E+: 864
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Copenhagen>)
+confidence: 0.22580644 support: 0.052238807 specialityRatio: 0.0
+N+(c): 7 B(c): 31 E+: 134
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dublin>)
+confidence: 0.11111111 support: 0.042372882 specialityRatio: 0.0
+N+(c): 5 B(c): 45 E+: 118
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.11764706 support: 0.009009009 specialityRatio: 0.0
+N+(c): 4 B(c): 34 E+: 444
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Oslo>)
+confidence: 0.3125 support: 0.05952381 specialityRatio: 0.0
+N+(c): 5 B(c): 16 E+: 84
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Athens>)
+confidence: 0.21052632 support: 0.02631579 specialityRatio: 0.0
+N+(c): 4 B(c): 19 E+: 152
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Belgrade>)
+confidence: 0.21428572 support: 0.033333335 specialityRatio: 0.0
+N+(c): 3 B(c): 14 E+: 90
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Berlin>)
+confidence: 0.14285715 support: 0.018181818 specialityRatio: 0.0
+N+(c): 6 B(c): 42 E+: 330
+diedIn(A,B)<-actedIn(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Saint_Petersburg>)
+confidence: 0.13043478 support: 0.0121951215 specialityRatio: 0.0
+N+(c): 3 B(c): 23 E+: 246
+diedIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.13970588 support: 0.13194445 specialityRatio: 0.0
+N+(c): 114 B(c): 816 E+: 864
+diedIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Rome>)
+confidence: 0.21073559 support: 0.16987179 specialityRatio: 0.0
+N+(c): 106 B(c): 503 E+: 624
+diedIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Kolkata>)
+confidence: 0.21243523 support: 0.33064517 specialityRatio: 0.0
+N+(c): 41 B(c): 193 E+: 124
+diedIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Munich>)
+confidence: 0.11072665 support: 0.121673 specialityRatio: 0.0
+N+(c): 32 B(c): 289 E+: 263
+diedIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Tehran>)
+confidence: 0.12608695 support: 0.29896906 specialityRatio: 0.0
+N+(c): 29 B(c): 230 E+: 97
+diedIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Warsaw>)
+confidence: 0.101265825 support: 0.16666667 specialityRatio: 0.0
+N+(c): 24 B(c): 237 E+: 144
+diedIn(A,B)<-hasAcademicAdvisor(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.5 support: 0.0069444445 specialityRatio: 0.0
+N+(c): 6 B(c): 12 E+: 864
+diedIn(A,B)<-hasAcademicAdvisor(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Berlin>)
+confidence: 0.11764706 support: 0.012121212 specialityRatio: 0.0
+N+(c): 4 B(c): 34 E+: 330
+diedIn(A,B)<-hasAcademicAdvisor(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.13043478 support: 0.006756757 specialityRatio: 0.0
+N+(c): 3 B(c): 23 E+: 444
+diedIn(A,B)<-isPoliticianOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Charleston,_South_Carolina>)
+confidence: 0.4375 support: 0.1627907 specialityRatio: 0.0
+N+(c): 7 B(c): 16 E+: 43
+diedIn(A,B)<-isPoliticianOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Boston>)
+confidence: 0.30769232 support: 0.016129032 specialityRatio: 0.0
+N+(c): 4 B(c): 13 E+: 248
+diedIn(A,B)<-isPoliticianOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Lewes,_Delaware>)
+confidence: 1.0 support: 0.30769232 specialityRatio: 0.0
+N+(c): 4 B(c): 4 E+: 13
+diedIn(A,B)<-isPoliticianOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Newark,_New_Jersey>)
+confidence: 0.6 support: 0.125 specialityRatio: 0.0
+N+(c): 3 B(c): 5 E+: 24
+diedIn(A,B)<-isPoliticianOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Haven,_Connecticut>)
+confidence: 0.5 support: 0.046153847 specialityRatio: 0.0
+N+(c): 3 B(c): 6 E+: 65
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.3809524 support: 0.4848485 specialityRatio: 0.0
+N+(c): 16 B(c): 42 E+: 33
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.7692308 support: 0.41666666 specialityRatio: 0.0
+N+(c): 10 B(c): 13 E+: 24
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Castle,_Delaware>)
+confidence: 1.0 support: 0.33333334 specialityRatio: 0.0
+N+(c): 4 B(c): 4 E+: 12
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Salt_Lake_City>)
+confidence: 0.1875 support: 0.0625 specialityRatio: 0.0
+N+(c): 3 B(c): 16 E+: 48
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Cambridge,_Massachusetts>)
+confidence: 0.3 support: 0.028846154 specialityRatio: 0.0
+N+(c): 3 B(c): 10 E+: 104
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Madison,_Wisconsin>)
+confidence: 0.23076923 support: 0.083333336 specialityRatio: 0.0
+N+(c): 3 B(c): 13 E+: 36
+diedIn(A,B)<-graduatedFrom(A,C)livesIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 1.0 support: 0.25 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 12
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Boston>)
+confidence: 0.11111111 support: 0.044354837 specialityRatio: 0.0
+N+(c): 11 B(c): 99 E+: 248
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Mexico_City>)
+confidence: 0.2195122 support: 0.042857144 specialityRatio: 0.0
+N+(c): 9 B(c): 41 E+: 210
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.13636364 support: 0.013513514 specialityRatio: 0.0
+N+(c): 6 B(c): 44 E+: 444
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Stockholm>)
+confidence: 0.17391305 support: 0.017777778 specialityRatio: 0.0
+N+(c): 4 B(c): 23 E+: 225
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Bucharest>)
+confidence: 0.23529412 support: 0.032 specialityRatio: 0.0
+N+(c): 4 B(c): 17 E+: 125
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.18181819 support: 0.0046296297 specialityRatio: 0.0
+N+(c): 4 B(c): 22 E+: 864
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Copenhagen>)
+confidence: 0.27272728 support: 0.02238806 specialityRatio: 0.0
+N+(c): 3 B(c): 11 E+: 134
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.14285715 support: 0.09090909 specialityRatio: 0.0
+N+(c): 3 B(c): 21 E+: 33
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.75 support: 0.125 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 24
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Castle,_Delaware>)
+confidence: 0.375 support: 0.25 specialityRatio: 0.0
+N+(c): 3 B(c): 8 E+: 12
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Basel>)
+confidence: 0.3 support: 0.125 specialityRatio: 0.0
+N+(c): 3 B(c): 10 E+: 24
+diedIn(A,B)<-graduatedFrom(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Salt_Lake_City>)
+confidence: 0.12 support: 0.0625 specialityRatio: 0.0
+N+(c): 3 B(c): 25 E+: 48
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.3027523 support: 0.038194444 specialityRatio: 0.0
+N+(c): 33 B(c): 109 E+: 864
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Mexico_City>)
+confidence: 0.24 support: 0.057142857 specialityRatio: 0.0
+N+(c): 12 B(c): 50 E+: 210
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Moscow>)
+confidence: 0.16393442 support: 0.022522522 specialityRatio: 0.0
+N+(c): 10 B(c): 61 E+: 444
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Oslo>)
+confidence: 0.3448276 support: 0.11904762 specialityRatio: 0.0
+N+(c): 10 B(c): 29 E+: 84
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Montevideo>)
+confidence: 0.37037036 support: 0.4 specialityRatio: 0.0
+N+(c): 10 B(c): 27 E+: 25
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Berlin>)
+confidence: 0.12162162 support: 0.027272727 specialityRatio: 0.0
+N+(c): 9 B(c): 74 E+: 330
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Bucharest>)
+confidence: 0.39130434 support: 0.072 specialityRatio: 0.0
+N+(c): 9 B(c): 23 E+: 125
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Munich>)
+confidence: 0.22222222 support: 0.03041825 specialityRatio: 0.0
+N+(c): 8 B(c): 36 E+: 263
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Colombo>)
+confidence: 0.19354838 support: 0.09836066 specialityRatio: 0.0
+N+(c): 6 B(c): 31 E+: 61
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Rio_de_Janeiro>)
+confidence: 0.1875 support: 0.07058824 specialityRatio: 0.0
+N+(c): 6 B(c): 32 E+: 85
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Geneva>)
+confidence: 0.26086956 support: 0.11111111 specialityRatio: 0.0
+N+(c): 6 B(c): 23 E+: 54
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Warsaw>)
+confidence: 0.16 support: 0.027777778 specialityRatio: 0.0
+N+(c): 4 B(c): 25 E+: 144
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Copenhagen>)
+confidence: 0.16666667 support: 0.029850746 specialityRatio: 0.0
+N+(c): 4 B(c): 24 E+: 134
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Patras>)
+confidence: 0.26666668 support: 0.22222222 specialityRatio: 0.0
+N+(c): 4 B(c): 15 E+: 18
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/The_Hague>)
+confidence: 0.15384616 support: 0.051282052 specialityRatio: 0.0
+N+(c): 4 B(c): 26 E+: 78
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Kolkata>)
+confidence: 0.12 support: 0.024193548 specialityRatio: 0.0
+N+(c): 3 B(c): 25 E+: 124
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Barcelona>)
+confidence: 0.13636364 support: 0.048387095 specialityRatio: 0.0
+N+(c): 3 B(c): 22 E+: 62
+diedIn(A,B)<-isCitizenOf(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Damascus>)
+confidence: 0.33333334 support: 0.078947365 specialityRatio: 0.0
+N+(c): 3 B(c): 9 E+: 38
+diedIn(A,B)<-influences(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Bucharest>)
+confidence: 0.5 support: 0.04 specialityRatio: 0.0
+N+(c): 5 B(c): 10 E+: 125
+diedIn(A,B)<-influences(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Paris>)
+confidence: 0.2962963 support: 0.009259259 specialityRatio: 0.0
+N+(c): 8 B(c): 27 E+: 864
+diedIn(A,B)<-influences(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Tokyo>)
+confidence: 0.42857143 support: 0.023346303 specialityRatio: 0.0
+N+(c): 6 B(c): 14 E+: 257
+diedIn(A,B)<-influences(A,C)wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Berlin>)
+confidence: 0.14285715 support: 0.009090909 specialityRatio: 0.0
+N+(c): 3 B(c): 21 E+: 330
+time elapsed for whole partition: 9040

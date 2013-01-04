@@ -69,23 +69,28 @@ public class LearningManager
 				  positivesCoveredThreshold, functionThreshold, symmetryThreshold, smoothingMethod, stoppingThreshold, partitionNumber);
 
 		
+		String path = "retionsInfoForDBpedia.ser";
 		
-		//preprocessor=new RelationPreProcessor(conn,tChecker,relations,types,relationsForConstants);		
-		//info = preprocessor.getRelationsInfo();
+		/*preprocessor=new RelationPreProcessor(conn,tChecker,relations,types,relationsForConstants,path);		
+		info = preprocessor.getRelationsInfo();
+		info.persist(path);
 		
-
-		
-		info = RelationsInfo.readFromDisk();
+		info = RelationsInfo.readFromDisk(path);
 		for (Relation relation: info.getAllRelations().values()) 
 			if (relation.isRangeLiteral())
 				System.out.println("HasLiteralRange: "+relation.getName());
+		 */
+		
+		info = RelationsInfo.readFromDisk(path); 
+		info.updateJoinableRelations(conn, tChecker.positivesCoveredThreshold);
+		info.persist(path);
 
 		
-		//info.calculateMinAndMaxLiterals(conn);
-		//info.persist();
+		info.calculateMinAndMaxLiterals(conn);
+		info.persist(path);
 
 
-		//RelationsInfo.printRelations(info);
+		RelationsInfo.printRelations(info);
 				
 		tChecker.setDangerousRelations(info.dangerousRelations);
 		

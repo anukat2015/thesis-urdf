@@ -1,0 +1,42 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/directed>
+ 
+directed(A,B)<-edited(A,B)
+confidence: 0.07828444 support: 0.012858789 specialityRatio: 0.0
+N+(c): 491 B(c): 6272 E+: 38184
+directed(A,B)<-diedIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Histoires_extraordinaires>)
+confidence: 0.75 support: 1.0 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 3
+directed(A,B)<-isMarriedTo(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Les_plus_belles_escroqueries_du_monde>)
+confidence: 1.0 support: 0.75 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 4
+directed(A,B)<-isMarriedTo(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Histoires_extraordinaires>)
+confidence: 0.75 support: 1.0 specialityRatio: 0.0
+N+(c): 3 B(c): 4 E+: 3
+directed(A,B)<-isMarriedTo(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Aria_(1987_film)>)
+confidence: 1.0 support: 0.4 specialityRatio: 0.0
+N+(c): 4 B(c): 4 E+: 10
+directed(A,B)<-isMarriedTo(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Les_Sept_p%C3%A9ch%C3%A9s_capitaux>)
+confidence: 1.0 support: 0.42857143 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 7
+directed(A,B)<-actedIn(A,B)=(B,<http://yago-knowledge.org/resource/Lucky_Stars>)
+confidence: 0.15 support: 0.6 specialityRatio: 0.0
+N+(c): 3 B(c): 20 E+: 5
+directed(A,B)<-wasBornIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Aria_(1987_film)>)
+confidence: 1.0 support: 0.5 specialityRatio: 0.0
+N+(c): 5 B(c): 5 E+: 10
+directed(A,B)<-wasBornIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/The_Animatrix>)
+confidence: 1.0 support: 0.6666667 specialityRatio: 0.0
+N+(c): 4 B(c): 4 E+: 6
+directed(A,B)<-wasBornIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Eros_(film)>)
+confidence: 1.0 support: 1.0 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 3
+directed(A,B)<-wasBornIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Les_plus_belles_escroqueries_du_monde>)
+confidence: 1.0 support: 0.75 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 4
+directed(A,B)<-wasBornIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Les_Sept_p%C3%A9ch%C3%A9s_capitaux>)
+confidence: 1.0 support: 0.42857143 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 7
+directed(A,B)<-wasBornIn(A,C)created(A,B)=(B,<http://yago-knowledge.org/resource/Love_at_Twenty>)
+confidence: 1.0 support: 0.6 specialityRatio: 0.0
+N+(c): 3 B(c): 3 E+: 5
+time elapsed for whole partition: 18899

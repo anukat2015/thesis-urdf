@@ -1,0 +1,63 @@
+TARGET PREDICATE: <http://yago-knowledge.org/resource/livesIn>
+ 
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Germany>)
+confidence: 0.11784512 support: 0.5 specialityRatio: 0.0
+N+(c): 140 B(c): 1188 E+: 280
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/India>)
+confidence: 0.1403302 support: 0.5173913 specialityRatio: 0.0
+N+(c): 119 B(c): 848 E+: 230
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Netherlands>)
+confidence: 0.14748201 support: 0.5985401 specialityRatio: 0.0
+N+(c): 82 B(c): 556 E+: 137
+livesIn(A,B)<-isCitizenOf(A,B)=(B,<http://yago-knowledge.org/resource/Pakistan>)
+confidence: 0.12206573 support: 0.3561644 specialityRatio: 0.0
+N+(c): 26 B(c): 213 E+: 73
+livesIn(A,B)<-isPoliticianOf(A,B)=(B,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.9220779 support: 0.3922652 specialityRatio: 0.0
+N+(c): 71 B(c): 77 E+: 181
+livesIn(A,B)<-diedIn(A,B)isPoliticianOf(A,C)=(C,<http://yago-knowledge.org/resource/Delaware>)
+confidence: 0.75 support: 0.0012929796 specialityRatio: 0.0
+N+(c): 27 B(c): 36 E+: 20882
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Chicago>)
+confidence: 0.110738255 support: 0.25984251 specialityRatio: 0.0
+N+(c): 33 B(c): 298 E+: 127
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.6666667 support: 0.36666667 specialityRatio: 0.0
+N+(c): 22 B(c): 33 E+: 60
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Dover,_Delaware>)
+confidence: 0.875 support: 0.7 specialityRatio: 0.0
+N+(c): 21 B(c): 24 E+: 30
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Milford,_Delaware>)
+confidence: 0.6666667 support: 0.8888889 specialityRatio: 0.0
+N+(c): 8 B(c): 12 E+: 9
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Boise,_Idaho>)
+confidence: 0.25925925 support: 0.25925925 specialityRatio: 0.0
+N+(c): 7 B(c): 27 E+: 27
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/New_Castle,_Delaware>)
+confidence: 0.5833333 support: 0.6363636 specialityRatio: 0.0
+N+(c): 7 B(c): 12 E+: 11
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Lewes,_Delaware>)
+confidence: 0.46153846 support: 0.85714287 specialityRatio: 0.0
+N+(c): 6 B(c): 13 E+: 7
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.22222222 support: 0.16216215 specialityRatio: 0.0
+N+(c): 6 B(c): 27 E+: 37
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Albuquerque,_New_Mexico>)
+confidence: 0.13157895 support: 0.2173913 specialityRatio: 0.0
+N+(c): 5 B(c): 38 E+: 23
+livesIn(A,B)<-diedIn(A,B)=(B,<http://yago-knowledge.org/resource/Kuala_Lumpur>)
+confidence: 0.16 support: 0.36363637 specialityRatio: 0.0
+N+(c): 4 B(c): 25 E+: 11
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Indianapolis>)
+confidence: 0.11801242 support: 0.33333334 specialityRatio: 0.0
+N+(c): 19 B(c): 161 E+: 57
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Wilmington,_Delaware>)
+confidence: 0.20224719 support: 0.3 specialityRatio: 0.0
+N+(c): 18 B(c): 89 E+: 60
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Macau>)
+confidence: 0.375 support: 0.8 specialityRatio: 0.0
+N+(c): 12 B(c): 32 E+: 15
+livesIn(A,B)<-wasBornIn(A,B)=(B,<http://yago-knowledge.org/resource/Jersey_City,_New_Jersey>)
+confidence: 0.10891089 support: 0.2972973 specialityRatio: 0.0
+N+(c): 11 B(c): 101 E+: 37
+time elapsed for whole partition: 207103
