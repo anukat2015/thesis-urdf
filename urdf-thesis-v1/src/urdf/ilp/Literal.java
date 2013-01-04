@@ -1,13 +1,17 @@
 package urdf.ilp;
 
+import java.io.Serializable;
+
 
 
 /**
  * @author Christina Teflioudi *
  */
 
-public class Literal implements Cloneable
-{
+public class Literal implements Cloneable, Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
 	private static final String prefix = "<http://yago-knowledge.org/resource/";
 	private static final String suffix = ">";
 	
@@ -19,6 +23,11 @@ public class Literal implements Cloneable
 	private int secondMode=0;
 	private String constant=null;
 	private int freeVariable=0; // 0: no free variable in this literal 1: the firstArgument is a free variable 2: the secondArgument is a free variable
+	
+	private float min = Float.NEGATIVE_INFINITY;
+	private float max = Float.POSITIVE_INFINITY;
+	
+	//private float upperBound
 	
 	private boolean constNeedsQuotes = false;
 	
@@ -32,7 +41,11 @@ public class Literal implements Cloneable
 		this.secondArgument = secondArgument;
 		this.secondMode=secondMode;
 		this.freeVariable=freeVariable;
-		
+	}
+	
+	public Literal(Relation relation, int firstArgument,int firstMode, int secondArgument,int secondMode, int freeVariable, float min, float max) {
+		this(relation, firstArgument, firstMode, secondArgument, secondMode, freeVariable);
+		setMinMax(min, max);
 	}
 	
 	public Literal(Relation relation, int firstArgument, int secondArgument) {
@@ -64,16 +77,27 @@ public class Literal implements Cloneable
 		}
 		return null;
 	}
-	public boolean equals(Literal lit)
-	{
-		if (!this.relation.equals(lit.relation))
-			return false;
-		if (this.firstArgument!=lit.firstArgument)
-			return false;
-		if (this.secondArgument!=lit.secondArgument)
-			return false;
-		
-		return true;
+	
+	@Override
+	public boolean equals(Object o) {
+		try {
+			Literal lit = (Literal) o;
+			if (this.relation.equals(lit.relation) && this.firstArgument==lit.firstArgument && this.secondArgument==lit.secondArgument) {
+				if ((this.secondArgument!=-1 && this.min==lit.min && this.max==lit.max)|| this.constant.equalsIgnoreCase(lit.constant) ) {
+					return true;
+				}	
+			}
+		} catch (ClassCastException e) {
+		}
+		return false;
+	}
+	
+	@Override
+	public int hashCode() {
+		int code = (this.relation.hashCode() + this.firstArgument) * this.secondArgument;
+		if (this.secondArgument==-1)
+			code += this.constant.hashCode();
+		return code;
 	}
 	
 	//***************** GET METHODS *****************
@@ -166,6 +190,19 @@ public class Literal implements Cloneable
 			return getSparqlPattern(0);
 	}
 	
+	@Override
+	public String toString() {
+		String output = relation.getSimpleName() + "(" + (char)firstArgument + ",";
+		if (secondArgument == -1)
+			output += constant;
+		else 
+			if (min==Float.NEGATIVE_INFINITY && max==Float.POSITIVE_INFINITY) 
+				output += (char)secondArgument;
+			else 
+				output += "["+min+","+max+"]";
+		return output+")";	
+	}
+	
 	public String getSparqlPatternWithConstant() {
 		if (constant == null)
 			return " ?" + (char)firstArgument + " "+relation.getName()+" ?"+ (char)secondArgument +" ";
@@ -192,6 +229,19 @@ public class Literal implements Cloneable
 		else
 			output += (char)secondArgument;
 		return output += ")";
+	}
+	
+	public void setMinMax(float min, float max) {
+		setMax(max);
+		setMin(min);
+	}
+	
+	public void setMax(float max){
+		this.max = max;
+	}
+	
+	public void setMin(float min){
+		this.min = min;
 	}
 	
 

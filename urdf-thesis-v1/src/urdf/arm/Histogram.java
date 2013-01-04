@@ -1,8 +1,13 @@
 package urdf.arm;
 
+import java.io.Serializable;
+
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-public class Histogram implements Cloneable{
+public class Histogram implements Cloneable, Serializable{
+
+	private static final long serialVersionUID = 1L;
+	
 	protected int[] count;
 	protected float[] normalized;
 	
@@ -18,12 +23,13 @@ public class Histogram implements Cloneable{
 	public Histogram(float min, float max, int numberOfBuckets) {
 		this.min = min;
 		this.max = max;
+
 		this.numberOfBuckets = numberOfBuckets;
 		this.boundaries = new float[this.numberOfBuckets-1];
 		this.count = new int[numberOfBuckets];
 		this.normalized = new float[numberOfBuckets];
-		bucketWidth = (max-min)/((float)numberOfBuckets);
-		float boundary = min;
+		bucketWidth = (this.max-this.min)/((float)numberOfBuckets);
+		float boundary = this.min;
 		for (int i=0; i<(numberOfBuckets-1); i++) {
 			boundary += bucketWidth;
 			boundaries[i] = boundary;
@@ -55,6 +61,7 @@ public class Histogram implements Cloneable{
 	
 	public int getBucket(float x) {
 		int bucket = (int) Math.ceil((x-min)/bucketWidth);
+		//int bucket = (int) Math.ceil((x-boundaries[0])/bucketWidth);
 		if (bucket>=numberOfBuckets) 
 			return numberOfBuckets-1;
 		if (bucket < 0)
@@ -64,6 +71,7 @@ public class Histogram implements Cloneable{
 	}
 	
 	public void addDataPoint(float x, int y) {
+		//if (x==0) return;
 		int bucket = -1;
 		if (x<=max && x>=min) {
 			bucket = getBucket(x);
@@ -100,6 +108,10 @@ public class Histogram implements Cloneable{
 	
 	public int[] getDistribution() {
 		return count;
+	}
+	
+	public int getSupport(){
+		return totalCount;
 	}
 	
 	public float getMean() {

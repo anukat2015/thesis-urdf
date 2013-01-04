@@ -122,13 +122,14 @@ public class RelationsInfo implements Serializable {
 	public static void printRelations(Collection<Relation> relations) {
 		System.out.println("Relations:");
 		for (Relation r: relations) {
-			System.out.println(r.getName() + "("+  
-							   r.getDomain().getName() + ", " + 
-							   r.getRange().getName()+") " +
-							   "("+r.getMult(1)+","+r.getMult(2)+") " +
-							   "("+r.getVar(1)+","+r.getVar(2)+") " +
-							   "("+r.getDistinctEntities(1)+","+r.getDistinctEntities(2)+") " +
-							   "("+r.getIdealMult(1)+","+r.getIdealMult(2)+")");
+			String s = r.getName();
+			if (r.getDomain()!=null) s += "("+ r.getDomain().getName() + ", "; 
+			if (r.getRange()!=null) s+= r.getRange().getName()+") ";
+		    s += "("+r.getMult(1)+","+r.getMult(2)+") " +
+		    "("+r.getVar(1)+","+r.getVar(2)+") " +
+		    "("+r.getDistinctEntities(1)+","+r.getDistinctEntities(2)+") " +
+		    "("+r.getIdealMult(1)+","+r.getIdealMult(2)+")";
+			System.out.println(s);
 		}
 	}
 	
@@ -166,10 +167,10 @@ public class RelationsInfo implements Serializable {
 		}
 	}
 	
-	public void persist() {
+	public void persist(String path) {
       try  {
     	  FileOutputStream fileOut;
-		  fileOut = new FileOutputStream("relationsInfoForRdf3x.ser");  	  
+		  fileOut = new FileOutputStream(path);  	  
 	      ObjectOutputStream out = new ObjectOutputStream(fileOut);
 	      out.writeObject(this);
 	      out.close();
@@ -180,11 +181,11 @@ public class RelationsInfo implements Serializable {
       }
 	}
 	
-	public static RelationsInfo readFromDisk() {	 
+	public static RelationsInfo readFromDisk(String path) {	 
         try{
         	FileInputStream fileIn;
         	ObjectInputStream in;
-        	fileIn =new FileInputStream("relationsInfoForRdf3x.ser");
+        	fileIn =new FileInputStream(path);
         	in = new ObjectInputStream(fileIn);
         	RelationsInfo relationsInfo = (RelationsInfo) in.readObject();    
         	in.close();
@@ -234,6 +235,74 @@ public class RelationsInfo implements Serializable {
 			}
 			else {
 				relation.setRangeIsLiteral(false);
+			}
+		}
+	}
+	
+	public void updateJoinableRelations(Connection conn, int minFacts) throws SQLException {
+		Relation[] rels = new Relation[relations.values().size()];
+		int i=0; 
+		for (Relation r: relations.values()) 
+			rels[i++] = r;
+			
+		String query;
+		ResultSet rs;
+		Statement stmt = (Statement) conn.createStatement();
+		for (i=0; i<rels.length; i++) {
+			System.out.println("i="+rels[i].getName());
+			arg1JoinOnArg1.get(rels[i]).add(rels[i]);
+			arg2JoinOnArg2.get(rels[i]).add(rels[i]);
+			if (rels[i].domainTypesIntersects(rels[i].getRangeTypes())) {
+				query = "SELECT COUNTDISTINCT ?x WHERE {?x "+rels[i].getName()+" ?a . ?b "+rels[i].getName()+" ?x}";
+				rs = (ResultSet) stmt.executeQuery(query);
+				rs.first();
+				if (rs.getInt(1) >= minFacts) {
+					arg1JoinOnArg2.get(rels[i]).add(rels[i]);
+					arg2JoinOnArg1.get(rels[i]).add(rels[i]);
+				}
+			}
+			
+			for (int j=i+1; j<rels.length; j++) {				
+				// arg1 joins arg1
+				if (rels[i].domainTypesIntersects(rels[j].getDomainTypes())) {
+					query = "SELECT COUNTDISTINCT ?x WHERE {?x "+rels[i].getName()+" ?a . ?x "+rels[j].getName()+" ?b}";
+					rs = (ResultSet) stmt.executeQuery(query);
+					rs.first();
+					if (rs.getInt(1) >= minFacts) {
+						arg1JoinOnArg1.get(rels[i]).add(rels[j]);
+						arg1JoinOnArg1.get(rels[j]).add(rels[i]);
+					}
+				}
+				// arg1 joins arg2
+				if (rels[i].domainTypesIntersects(rels[j].getRangeTypes())) {
+					query = "SELECT COUNTDISTINCT ?x WHERE {?x "+rels[i].getName()+" ?a . ?b "+rels[j].getName()+" ?x}";
+					rs = (ResultSet) stmt.executeQuery(query);
+					rs.first();
+					if (rs.getInt(1) >= minFacts) {
+						arg1JoinOnArg2.get(rels[i]).add(rels[j]);
+						arg2JoinOnArg1.get(rels[j]).add(rels[i]);
+					}
+				}
+				// arg2 joins arg1
+				if (rels[i].rangeTypesIntersects(rels[j].getDomainTypes())) {
+					query = "SELECT COUNTDISTINCT ?x WHERE {?a "+rels[i].getName()+" ?x . ?x "+rels[j].getName()+" ?b}";
+					rs = (ResultSet) stmt.executeQuery(query);
+					rs.first();
+					if (rs.getInt(1) >= minFacts) {
+						arg2JoinOnArg1.get(rels[i]).add(rels[j]);
+						arg1JoinOnArg2.get(rels[j]).add(rels[i]);
+					}
+				}
+				// arg2 joins arg2
+				if (rels[i].rangeTypesIntersects(rels[j].getRangeTypes())) {
+					query = "SELECT COUNTDISTINCT ?x WHERE {?a "+rels[i].getName()+" ?x . ?b "+rels[j].getName()+" ?x}";
+					rs = (ResultSet) stmt.executeQuery(query);
+					rs.first();
+					if (rs.getInt(1) >= minFacts) {
+						arg2JoinOnArg2.get(rels[i]).add(rels[j]);
+						arg2JoinOnArg2.get(rels[j]).add(rels[i]);
+					}
+				}
 			}
 		}
 	}

@@ -160,9 +160,21 @@ public final class ResultSet implements java.sql.ResultSet
 		   return Float.parseFloat(f.substring(0,f.indexOf('-')));
 	   } catch (NumberFormatException e) {} catch (StringIndexOutOfBoundsException e) {} 
 	   try {
+		   return Float.parseFloat(f.substring(0,f.indexOf('^')));
+	   } catch (NumberFormatException e) {} catch (StringIndexOutOfBoundsException e) {} 
+	   try {
 		   return Float.parseFloat(f.substring(0,f.indexOf('#')));
-	   } catch (StringIndexOutOfBoundsException e1) {} catch (NumberFormatException e1) {}
-	   return Float.NaN;
+	   } catch (Exception e1) {
+		   try {
+			   return Float.parseFloat(f.replaceAll("[a-zA-Z]|@|\\$|," , ""));
+		   } catch (Exception e2) {
+			   return Float.NaN;
+		   }
+	   }
+   }
+   // Get number of rows
+   public int getNumberOfRows() throws SQLException {
+	   return data.length;
    }
    // Get an entry as float
    public float getFloat(String columnLabel) throws SQLException { return getFloat(findColumn(columnLabel)); }

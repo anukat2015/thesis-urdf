@@ -49,7 +49,7 @@ public class RelationPreProcessor implements Serializable
 	private static final String arg2JoinOnArg2OverlapSPARQL = "select count ?u where {?a $rel1 ?x . ?b $rel2 ?x}";				
 	
 	
-	public RelationPreProcessor(Connection conn, ThresholdChecker tChecker, ArrayList<Relation> relations,ArrayList<Type> types, HashMap<Integer,String>relationsForConstants) throws Exception {
+	public RelationPreProcessor(Connection conn, ThresholdChecker tChecker, ArrayList<Relation> relations,ArrayList<Type> types, HashMap<Integer,String>relationsForConstants, String persistPath) throws Exception {
 		try {	
 			this.tChecker=tChecker;			
 			this.relationsForConstants=relationsForConstants;	
@@ -63,14 +63,14 @@ public class RelationPreProcessor implements Serializable
 		
 		long time=System.currentTimeMillis();
 		
-		CreateStatistics.LoadStatistics(conn, "src/insert-stats-rdf3x");
+		CreateStatistics.LoadStatistics(conn, "src/insert-rdf3x-dbpedia-stat.sparql");
 		System.out.println("Statitics loaded in the DB successfully");
 		
 		preprocess();	
 
 		relationsInfo=new RelationsInfo(this.relations,this.types, arg1JoinOnArg2, arg1JoinOnArg1, arg2JoinOnArg2, arg2JoinOnArg1, dangerousRelations);		
 		
-		relationsInfo.persist();
+		relationsInfo.persist(persistPath);
 
 		time=System.currentTimeMillis()-time;
 		System.out.println("time for preprocessing: "+time);
@@ -96,8 +96,14 @@ public class RelationPreProcessor implements Serializable
 			int numberOfFacts;
 			float mult1,mult2,var1,var2;
 			
-			//  Get the Types that appear in the DB
-			ResultSet rs=getTypeHierarchyFromDB();
+
+			ResultSet rs = (ResultSet) stmt.executeQuery("SELECT DISTINCT ?o WHERE {?s a ?o}");
+			while(rs.next()){
+				String type   = rs.getString(1);		
+				types.put(type, new Type(type));			
+			}
+			
+			rs=getTypeHierarchyFromDB();
 			while(rs.next()){
 				subType   = rs.getString(1);
 				superType = rs.getString(2);
@@ -113,52 +119,35 @@ public class RelationPreProcessor implements Serializable
 			}
 			rs.close();
 			System.out.println("Type Hierarchy created successfully");
-			
 
-			//  Get the Relations that appear in the DB
-			//relations = getRelationsFromDBFaster();
-			rs = getRelationsFromDB();
-			while (rs!=null && rs.next()){
-				
+			rs = (ResultSet) stmt.executeQuery("SELECT DISTINCT ?p WHERE {?s ?p ?o}");	
+			while (rs!=null && rs.next()){			
 				name = rs.getString(1);
-				if(eliminateRelations(name)){
-					continue;
-				}
-				
-				domain=rs.getString(2);
-				if (rs.wasNull()){
-					domain=repairDomainOrRange(name,true);
-				}
-				
-				range=rs.getString(3);
-				if (rs.wasNull()){
-					range=repairDomainOrRange(name,false);
-				}
-				
-				if (!types.containsKey(domain))
-					types.put(domain, new Type(domain));
-				
-				if (!types.containsKey(range))
-					types.put(range, new Type(range));
-				
-				numberOfFacts = rs.getInt(4);
-				mult1 = rs.getFloat(5);
-				mult2 = rs.getFloat(6);
-				var1 = rs.getFloat(7);
-				var2 = rs.getFloat(8);
-				if (constantIn1!=null && constantIn1.contains(name)){
-					constant=1;
-				}
-				else if(constantIn2!=null && constantIn2.contains(name)){
-					constant=2;
-				}
-				else{
-					constant=0;
-				}
-				
-				rel = new Relation(name, types.get(domain), types.get(range), numberOfFacts, mult1, mult2, var1, var2, constant);				
-				relations.put(name,rel);		
+				rel = new Relation(name, null, null);
+				relations.put(name,rel);	
+				System.out.println(name);
 			}
+			
+			System.out.println("Relations created successfully");
+			
+			// add domain types
+			for (Relation r : relations.values()) {
+				System.out.println(r.getName());
+				rs = (ResultSet) stmt.executeQuery("SELECT DISTINCT ?t WHERE {?s "+r.getName()+" ?o . ?s a ?t}");	
+				while (rs!=null && rs.next()){			
+					//rel = relations.get(rs.getString(1));
+					Type domainType  = types.get(rs.getString(1));
+					r.addDomainType(domainType);	
+				}
+				
+				rs = (ResultSet) stmt.executeQuery("SELECT DISTINCT ?t WHERE {?s "+r.getName()+" ?o . ?o a ?t}");	
+				while (rs!=null && rs.next()){			
+					//rel = relations.get(rs.getString(1));
+					Type rangeType  = types.get(rs.getString(1));
+					r.addRangeType(rangeType);	
+				}
+			}
+			
 			RelationsInfo.printRelations(relations);
 			rs.close();
 			System.out.println("Relations created successfully");
@@ -166,7 +155,7 @@ public class RelationPreProcessor implements Serializable
 			//repairTypes();
 			//repairRelations();
 		}
-		dangerousRelations=getDangerousRelationsFromDB();
+		//dangerousRelations=getDangerousRelationsFromDB();
 		findJoinableRelations();
 	}
 
@@ -254,35 +243,23 @@ public class RelationPreProcessor implements Serializable
 				}
 				else{
 					// try to join i's 1st arg with j's 1st arg
-					if (iRelation.getDomain().equals(jRelation.getDomain()) || 
-						iRelation.getDomain().isChildOf(jRelation.getDomain()) || 
-						jRelation.getDomain().isChildOf(iRelation.getDomain()))
-					{				
+					if (iRelation.domainTypesIntersects(jRelation.getDomainTypes())) {				
 							fillInJoinOnMap(1, arg1JoinOnArg1, arg1JoinOnArg1,  iRelation,1, jRelation, 1,minFacts, sameFlag);
 					}
 					
 					// try to join i's 2nd arg with j's 2nd arg
-					if (iRelation.getRange().equals(jRelation.getRange())
-							||iRelation.getRange().isChildOf(jRelation.getRange())
-							||jRelation.getRange().isChildOf(iRelation.getRange()))
-					{	
+					if (iRelation.rangeTypesIntersects(jRelation.getRangeTypes())) {	
 						fillInJoinOnMap(4, arg2JoinOnArg2, arg2JoinOnArg2,  iRelation,2, jRelation, 2,minFacts, sameFlag);
 					}
 
 				}
 				
 				// try to join i's 1st arg with j's 2nd arg
-				if (iRelation.getDomain().equals(jRelation.getRange())
-						||iRelation.getDomain().isChildOf(jRelation.getRange())
-						||jRelation.getRange().isChildOf(iRelation.getDomain()))
-				{
+				if (iRelation.domainTypesIntersects(jRelation.getRangeTypes())) {
 					fillInJoinOnMap( 2, arg1JoinOnArg2, arg2JoinOnArg1,  iRelation,1, jRelation, 2,minFacts,  sameFlag);
 				}
 				// try to join i's 2nd arg with j's 1st arg
-				if (iRelation.getRange().equals(jRelation.getDomain())
-						||iRelation.getRange().isChildOf(jRelation.getDomain())
-						||jRelation.getDomain().isChildOf(iRelation.getRange()))
-				{
+				if (iRelation.rangeTypesIntersects(jRelation.getDomainTypes())) {
 					fillInJoinOnMap(3, arg2JoinOnArg1, arg1JoinOnArg2,  iRelation,2, jRelation, 1,minFacts,  sameFlag);
 				}
 				j++;
@@ -498,6 +475,13 @@ public class RelationPreProcessor implements Serializable
 		
 		
 		//System.out.println(sparql);
+		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
+		return rs;
+	}
+	
+	private ResultSet getRelationsFromDBNoStats() throws SQLException{
+		String sparql = "SELECT DISTINCT ?p {?s ?p ?o}";
+
 		ResultSet rs = (ResultSet) stmt.executeQuery(sparql);		
 		return rs;
 	}

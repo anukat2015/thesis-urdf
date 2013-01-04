@@ -190,7 +190,7 @@ public class CreateStatistics {
 			Driver drvr = new urdf.rdf3x.Driver();
      		String db = (String) props.get("Database");
             Connection conn = (Connection) drvr.connect(db, props);
-            LoadStatistics(conn, new FileOutputStream("src/insert-rdf3x-data.sparql"));
+            LoadStatistics(conn, new FileOutputStream("src/insert-rdf3x-dbpedia-stat.sparql"));
             /*Statement stmt = (Statement) conn.createStatement();
     		String sparql = "SELECT ?r ?m1 ?m2 ?n ?domain ?range where {?r <http://yago-knowledge.org/resource/hasArg1Mult> ?m1 . " +
 					   "?r <http://yago-knowledge.org/resource/hasArg2Mult> ?m2 . " +

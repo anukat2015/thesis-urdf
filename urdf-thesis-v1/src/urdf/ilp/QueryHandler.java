@@ -296,43 +296,30 @@ public class QueryHandler
 		return (ResultSet) stmt.executeQuery(query);
 	}
 	
-	public ResultSet retrieveDistribution(Literal x, Collection<Literal> collection) throws SQLException {
+	public ResultSet retrieveDistribution(Literal x, Collection<Literal> collection, String filter) throws SQLException {
 		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelationName());
 		
-		String patterns = x.getSparqlPatternWithConstant();
-		if (collection!= null || collection.isEmpty()) {
-			for (Literal l: collection) 
-				patterns += l.getSparqlPatternWithConstant();
-		}
-		
-		String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" WHERE {"+patterns+"} ORDER BY ASC(?"+(char)x.getSecondArgument()+")";
-		
-		return (ResultSet) stmt.executeQuery(sparql);
-	}
-	
-	public ResultSet retrieveMultiGroupDistribution(Literal x, Collection<Literal> collection) throws SQLException {
-		logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelationName());
+		String filterstmt = "";
+		if (filter.length()>0)
+			filterstmt = " filter("+filter+")";
 		
 		String patterns = x.getSparqlPatternWithConstant();
-		String projection = "";
-		String orderby = "";
+		boolean noCount = false;
 		if (collection!= null || collection.isEmpty()) {
 			for (Literal l: collection) {
 				patterns += l.getSparqlPatternWithConstant();
-				
-				if (l.getFirstArgument()==x.getFirstArgument()) {
-					projection += ", ?" + (char)l.getSecondArgument();
-					orderby += "asc("+(char)l.getSecondArgument()+") ";
-				} else {
-					projection += ", ?" + (char)l.getFirstArgument();
-					orderby += "asc("+(char)l.getFirstArgument()+") ";
-				}
-				
-				
+				if (l.getSecondArgument()!=-1) 
+					noCount = true;
 			}
 		}
 		
-		String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" "+projection+" WHERE {"+patterns+"} ORDER BY "+orderby+"ASC(?"+(char)x.getSecondArgument()+")";
+		String sparql = "";
+		if (!noCount)
+			sparql += "SELECT COUNT ?"+(char)x.getSecondArgument();
+		else 
+			sparql += "SELECT DISTINCT ?"+(char)x.getSecondArgument() + " ?"+(char)x.getFirstArgument(
+					);
+		sparql += " WHERE {"+patterns+filterstmt+"} ORDER BY ASC(?"+(char)x.getSecondArgument()+")";
 		
 		return (ResultSet) stmt.executeQuery(sparql);
 	}
@@ -350,6 +337,67 @@ public class QueryHandler
 		
 		return (ResultSet) stmt.executeQuery(sparql);
 	}
+	
+	// ResultSet should be sorted by the First column and may or may not have a Count column
+	public static float getMean(ResultSet rs) throws SQLException {
+		// Tests if first column is numerical
+		try {
+			rs.next();
+			rs.getFloat(1);
+		} catch (SQLException e) {
+			return Float.NaN;
+		}
+		
+		int col = -1;
+		try {col = rs.findColumn("count");} catch (SQLException e) {}
+		
+		rs.beforeFirst();
+		int sumCount = 0;
+		while (rs.next()) 
+			sumCount += (col==-1)? 1 : rs.getInt(col);
+		int halfCount = sumCount/2;
+		
+		rs.beforeFirst();
+		float mean = Float.NaN;
+		int curCount = 0;
+		while (rs.next()) {
+			curCount += (col==-1)? 1 : rs.getInt(col);
+			if (curCount>=halfCount) {
+				mean = rs.getFloat(1);
+				break;
+			}
+		}
+		rs.beforeFirst();
+		
+		return mean;
+	}
+	
+	/*public ResultSet retrieveMultiGroupDistribution(Literal x, Collection<Literal> collection) throws SQLException {
+	logger.log(Level.DEBUG, "Retrieving distribution on "+x.getRelationName());
+	
+	String patterns = x.getSparqlPatternWithConstant();
+	String projection = "";
+	String orderby = "";
+	if (collection!= null || collection.isEmpty()) {
+		for (Literal l: collection) {
+			patterns += l.getSparqlPatternWithConstant();
+			
+			if (l.getFirstArgument()==x.getFirstArgument()) {
+				projection += " ?" + (char)l.getSecondArgument();
+				orderby += "asc(?"+(char)l.getSecondArgument()+") ";
+			} else {
+				projection += " ?" + (char)l.getFirstArgument();
+				orderby += "asc(?"+(char)l.getFirstArgument()+") ";
+			}
+			
+			
+		}
+	}
+	
+	String sparql = "SELECT COUNT ?"+(char)x.getSecondArgument()+" "+projection+" WHERE {"+patterns+"} ORDER BY "+orderby+"ASC(?"+(char)x.getSecondArgument()+")";
+	
+	return (ResultSet) stmt.executeQuery(sparql);
+}*/
 	
 }
 

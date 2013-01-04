@@ -6,6 +6,8 @@ import java.io.Serializable;
 //import java.sql.ResultSet;
 //import java.sql.Statement;
 import java.sql.SQLException;
+import java.util.Collection;
+import java.util.HashSet;
 
 import urdf.rdf3x.Connection;
 import urdf.rdf3x.Driver;
@@ -19,9 +21,17 @@ import urdf.rdf3x.Statement;
 public class Relation implements Serializable
 {
 	private static final long serialVersionUID = 1L;
+	
+	
 	private String name;
+	
 	private Type domain;
 	private Type range;
+	
+	private HashSet<Type> domainTypes = new HashSet<Type>();
+	private HashSet<Type> rangeTypes = new HashSet<Type>();
+	
+	
 	private float max = Float.NaN;
 	private float min = Float.NaN;
 	private boolean rangeIsLiteral = false;
@@ -82,6 +92,39 @@ public class Relation implements Serializable
 		
 		
 	}
+ 	
+ 	public Collection<Type> getRangeTypes() {
+ 		return rangeTypes;
+ 	}
+ 	
+ 	public Collection<Type> getDomainTypes() {
+ 		return domainTypes;
+ 	}
+ 	
+ 	public void addRangeType(Type t) {
+ 		rangeTypes.add(t);
+ 	}
+ 	
+ 	public void addDomainType(Type t) {
+ 		domainTypes.add(t);
+ 	}
+ 	
+ 	public boolean rangeTypesIntersects(Collection<Type> c) {
+ 		for (Type t: c) {
+ 			if (rangeTypes.contains(t))
+ 				return true;
+ 		}
+ 		return false;
+ 	}
+ 	
+ 	public boolean domainTypesIntersects(Collection<Type> c) {
+ 		for (Type t: c) {
+ 			if (domainTypes.contains(t))
+ 				return true;
+ 		}
+ 		return false;
+ 	}
+ 	
 	
 	// ************ GETTERS ***********
  	public float getVar(int arg){
