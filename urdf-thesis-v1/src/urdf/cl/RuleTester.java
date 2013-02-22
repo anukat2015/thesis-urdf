@@ -33,7 +33,7 @@ public class RuleTester {
 		this.lattice = lattice;
 		this.rootLiteral = lattice.getRootLiteral();
 		this.qh = qh;
-		this.histogram = lattice.getRoot().getHistogram().clone();
+		this.histogram = lattice.getHistogram().clone();
 		this.histogram.reset();
 	}
 	

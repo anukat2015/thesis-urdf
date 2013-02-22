@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.management.GarbageCollectorMXBean;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +31,7 @@ public class CorrelationLattice implements Serializable {
 	private static Logger logger = Logger.getLogger(LearningManager.loggerName);
 	
 	private CorrelationLatticeNode root;
-	private HashMap<Long,CorrelationLatticeNode> idNodesMap = new HashMap<Long, CorrelationLatticeNode>();
+	//private HashMap<Long,CorrelationLatticeNode> idNodesMap = new HashMap<Long, CorrelationLatticeNode>();
 	private ArrayList<CorrelationLatticeNode> existentNodes = new ArrayList<CorrelationLatticeNode>();
 	private Collection<Relation> candidates;
 	private Relation rootRelation;
@@ -39,6 +40,8 @@ public class CorrelationLattice implements Serializable {
 	private float independenceThreshold = (float) 0.0;
 	private float confidenceThreshold = (float) 0.75;
 	private int supportThreshold = 25;
+	
+	private Histogram rootHistogram;
 	
 	private int numberOfBuckets = 25;
 	
@@ -59,7 +62,7 @@ public class CorrelationLattice implements Serializable {
 		this.rootRelation = rootRelation;
 		this.root = new CorrelationLatticeNode(this,rootRelation);
 		this.root.setNumberOfBuckets(numberOfBuckets);
-		this.idNodesMap.put(root.getId(),root);
+		//this.idNodesMap.put(root.getId(),root);
 		this.existentNodes.add(root);
 		this.resultRules = new ArrayList<NumericalRule>();
 	}
@@ -67,8 +70,13 @@ public class CorrelationLattice implements Serializable {
 	
 	public void buildLattice(QueryHandler queryHandler) throws SQLException {
 		logger.log(Level.INFO,"Building Lattice for relation "+rootRelation.getSimpleName());
+
+		root.queryNodeProperties(queryHandler);	
 		
-		root.queryNodeProperties(queryHandler);		
+		ArrayTools.print(root.getDistribution());
+		ArrayTools.print(rootHistogram.getBoundaries());
+		
+		//rootHistogram = root.getHistogram();
 		
 		// First level with the candidate relations
 		LinkedList<CorrelationLatticeNode> nextLevel = new LinkedList<CorrelationLatticeNode>(); 
@@ -79,20 +87,23 @@ public class CorrelationLattice implements Serializable {
 				newNode.addLiteral(r);
 				newNode.addParent(root);
 				newNode.queryNodeGroupProperties(queryHandler);
-				//if (!r.isDangerous()) {
-				//	nextLevel.add(newNode);
-				//	logger.log(Level.DEBUG,"\n"+newNode);
-				//	logger.log(Level.DEBUG,"\t"+newNode.getInfo());
-				//}
+				
+				if (!r.isDangerous()) {
+					nextLevel.add(newNode);
+					logger.log(Level.DEBUG,"\n"+newNode);
+					logger.log(Level.DEBUG,"\t"+newNode.getInfo());
+				}
 				
 				int i=0;
-				for (long l: newNode.getConstants()) {
-					CorrelationLatticeNode n = getExistentNode(l);
+				//for (long l: newNode.getConstants()) {
+				//	CorrelationLatticeNode n = getExistentNode(l);
+				for (CorrelationLatticeNode n: newNode.getConstants()) {
 					logger.log(Level.DEBUG,"\n"+n);
 					logger.log(Level.DEBUG,"\t"+n.getInfo());
-					if (i++<maxConstantsPerRelation)
+					if (i++<maxConstantsPerRelation && n.getSupport()>=supportThreshold) {
 						nextLevel.add(n);
-					else 
+						//System.out.println(n);
+					}else 
 						break;
 				}
 			}
@@ -110,7 +121,7 @@ public class CorrelationLattice implements Serializable {
 			int joinedpairs = 0;
 			
 			for (int i=1; i<leaves.length; i++) {
-				System.out.println(i);
+				if ((i%100)==0) System.out.println(i);
 				CorrelationLatticeNode iNode = (CorrelationLatticeNode) leaves[i];				
 				for (int j=0; !iNode.isPruned() && j<i; j++) {
 					CorrelationLatticeNode jNode = (CorrelationLatticeNode) leaves[j];
@@ -118,16 +129,18 @@ public class CorrelationLattice implements Serializable {
 						if (!jNode.isPruned() && !iNode.isPruned()) {
 							if (joinedpairs<maxNodesPerLevel)
 								try {
-									CorrelationLatticeNode newNode = joinNodes(iNode, jNode, queryHandler);				
-									iNode.addChild(newNode);
-									jNode.addChild(newNode);
-									
-									if (!newNode.isPruned() && newNode.getSupport()>=supportThreshold) 
+									CorrelationLatticeNode newNode = joinNodes(iNode, jNode, queryHandler);	
+									if (newNode.getSupport()>=supportThreshold) {
+										//System.out.println(newNode);
+										iNode.addChild(newNode);
+										jNode.addChild(newNode);
 										nextLevel.add(newNode);										
+	
+										joinedpairs++;
+										logger.log(Level.DEBUG,"\n"+newNode);
+										logger.log(Level.DEBUG,"\t"+newNode.getInfo());
+									}
 
-									joinedpairs++;
-									logger.log(Level.DEBUG,"\n"+newNode);
-									logger.log(Level.DEBUG,"\t"+newNode.getInfo());
 								} catch (IllegalArgumentException e) {
 								}
 						}
@@ -141,16 +154,16 @@ public class CorrelationLattice implements Serializable {
 		}
 	}
 	
-	public CorrelationLatticeNode getExistentNode(long n) {
-		return idNodesMap.get(n);
-	}
+	//public CorrelationLatticeNode getExistentNode(long n) {
+	//	return idNodesMap.get(n);
+	//}
 	
 	public CorrelationLatticeNode getExistentNode(CorrelationLatticeNode n) {
 		return existentNodes.get(existentNodes.indexOf(n));
 	}
 	
 	public boolean addNodeToExistent(CorrelationLatticeNode n) {
-		idNodesMap.put(n.getId(),n);
+		//idNodesMap.put(n.getId(),n);
 		return existentNodes.add(n);
 	}
 	
@@ -168,12 +181,13 @@ public class CorrelationLattice implements Serializable {
 			resultRules.add(rule);
 	}
 	
-	public CorrelationLatticeNode joinNodes(CorrelationLatticeNode node1,CorrelationLatticeNode node2, QueryHandler qh) throws SQLException {
+	public CorrelationLatticeNode joinNodes(CorrelationLatticeNode node1,CorrelationLatticeNode node2, QueryHandler qh) throws SQLException {		
 		CorrelationLatticeNode newNode = node1.clone();
 
 		if (node1.getLevel() != node2.getLevel())
 			throw new IllegalArgumentException("Nodes should be of same level");
-		if (node1.getConstants().contains(node2.getId()) || node2.getConstants().contains(node1.getId()))
+		//if (node1.getConstants().contains(node2.getId()) || node2.getConstants().contains(node1.getId()))
+		if (node1.getConstants().contains(node2) || node2.getConstants().contains(node1))
 			throw new IllegalArgumentException("One node is constant of the other");
 		
 
@@ -206,15 +220,22 @@ public class CorrelationLattice implements Serializable {
 			throw new IllegalArgumentException("Nodes cannot join, there's not 2 differential literals \n\t"+ node1 + "\n\t" + node2);
 
 
-		if (!idNodesMap.containsKey(newNode)) {
-			newNode.addParent(node1);
-			newNode.addParent(node2);
+		//if (!idNodesMap.containsKey(newNode)) {
+		if (!existentNodes.contains(newNode)) {
+
 			newNode.queryNodeProperties(qh);
-			newNode.analizeNode();
-			idNodesMap.put(newNode.getId(),newNode);
+
+			
+			//idNodesMap.put(newNode.getId(),newNode);
+			
+			//existentNodes.add(newNode);
 			
 			//if (!node.isPruned()) {
-			if (newNode.getSupport()>=supportThreshold) {
+			if (newNode.getSupport()>=supportThreshold) {		
+				newNode.addParent(node1);
+				newNode.addParent(node2);
+				newNode.analizeNode();
+				existentNodes.add(newNode);
 				int[] indepHipotheses = independentJoinDitribution(node1, node2);
 				float indepMeasure = ArrayTools.chiSquare(ArrayTools.laplaceSmooth(indepHipotheses), ArrayTools.laplaceSmooth(newNode.getDistribution()));
 				if (indepMeasure >= independenceThreshold) {
@@ -225,12 +246,14 @@ public class CorrelationLattice implements Serializable {
 					node1.addHeadNewLiteral(diff1, diff2, newNode, node2);
 					node2.addHeadNewLiteral(diff2, diff1, newNode, node1);
 				}
+			} else {
+				throw new IllegalArgumentException("Node "+newNode+" doesnt satisfy support threshold");
 			}
-			
-			
 		} else {
 			CorrelationLatticeNode existent = getExistentNode(newNode);
 			int[] indepHipotheses = independentJoinDitribution(node1, node2);
+			if (existent.getDistribution()==null)
+				existent.queryNodeProperties(qh);
 			float indepMeasure = ArrayTools.chiSquare(ArrayTools.laplaceSmooth(indepHipotheses), ArrayTools.laplaceSmooth(existent.getDistribution()));
 			existent.addParent(node1);
 			existent.addParent(node2);
@@ -252,11 +275,14 @@ public class CorrelationLattice implements Serializable {
 	}
 	
 	public void checkNodeForRules(CorrelationLatticeNode node) {
-		for (long p: node.getParents()) 
-			testRule(node,idNodesMap.get(p));
+		//for (long p: node.getParents()) 
+		//	testRule(node,idNodesMap.get(p));
+		for (CorrelationLatticeNode p: node.getParents())
+			testRule(node,p);
 		
-		for (long c: node.getConstants()) {
-			CorrelationLatticeNode n = getExistentNode(c);
+		//for (long c: node.getConstants()) {
+		//	CorrelationLatticeNode n = getExistentNode(c);
+		for (CorrelationLatticeNode n: node.getConstants()) {
 			if (n.getSupport()>=supportThreshold) 
 				testRule(n,node);
 		}
@@ -269,8 +295,9 @@ public class CorrelationLattice implements Serializable {
 		set.add(root);
 		while (!set.isEmpty()) {
 			for (CorrelationLatticeNode node: set) {
-				for (long l: node.getChildren()) {
-					CorrelationLatticeNode child = getExistentNode(l);
+				//for (long l: node.getChildren()) {
+				//	CorrelationLatticeNode child = getExistentNode(l);
+				for (CorrelationLatticeNode child: node.getChildren()) {
 					if (/*!child.isPruned()*/child.getSupport()>=supportThreshold)
 						next.add(child);
 				}
@@ -290,7 +317,8 @@ public class CorrelationLattice implements Serializable {
 		
 		if (node1.getLevel() != node2.getLevel())
 			return;
-		if (node1.getConstants().contains(node2.getId()) || node2.getConstants().contains(node1.getId()))
+		//if (node1.getConstants().contains(node2.getId()) || node2.getConstants().contains(node1.getId()))
+		if (node1.getConstants().contains(node2) || node2.getConstants().contains(node1))
 			return;
 		
 		for (Literal l2 : node2.getLiterals()) {
@@ -415,9 +443,11 @@ public class CorrelationLattice implements Serializable {
 	}
 	
 	public CorrelationLatticeNode getCommonParent(CorrelationLatticeNode node1,CorrelationLatticeNode node2) {
-		for (long l1: node1.getParents()) {
-			CorrelationLatticeNode p1 = getExistentNode(l1);
-			if (node2.getParents().contains(p1.getId()))
+		//for (long l1: node1.getParents()) {
+		//	CorrelationLatticeNode p1 = getExistentNode(l1);
+		for (CorrelationLatticeNode p1: node1.getParents()) {
+			//if (node2.getParents().contains(p1.getId()))
+			if (node2.getParents().contains(p1))
 				return p1;
 		}
 		return null;
@@ -437,6 +467,22 @@ public class CorrelationLattice implements Serializable {
 	
 	public CorrelationLatticeNode getRoot() {
 		return root;
+	}
+	
+	public Histogram getHistogram() {
+		return rootHistogram;
+	}
+
+	public void setHistogram(Histogram histogram) {
+		this.rootHistogram = histogram;
+	}
+	
+	public Histogram copyHistogram() {
+		if (rootHistogram==null)
+			return null;
+		Histogram h = rootHistogram.clone();
+		h.reset();
+		return h;
 	}
 	
 	public Literal getRootLiteral() {
@@ -504,15 +550,15 @@ public class CorrelationLattice implements Serializable {
 		root.breadthFirst();
 	}
 	
-	public static CorrelationLatticeNode readFromDisk(String path) {	 
+	public static CorrelationLattice readFromDisk(String path) {	 
         try{
         	FileInputStream fileIn;
         	fileIn =new FileInputStream(path);
-        	CorrelationLatticeNode root = (CorrelationLatticeNode) SerializationUtils.deserialize(fileIn);
-        	return root;
+        	CorrelationLattice lattice = (CorrelationLattice) SerializationUtils.deserialize(fileIn);
+        	return lattice;
        }
        catch(IOException e){
-           e.printStackTrace();
+           //e.printStackTrace();
            return null;
        }
 	}

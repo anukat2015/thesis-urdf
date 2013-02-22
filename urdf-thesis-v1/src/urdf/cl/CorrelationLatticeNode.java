@@ -39,27 +39,35 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	private static Logger logger = Logger.getLogger(LearningManager.loggerName);
 	
 	private CorrelationLattice lattice;
-	private long root;
+	//private long root;
+	private CorrelationLatticeNode root;
 	private Relation rootRelation;
 	private Literal rootLiteral;
 	
 	public static boolean histogramBySupport = true;
+	public static boolean nonNegativeAttribute = true;
 
 	private float kldivRoot;
 
-	private Histogram histogram = null;
+	//private TreeSet<Long> children;
+	//private TreeSet<Long> parents;
+	//private TreeSet<Long> constants;
+	private TreeSet<CorrelationLatticeNode> children;
+	private TreeSet<CorrelationLatticeNode> parents;
+	private TreeSet<CorrelationLatticeNode> constants;
 
-	private TreeSet<Long> children;
-	private TreeSet<Long> parents;
-	private TreeSet<Long> constants;
-
-	private TreeMap<Float,Long> sortedChildren;
-	private TreeMap<Float,Long> sortedConstants;
 	
-	private HashMap<String,Long> literalChildMap;
+	//private TreeMap<Float,Long> sortedChildren;
+	private TreeMap<Float,CorrelationLatticeNode> sortedChildren;
+	//private TreeMap<Float,Long> sortedConstants;
+	private TreeMap<Float,CorrelationLatticeNode> sortedConstants;
+	
+	//private HashMap<String,Long> literalChildMap;
+	private HashMap<String,CorrelationLatticeNode> literalChildMap;
 	private HashMap<String, TreeMap<Float,Literal>> headSuggestionsMap;
 	
-	private TreeMap<Float,Long> kldivParents;
+	//private TreeMap<Float,Long> kldivParents;
+	private TreeMap<Float,CorrelationLatticeNode> kldivParents;
 	private TreeMap<Float,Literal> suggestions;
 
 	public float maxKldivParents;
@@ -79,7 +87,6 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 
 	private int nextVariable;
 	private int level;
-	
 
 	// Thresholds
 	private float divThreshold = (float) 0.0;
@@ -101,25 +108,36 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		this.mean = Float.NaN;
 		this.kldivRoot = Float.NaN;
 		this.entropy = Float.NaN;
+		//this.relationLiteralMap = new HashMap<Relation, Literal>();
+		//this.literalChildMap = new HashMap<String, Long>();
+		//this.children = new TreeSet<Long>();
+		//this.parents = new TreeSet<Long>();
+		//this.constants = new TreeSet<Long>();
+		//this.suggestions = new TreeMap<Float, Literal>();
+		//this.kldivParents = new TreeMap<Float, Long>();
+		//this.sortedChildren = new TreeMap<Float, Long>();
+		//this.sortedConstants = new TreeMap<Float, Long>();
 		this.relationLiteralMap = new HashMap<Relation, Literal>();
-		this.literalChildMap = new HashMap<String, Long>();
-		this.children = new TreeSet<Long>();
-		this.parents = new TreeSet<Long>();
-		this.constants = new TreeSet<Long>();
+		this.literalChildMap = new HashMap<String, CorrelationLatticeNode>();
+		this.children = new TreeSet<CorrelationLatticeNode>();
+		this.parents = new TreeSet<CorrelationLatticeNode>();
+		this.constants = new TreeSet<CorrelationLatticeNode>();
 		this.suggestions = new TreeMap<Float, Literal>();
-		this.kldivParents = new TreeMap<Float, Long>();
-		this.sortedChildren = new TreeMap<Float, Long>();
-		this.sortedConstants = new TreeMap<Float, Long>();
+		this.kldivParents = new TreeMap<Float, CorrelationLatticeNode>();
+		this.sortedChildren = new TreeMap<Float, CorrelationLatticeNode>();
+		this.sortedConstants = new TreeMap<Float, CorrelationLatticeNode>();
 		this.headSuggestionsMap = new HashMap<String, TreeMap<Float,Literal>>();
 		this.maxKldivChildren = Float.NEGATIVE_INFINITY;
 		this.maxKldivParents = Float.NEGATIVE_INFINITY;
 		
 		if (lattice.getRoot()!=null) {
-			this.root = lattice.getRoot().getId();
+			//this.root = lattice.getRoot().getId();
+			this.root = root;
 			this.rootRelation = lattice.getRootRelation();
 			this.rootLiteral = lattice.getRootLiteral();	
 		}else {
-			this.root = id;
+			//this.root = id;
+			this.root = this;
 			this.rootRelation = numericalProperty;
 			this.rootLiteral = new Literal(rootRelation, nextVariable++, nextVariable++);
 			//this.relationLiteralMap.put(rootRelation, rootLiteral);
@@ -129,19 +147,21 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		
 
 		
-		lattice.addNodeToExistent(this);
+		//lattice.addNodeToExistent(this);
 
 	}
 	
-	public void addParent(long node) {
-		addParent(lattice.getExistentNode(node));
-	}
+	//public void addParent(long node) {
+	//	addParent(lattice.getExistentNode(node));
+	//}
+	
 
 	public void addParent(CorrelationLatticeNode node) {
 		if (lattice.nodeExistis(node)) {
 			if (node.getRelations().size() == (this.getRelations().size() - 1) && node.level == (this.level - 1)) {
 				if (this.getRelations().containsAll(node.getRelations())) {
-					this.parents.add(node.getId());
+					//this.parents.add(node.getId());
+					this.parents.add(node);
 					return;
 				} else {
 					throw new IllegalArgumentException("Child itemset is not valid, it should be equals to this set plus an extra relation");
@@ -153,20 +173,21 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 			throw new IllegalArgumentException("Parent node should already be existent:\n"+node.toString());
 	}
 	
-	public void addChild(long node) {
-		addChild(lattice.getExistentNode(node));
-	}
+	//public void addChild(long node) {
+	//	addChild(lattice.getExistentNode(node));
+	//}
 
 	public void addChild(CorrelationLatticeNode node) {
 		if (node.getRelations().size() == (this.getRelations().size() + 1) && node.level == (this.level + 1)) {
 			if (node.getRelations().containsAll(this.getRelations())) {
-				this.children.add(node.getId());
+				//this.children.add(node.getId());
+				this.children.add(node);
 				lattice.addNodeToExistent(node);
 				Literal difference = node.getDifferenceLiteralFromParent(this);
 				String key = (difference.toString()).replaceAll("\\?([A-Z])", "\\?");
 				this.addSuggestion(node, difference);
-				this.literalChildMap.put(key, node.getId());
-				
+				//this.literalChildMap.put(key, node.getId());
+				this.literalChildMap.put(key, node);
 				return;
 			} else
 				throw new IllegalArgumentException("Child itemset is not valid, it should be equals to this set plus an extra relation");
@@ -175,14 +196,15 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 			throw new IllegalArgumentException("Child itemset size doesn't match! It's " + node.getRelations().size() + " and should be "+ this.getRelations().size());
 	}
 	
-	public void addConstant(long node) {
-		addConstant(lattice.getExistentNode(node));
-	}
+	//public void addConstant(long node) {
+	//	addConstant(lattice.getExistentNode(node));
+	//}
 
 	public void addConstant(CorrelationLatticeNode node) {
 		if (node.getRelations().size() == this.getRelations().size() && node.level == this.level) {
 			if (node.getRelations().containsAll(this.getRelations())) {
-				this.constants.add(node.getId()); 
+				//this.constants.add(node.getId()); 
+				this.constants.add(node);
 				lattice.addNodeToExistent(node);
 				return;
 			} else
@@ -193,9 +215,9 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 
 	}
 	
-	public long getId() {
-		return id;
-	}
+	//public long getId() {
+	//	return id;
+	//}
 
 	public boolean isPruned() {
 		return pruned;
@@ -203,10 +225,6 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 
 	public int[] getDistribution() {
 		return this.distribution;
-	}
-	
-	public float[] getBoundaries() {
-		return this.histogram.getBoundaries();
 	}
 
 	public int getLevel() {
@@ -216,10 +234,7 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	public float[] getNormalizedDistribution() {
 		return ArrayTools.normalize(distribution);
 	}
-	
-	public Histogram getHistogram() {
-		return histogram;
-	}
+
 	
 	public int getSupport() {
 		return support;
@@ -227,11 +242,13 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	
 	public CorrelationLatticeNode getChild(Literal l) {
 		String key = (l.toString()).replaceAll("\\?([A-Z])", "\\?");
-		Long id = literalChildMap.get(key);
-		if (id==null) 
-			return null;
-		else
-			return lattice.getExistentNode(id);
+		//Long id = literalChildMap.get(key);
+		//if (id==null) 
+		//	return null;
+		//else
+		//	return lattice.getExistentNode(id);
+		//System.out.println("getChild("+key+")");
+		return literalChildMap.get(key);
 	}
 	
 	public Literal getRootLiteral() {
@@ -250,16 +267,23 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		return relationLiteralMap.keySet();
 	}
 
-	public Collection<Long> getConstants() {
+	//public Collection<Long> getConstants() {
+	public Collection<CorrelationLatticeNode> getConstants() {
 		return this.constants;
 	}
 	
-	public Collection<Long> getParents() {
+	//public Collection<Long> getParents() {
+	public Collection<CorrelationLatticeNode> getParents() {
 		return this.parents;
 	}
 	
-	public Collection<Long> getChildren() {
+	//public Collection<Long> getChildren() {
+	public Collection<CorrelationLatticeNode> getChildren() {
 		return this.children;
+	}
+	
+	public Collection<String> getChildrenKeys() {
+		return this.literalChildMap.keySet();
 	}
 	
 	public int getNumberOfBuckets() {
@@ -302,66 +326,79 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 			throw new IllegalArgumentException("Relation " + item.getName() + " is not contained in node");
 	}
 	
-	public void setHistogram(HistogramRange hs) {
-		this.histogram = hs;
-	}
-	
 	private void extractNodeAndConstants(ResultSet rs, Literal groupLiteral, float mean) throws SQLException {
 		logger.log(Level.DEBUG,"Extracting "+groupLiteral.getRelationName()+" with mean="+mean);
+		
+		Histogram histogram = lattice.copyHistogram();
+
 		CorrelationLatticeNode greaterConst = this.clone();
 		CorrelationLatticeNode smallerConst = this.clone();
 		greaterConst.relationLiteralMap.get(groupLiteral.getRelation()).setMin(mean);
 		smallerConst.relationLiteralMap.get(groupLiteral.getRelation()).setMax(mean);
-		greaterConst.histogram.reset();
-		smallerConst.histogram.reset();
+		Histogram greaterConsthistogram = lattice.copyHistogram();
+		Histogram smallerConsthistogram = lattice.copyHistogram();
 		
 		while (rs.next()) {
 			float numConst = rs.getFloat("C");
 			float x = rs.getFloat("B");
+			if (nonNegativeAttribute) x = Math.abs(x);
 			
 			int count = 1;
 			try { 
 				count = rs.getInt("count");
 			} catch (SQLException e){}
 			
-			this.histogram.addDataPoint(x, count);
+			histogram.addDataPoint(x, count);
 			if (numConst>mean)
-				greaterConst.histogram.addDataPoint(x, count);
+				greaterConsthistogram.addDataPoint(x, count);
 			else
-				smallerConst.histogram.addDataPoint(x, count);
+				smallerConsthistogram.addDataPoint(x, count);
 		}
-		lattice.addNodeToExistent(greaterConst);
-		lattice.addNodeToExistent(smallerConst);
 		
-		this.constants.add(smallerConst.getId());
-		this.constants.add(greaterConst.getId());
-		smallerConst.addParent(root);
-		greaterConst.addParent(root);
 		
-		this.extractHistogramInformation();
+		
+		this.extractHistogramInformation(histogram);
 		this.analizeNode();
-		greaterConst.extractHistogramInformation();
-		greaterConst.analizeNode();
-		smallerConst.extractHistogramInformation();
-		smallerConst.analizeNode();
+		greaterConst.extractHistogramInformation(greaterConsthistogram);
+		if (greaterConst.getSupport()>=supportThreshold) {
+			//this.constants.add(smallerConst.getId());
+			this.constants.add(greaterConst);
+			greaterConst.addParent(root);
+			greaterConst.analizeNode();			
+			lattice.addNodeToExistent(greaterConst);
+		}
+		smallerConst.extractHistogramInformation(smallerConsthistogram);
+		if (smallerConst.getSupport()>=supportThreshold) {
+			this.constants.add(smallerConst);
+			//this.constants.add(greaterConst.getId());			
+			smallerConst.addParent(root);		
+			smallerConst.analizeNode();
+			lattice.addNodeToExistent(smallerConst);
+		}
+
 		
-		for (long id: constants) {
-			CorrelationLatticeNode constNode = lattice.getExistentNode(id);
+		//for (long id: constants) {
+		//	CorrelationLatticeNode constNode = lattice.getExistentNode(id);
+		for (CorrelationLatticeNode constNode: constants) {
 			float div = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(constNode.distribution));
-			sortedConstants.put(div, constNode.getId());
+			//sortedConstants.put(div, constNode.getId());
+			sortedConstants.put(div, constNode);
 		}
 		
 	}
 	
 	private void extractNodeAndConstants(ResultSet rs, Literal groupLiteral) throws SQLException {
+		Histogram histogram = lattice.copyHistogram();
+		
 		if (level > 0 && histogram != null) {
 			String lastGroup = "";
 			HashSet<String> entitiesSet = new HashSet<String>();
 			CorrelationLatticeNode newConst = this.clone();
-			newConst.histogram.reset();
+			Histogram newConsthistogram = lattice.copyHistogram();
 			while (rs.next()) {
 				String groupConst = rs.getString("C").replaceAll("\"", "");
 				float x = rs.getFloat("B");
+				if (nonNegativeAttribute) x = Math.abs(x);
 				
 				int count = 1;
 				try { 
@@ -374,7 +411,7 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 				} catch (SQLException e){}
 
 				if (!lastGroup.equals(groupConst)) {
-					newConst.extractHistogramInformation();
+					newConst.extractHistogramInformation(newConsthistogram);
 					if (newConst.support>=lattice.getSupportThreshold()) {
 						newConst.setConstant(groupLiteral.getRelation(), lastGroup);
 						this.addConstant(newConst);
@@ -383,18 +420,18 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 						lattice.addNodeToExistent(newConst);
 						newConst = this.clone();
 					}
-					newConst.histogram.reset();
+					newConsthistogram.reset();
 				}
 				
 				if (entity==null || !entitiesSet.contains(entity)) 
-					this.histogram.addDataPoint(x, count);				
-				newConst.histogram.addDataPoint(x, count);
+					histogram.addDataPoint(x, count);				
+				newConsthistogram.addDataPoint(x, count);
 				
 				if (entity!=null)
 					entitiesSet.add(entity);
 				lastGroup = groupConst;
 			}
-			newConst.extractHistogramInformation();
+			newConst.extractHistogramInformation(newConsthistogram);
 			if (newConst.support>=lattice.getSupportThreshold()) {
 				newConst.setConstant(groupLiteral.getRelation(), lastGroup);
 				this.addConstant(newConst);
@@ -402,13 +439,15 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 				newConst.analizeNode();
 				lattice.addNodeToExistent(newConst);
 			} //else logger.log(Level.DEBUG,"FailedSupportTest[="+newConst.support+"]:"+lastGroup);
-			this.extractHistogramInformation();
+			this.extractHistogramInformation(histogram);
 			this.analizeNode();
 			
-			for (long id: constants) {
-				CorrelationLatticeNode constNode = lattice.getExistentNode(id);
+			//for (long id: constants) {
+			//	CorrelationLatticeNode constNode = lattice.getExistentNode(id);
+			for (CorrelationLatticeNode constNode: constants) {
 				float div = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(constNode.distribution));
-				sortedConstants.put(div, constNode.getId());
+				//sortedConstants.put(div, constNode.getId());
+				sortedConstants.put(div, constNode);
 			}
 		}
 	}
@@ -416,16 +455,19 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 
 	public void queryNodeGroupProperties(QueryHandler qh) throws SQLException {
 		logger.log(Level.DEBUG, "Querying Node Group Properties: "+this);
+		
+		Histogram histogram = lattice.copyHistogram();
+		
 		if (level == 1 && this.getRelations().size() == 1) {
 			logger.log(Level.DEBUG, "Now actually Querying Node Group Properties: "+this);
 			Literal groupLiteral = (Literal) relationLiteralMap.values().toArray()[0];
 			Relation groupRelation = groupLiteral.getRelation();
 			
 			ResultSet rs = null;
-			//if (groupRelation.isFunction() || groupRelation.isDangerous())
+			if (groupRelation.isFunction() || groupRelation.isDangerous())
 				rs = qh.retrieveCategoryDistribution(rootLiteral,groupLiteral);
-			//else
-			//	rs = qh.retrieveNonFuctionGroupDistribution(rootLiteral, groupLiteral);
+			else
+				rs = qh.retrieveNonFuctionGroupDistribution(rootLiteral, groupLiteral);
 			
 			float mean = QueryHandler.getMean(rs);
 			if (!Float.isNaN(mean)) {
@@ -438,28 +480,34 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 			//if (!groupRelation.isDangerous()) 
 			//	rootNode.addChild(this);
 
-			for (long n: constants) {
-				rootNode.addChild(lattice.getExistentNode(n));
+			//for (long n: constants) {
+			for (CorrelationLatticeNode n: constants) {
+				//rootNode.addChild(lattice.getExistentNode(n));
+				rootNode.addChild(n);
 			}
 			
 			lattice.addNodeToExistent(this);
-			
 		}
-
-
 	}
 
 	public void queryNodeProperties(QueryHandler qh) throws SQLException {
+
 		ResultSet rs = qh.retrieveDistribution(rootLiteral,relationLiteralMap.values(),this.getFilter());
 
+		Histogram histogram = lattice.copyHistogram();
+		
 		if (histogramBySupport) {
-			if (level == 0 && histogram == null) 
-				histogram = new HistogramSupport(rs, numOfBuckets);
+			if (level == 0 && histogram == null) { 
+				histogram = new HistogramEqualFrequencies(rs, numOfBuckets);
+				lattice.setHistogram(histogram);
+			}
 			else {
 				histogram.reset();
 				rs.beforeFirst();
 				while (rs.next()) {
 					float x = rs.getFloat("B");
+					if (nonNegativeAttribute) x = Math.abs(x);
+					
 					int count = 1;
 					try { 
 						count = rs.getInt("count");
@@ -475,15 +523,24 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 				rs.beforeFirst();
 				while (rs.next()) {
 					float n = rs.getFloat("B");
+					if (nonNegativeAttribute) n = Math.abs(n);
+					
 					if (n<min) min = n;
 					if (n>max) max = n;
 				}
-				histogram = new HistogramRange(min, max, numOfBuckets);
+				min = (float) 0;
+				max = (float) 7550;
+				histogram = new HistogramEqualWidth(min, max, numOfBuckets);
+				histogram.setMax(Float.POSITIVE_INFINITY);
+				//histogram.setMin(Float.NEGATIVE_INFINITY);
+				lattice.setHistogram(histogram);
 			}			
 			histogram.reset();
 			rs.beforeFirst();
 			while (rs.next()) {
 				float x = rs.getFloat("B");
+				if (nonNegativeAttribute) x = Math.abs(x);
+				
 				int count = 1;
 				try { 
 					count = rs.getInt("count");
@@ -492,13 +549,13 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 				histogram.addDataPoint(x, count);
 			}
 		}
-		
-		extractHistogramInformation();
+		extractHistogramInformation(histogram);		
+
 		logger.log(Level.DEBUG, ArrayTools.toString(distribution));
 		logger.log(Level.DEBUG, ArrayTools.toString(histogram.getBoundaries()));
 	}
 	
-	public void extractHistogramInformation() {
+	public void extractHistogramInformation(Histogram histogram) {
 		this.distribution = histogram.getDistribution();
 		this.mean = histogram.getMean();
 		this.entropy = ArrayTools.entropy(this.distribution);
@@ -508,20 +565,25 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	
 	public void analizeNode() {
 		// Maximum KLDIV
-		for (long l : parents) {
-			CorrelationLatticeNode parent = lattice.getExistentNode(l);
+		//for (long l : parents) {
+		//	CorrelationLatticeNode parent = lattice.getExistentNode(l);
+		for (CorrelationLatticeNode parent: parents) {
 			float kldiv = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(parent.distribution));
-			kldivParents.put(kldiv,parent.getId());
+			//kldivParents.put(kldiv,parent.getId());
+			kldivParents.put(kldiv,parent);
 			if (kldiv > this.maxKldivParents)
 				this.maxKldivParents = kldiv;
 		}
 		
-		for (long l : children) {
-			CorrelationLatticeNode child = lattice.getExistentNode(l);
+		//for (long l : children) {
+		//	CorrelationLatticeNode child = lattice.getExistentNode(l);
+		for (CorrelationLatticeNode child: children) {
 			if (child.distribution != null) {
 				float kldiv = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution));
-				sortedChildren.put(kldiv, child.getId());
-				sortedChildren.put(ArrayTools.kullbackLeiblerDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution)), child.getId());
+				//sortedChildren.put(kldiv, child.getId());
+				sortedChildren.put(kldiv, child);
+				//sortedChildren.put(ArrayTools.kullbackLeiblerDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution)), child.getId());
+				sortedChildren.put(ArrayTools.kullbackLeiblerDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution)), child);
 				if (kldiv > this.maxKldivChildren)
 					this.maxKldivChildren = kldiv;
 			}
@@ -530,12 +592,15 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		if (/*this.maxKldivParents < kldivThreshold || */this.support < lattice.getSupportThreshold()) {
 			this.pruned = true;
 		}
-		for (long l : parents) {
-			CorrelationLatticeNode parent = lattice.getExistentNode(l);
+		//for (long l : parents) {
+		//	CorrelationLatticeNode parent = lattice.getExistentNode(l);
+		for (CorrelationLatticeNode parent: parents) {
 			float[] acc = ArrayTools.getAccuraciesWithMinSupport(this.getDistribution(), parent.getDistribution(), supportThreshold);
-			if (ArrayTools.max(acc) >= 0.05){
-				System.out.println(this + "\t<==\t" + parent);
-				ArrayTools.print(acc);
+			if (ArrayTools.max(acc) >= 0.75 && ArrayTools.max(acc)<=1){
+				//System.out.println(this + "\t<==\t" + parent);
+				//ArrayTools.print(acc);
+				//ArrayTools.print(ArrayTools.divide(this.getDistribution(), parent.getDistribution()));
+				//System.out.println(ArrayTools.entropy(acc));
 			}
 		}
 		
@@ -632,8 +697,8 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	@Override
 	public CorrelationLatticeNode clone() {
 		CorrelationLatticeNode newNode = new CorrelationLatticeNode(this.lattice,this.rootRelation);
-		newNode.histogram = this.histogram.clone();
-		newNode.histogram.reset();
+		//newNode.histogram = this.histogram.clone();
+		//newNode.histogram.reset();
 		newNode.nextVariable = this.nextVariable;
 		newNode.level = this.level;
 		newNode.root = this.root;
@@ -697,8 +762,12 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 			System.out.println("Level "+i+":");
 			for (CorrelationLatticeNode node: set) {
 				System.out.println(node);
-				for (long child: node.children) 
-					next.add(lattice.getExistentNode(child));
+				ArrayTools.print(node.getDistribution());
+				//for (long child: node.children) 
+				//	next.add(lattice.getExistentNode(child));
+				for (CorrelationLatticeNode child: node.getChildren()) {
+					next.add(child);
+				}
 			}
 			set = next;
 			next = new HashSet<CorrelationLatticeNode>();
@@ -734,9 +803,11 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		while (!set.isEmpty()) {
 			for (CorrelationLatticeNode node: set) {
 				
-				for (long child: node.children) {
-					next.add(lattice.getExistentNode(child));
-				}
+				//for (long child: node.children) 
+				//	next.add(lattice.getExistentNode(child));
+				for (CorrelationLatticeNode child: node.children) 
+					next.add(child);
+				
 				if (node.headSuggestionsMap.size()>0) {
 					logger.log(Level.DEBUG,node);
 				}
