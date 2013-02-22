@@ -21,5 +21,8 @@ public interface Histogram extends Cloneable, Serializable{
 	public float[] getBoundaries();
 
 	public Histogram clone();
+	
+	public void setMin(float min);
+	public void setMax(float max);
 
 }

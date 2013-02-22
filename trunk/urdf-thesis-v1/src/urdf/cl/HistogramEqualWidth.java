@@ -2,7 +2,7 @@ package urdf.cl;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
-public class HistogramRange implements Histogram{
+public class HistogramEqualWidth implements Histogram{
 
 	private static final long serialVersionUID = 1L;
 	
@@ -18,7 +18,7 @@ public class HistogramRange implements Histogram{
 	protected double xMean = 0;
 
 	
-	public HistogramRange(float min, float max, int numberOfBuckets) {
+	public HistogramEqualWidth(float min, float max, int numberOfBuckets) {
 		this.min = min;
 		this.max = max;
 
@@ -35,7 +35,18 @@ public class HistogramRange implements Histogram{
 		this.reset();
 	}
 	
-	public HistogramRange(float x[], int[] y, int numberOfBuckets) {
+	public HistogramEqualWidth(float min, float max, int numberOfBuckets, float bucketWidth, float[] boundaries) {
+		this.min = min;
+		this.max = max;
+		this.numberOfBuckets = numberOfBuckets;
+		this.boundaries = boundaries;
+		this.count = new int[numberOfBuckets];
+		this.normalized = new float[numberOfBuckets];
+		this.bucketWidth = bucketWidth;
+		this.reset();
+	}
+	
+	public HistogramEqualWidth(float x[], int[] y, int numberOfBuckets) {
 		if (x.length != y.length) 
 			throw new IllegalArgumentException("Both arrays must be of same size");
 		
@@ -121,12 +132,21 @@ public class HistogramRange implements Histogram{
 	
 	@Override
 	public Histogram clone() {
-		Histogram hist = new HistogramRange(this.min, this.max, this.numberOfBuckets);
+		Histogram hist = new HistogramEqualWidth(min, max, numberOfBuckets, bucketWidth, boundaries);
 		return hist;
 	}
 
 	@Override
 	public float[] getBoundaries() {
 		return boundaries;
+	}
+	
+	@Override
+	public void setMin(float min) {
+		this.min=min;
+	}
+	@Override
+	public void setMax(float max) {
+		this.max=max;
 	}
 }

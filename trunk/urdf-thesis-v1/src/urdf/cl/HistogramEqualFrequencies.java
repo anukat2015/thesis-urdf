@@ -1,12 +1,17 @@
 package urdf.cl;
 
 import java.sql.SQLException;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
+import javatools.datatypes.Tree;
 
 import edu.emory.mathcs.backport.java.util.Arrays;
 
 import urdf.rdf3x.ResultSet;
 
-public class HistogramSupport implements Histogram{
+public class HistogramEqualFrequencies implements Histogram{
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -21,8 +26,9 @@ public class HistogramSupport implements Histogram{
 	protected float xMean = 0;
 	
 	private int lastBucketAdded = 0; // for optimization in case data is inserted in ascending order 
+	private float lastElementAdded = Float.NEGATIVE_INFINITY;
 
-	public HistogramSupport(float min, float max, float[] boundaries) {
+	public HistogramEqualFrequencies(float min, float max, float[] boundaries) {
 		this.min = min;
 		this.max = max;
 		this.numberOfBuckets = boundaries.length+1;
@@ -37,67 +43,50 @@ public class HistogramSupport implements Histogram{
 		
 	}
 	
-	public HistogramSupport(ResultSet rs, int numOfBuckets) throws SQLException {
+	public HistogramEqualFrequencies(ResultSet rs, int numOfBuckets) throws SQLException {
 		this.numberOfBuckets = numOfBuckets;
 		this.boundaries = new float[this.numberOfBuckets-1];
 		this.count = new int[numberOfBuckets];
 		this.normalized = new float[numberOfBuckets];
 		
-		float minRS = Float.POSITIVE_INFINITY;
-		float maxRS = Float.NEGATIVE_INFINITY;
+		TreeMap<Float,Integer> sortedEntries = new TreeMap<Float, Integer>();
 		rs.beforeFirst();
+		int total = 0;
 		while (rs.next()) {
 			float n = rs.getFloat(1);
-			if (n<minRS) minRS = n;
-			if (n>maxRS) maxRS = n;
-		}
-		this.min = minRS;
-		this.max = maxRS;
-		
-		// Sum facts and check if ResultSet is sorted;
-		int count = 0;
-		float last = Float.NEGATIVE_INFINITY;
-		rs.beforeFirst();
-		while (rs.next()) {
+			int count = 1;
 			try {
 				count += rs.getInt("count");
-			} catch (SQLException e) {
-				count += 1;
-			}
-			if (rs.getFloat(1) < last)
-				 throw new IllegalArgumentException("Result set should be sorted in ascending order");
+			} catch (SQLException e) {}
+			total += count;
+			if (sortedEntries.containsKey(n)) 
+				sortedEntries.put(n, count+sortedEntries.get(n));
 			else
-				last = rs.getFloat(1);
+				sortedEntries.put(n, count);
 		}
+		this.min = sortedEntries.firstKey();
+		this.max = sortedEntries.lastKey();
 		
-		rs.beforeFirst();
-		int bucketSupport = (int) Math.ceil(((float)count)/((float)numOfBuckets));
+		
+		int bucketSupport = (int) Math.ceil(((float)total)/((float)numOfBuckets));
 		int sum = 0;
 		int bucket = 0;
 		int lastBoundary = 0;
-		while (rs.next() && bucket<boundaries.length) {
-			try {
-				sum += rs.getInt("count");
-			} catch (SQLException e) {
-				sum += 1;
-			}
-			if (sum >= lastBoundary+bucketSupport) {
-				this.boundaries[bucket] = rs.getFloat(1);
+		for (Entry<Float,Integer> e: sortedEntries.entrySet()) {
+			sum += e.getValue();
+			if (bucket < boundaries.length && sum >= lastBoundary+bucketSupport) {
+				this.boundaries[bucket] = e.getKey();
 				lastBoundary = sum;
 				bucket++;
-				bucketSupport = (int) Math.ceil(((float)(count-sum))/((float)(numOfBuckets-bucket)));
+				bucketSupport = (int) Math.ceil(((float)(total-sum))/((float)(numOfBuckets-bucket)));
 			}
 		}
-		//System.out.print("["+this.min+","+this.max+"]\t");
+		
+		for (Entry<Float,Integer> e: sortedEntries.entrySet()) {
+			this.addDataPoint(e.getKey(), e.getValue());
+		}
 		
 		rs.beforeFirst();
-		while (rs.next()) {
-			count = 1;
-			try {
-				count = rs.getInt("count");
-			} catch (SQLException e) {}
-			this.addDataPoint(rs.getFloat(1), count);
-		}
 	}
 	
 	@Override
@@ -106,9 +95,9 @@ public class HistogramSupport implements Histogram{
 		if (x > boundaries[numberOfBuckets-2])
 			bucket = numberOfBuckets-1;
 		else {
-			//if (lastBucketAdded<boundaries.length && x < boundaries[lastBucketAdded])
-			//	bucket = lastBucketAdded;
-			//else
+			if (x>lastElementAdded)
+				bucket = lastBucketAdded;
+			else
 				bucket = 0;
 			
 			while (bucket<(numberOfBuckets-1) && boundaries[bucket]<x) {
@@ -127,6 +116,7 @@ public class HistogramSupport implements Histogram{
 			count[i] += y;
 			normalized[i] += y;
 			lastBucketAdded = i;
+			lastElementAdded = x;
 		} else {
 			throw new IllegalArgumentException("Point "+x+" is out of bounds ["+min+","+max+"]");
 		}
@@ -140,11 +130,12 @@ public class HistogramSupport implements Histogram{
 		totalCount = 0;
 		xMean = 0;
 		lastBucketAdded = 0;
+		lastElementAdded = Float.NEGATIVE_INFINITY;
 	}
 	
 	@Override
 	public Histogram clone() {
-		Histogram hist = new HistogramSupport(this.min, this.max, this.boundaries);
+		Histogram hist = new HistogramEqualFrequencies(this.min, this.max, this.boundaries);
 		return hist;
 	}
 
@@ -172,6 +163,15 @@ public class HistogramSupport implements Histogram{
 	@Override
 	public float[] getBoundaries() {
 		return boundaries;
+	}
+	
+	@Override
+	public void setMin(float min) {
+		this.min=min;
+	}
+	@Override
+	public void setMax(float max) {
+		this.max=max;
 	}
 	
 

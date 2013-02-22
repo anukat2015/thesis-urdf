@@ -28,7 +28,7 @@ import urdf.rdf3x.Driver;
 import urdf.rdf3x.ResultSet;
 import edu.emory.mathcs.backport.java.util.Collections;
 
-public class RuleLearner {
+public class USCensusTester {
 
 	private QueryHandler queryHandler;
 	private ThresholdChecker tChecker;
@@ -48,7 +48,7 @@ public class RuleLearner {
 	
 	private static int maxLevels = 5;
 	
-	public RuleLearner(QueryHandler queryHandler,ThresholdChecker tChecker, RelationsInfo info, Relation rootRelation) {
+	public USCensusTester(QueryHandler queryHandler,ThresholdChecker tChecker, RelationsInfo info, Relation rootRelation) {
 		
 		PropertyConfigurator.configure(LearningManager.log4jConfig);
 		
@@ -300,7 +300,7 @@ public class RuleLearner {
 				Relation rootRelation = new Relation("<http://dbpedia.org/ontology/budget>", null, null);
 				
 				
-				RuleLearner learner = new RuleLearner(qh, null, null, rootRelation);
+				USCensusTester learner = new USCensusTester(qh, null, null, rootRelation);
 				
 				ArrayTools.measure = measure;
 				
