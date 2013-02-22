@@ -275,9 +275,9 @@ public class USCensusTester {
 		for (int i=0; i<indepTSArray.length; i++) {
 			for (int j=0; j<kldivTSArray.length; j++) {
 				//Connection connPartition = Driver.connect("src/rdf3x-dblp.properties");
-				//Connection connPartition = Driver.connect("src/rdf3x-data91-train.properties");
+				Connection connPartition = Driver.connect("src/rdf3x-data91-train.properties");
 				//Connection connPartition = Driver.connect("src/rdf3x-yago.properties");
-				Connection connPartition = Driver.connect("src/rdf3x-dbpedia.properties");
+				//Connection connPartition = Driver.connect("src/rdf3x-dbpedia.properties");
 				
 				
 				QueryHandler qh = new QueryHandler(connPartition);
@@ -292,12 +292,12 @@ public class USCensusTester {
 				//Relation rootRelation = info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasPopulation>");
 				//Relation rootRelation = info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasGDP>");
 				//Relation rootRelation = info.getRelationFromRelations("<http://yago-knowledge.org/resource/hasNumberOfPeople>");
-				//Relation rootRelation = new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/pincp>", null, null);
+				Relation rootRelation = new Relation("<http://data-gov.tw.rpi.edu/vocab/p/91/pincp>", null, null);
 				//Relation rootRelation = new Relation("<http://dbpedia.org/property/populationDensity>", null, null);
 				//Relation rootRelation = new Relation("<http://dbpedia.org/property/gdpNominalPerCapita>", null, null);
 				//Relation rootRelation = new Relation("<http://purl.org/ontology/mo/duration_ms>", null, null);
 				
-				Relation rootRelation = new Relation("<http://dbpedia.org/ontology/budget>", null, null);
+				//Relation rootRelation = new Relation("<http://dbpedia.org/ontology/budget>", null, null);
 				
 				
 				USCensusTester learner = new USCensusTester(qh, null, null, rootRelation);
@@ -326,19 +326,19 @@ public class USCensusTester {
 				root.breadthFirstWithSuggestions(null);
 				
 				//Deserialize load it
-				/*CorrelationLatticeNode root = CorrelationLatticeNode.readFromDisk("correlation-lattice-income.ser");
-				Histogram hs = root.getHistogram();
+				CorrelationLattice lattice = CorrelationLattice.readFromDisk("correlation-lattice-income.ser");
+				Histogram hs = lattice.getHistogram();
 				ObjectInputStream ois = new ObjectInputStream(new FileInputStream("rules-income.ser"));
-				Set<NumericalRule> learnedRules = (HashSet<NumericalRule>) ois.readObject();
+				//learnedRules = (HashSet<NumericalRule>) ois.readObject();
 				for (NumericalRule r: learnedRules) {
 					System.out.println(r.getRuleString());
 				}
 				if (root.getRootLiteral()==null) System.out.println("FODEO!");
-				*/
+				
 				//RuleTester rt = new RuleTester(qh,hs,rootRelation);
 				
 				
-				/*
+				
 				// Test on test partition
 				connPartition = Driver.connect("src/rdf3x-data91-test.properties");
 				
@@ -347,7 +347,7 @@ public class USCensusTester {
 				float negatives = 0;
 				float positives = 0;
 				float avgGain = 0;
-				RuleTester rt = new RuleTester(root,qh);
+				RuleTester rt = new RuleTester(lattice,qh);
 				for (NumericalRule r: learnedRules) {
 					rt.testRule(r, learner.suppThreshold, confidenceThreshold);
 
@@ -383,9 +383,9 @@ public class USCensusTester {
 						  "\nacc="+(positives/(positives+negatives)) + 
 						  "\nsup="+(positives+negatives) +
 						  "\ngain="+(avgGain) +
-						  "\nnodes="+root.countNonPruned() +
+						  //"\nnodes="+root.countNonPruned() +
 						  "\nrules="+learnedRules.size();
-				*/
+				
 				
 				
 				CorrelationLatticeNode.reset();
