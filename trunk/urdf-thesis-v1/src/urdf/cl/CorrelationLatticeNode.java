@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map.Entry;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -46,6 +47,7 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	
 	public static boolean histogramBySupport = true;
 	public static boolean nonNegativeAttribute = true;
+	public static boolean allowNumericalBipartition = false;
 
 	private float kldivRoot;
 
@@ -67,11 +69,11 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	private HashMap<String, TreeMap<Float,Literal>> headSuggestionsMap;
 	
 	//private TreeMap<Float,Long> kldivParents;
-	private TreeMap<Float,CorrelationLatticeNode> kldivParents;
+	//private TreeMap<Float,CorrelationLatticeNode> interestingnessParents;
 	private TreeMap<Float,Literal> suggestions;
 
-	public float maxKldivParents;
-	private float maxKldivChildren;
+	public float maxInterestingnessParents;
+	private float maxInterestingnessChildren;
 
 
 	private HashMap<Relation, Literal> relationLiteralMap;
@@ -123,12 +125,12 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		this.parents = new TreeSet<CorrelationLatticeNode>();
 		this.constants = new TreeSet<CorrelationLatticeNode>();
 		this.suggestions = new TreeMap<Float, Literal>();
-		this.kldivParents = new TreeMap<Float, CorrelationLatticeNode>();
+		//this.interestingnessParents = new TreeMap<Float, CorrelationLatticeNode>();
 		this.sortedChildren = new TreeMap<Float, CorrelationLatticeNode>();
 		this.sortedConstants = new TreeMap<Float, CorrelationLatticeNode>();
 		this.headSuggestionsMap = new HashMap<String, TreeMap<Float,Literal>>();
-		this.maxKldivChildren = Float.NEGATIVE_INFINITY;
-		this.maxKldivParents = Float.NEGATIVE_INFINITY;
+		this.maxInterestingnessChildren = Float.NEGATIVE_INFINITY;
+		this.maxInterestingnessParents = Float.NEGATIVE_INFINITY;
 		
 		if (lattice.getRoot()!=null) {
 			//this.root = lattice.getRoot().getId();
@@ -179,7 +181,7 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 
 	public void addChild(CorrelationLatticeNode node) {
 		if (node.getRelations().size() == (this.getRelations().size() + 1) && node.level == (this.level + 1)) {
-			if (node.getRelations().containsAll(this.getRelations())) {
+			if (node.getRelations().containsAll(this.getRelations()) && node.getSupport()>=supportThreshold) {
 				//this.children.add(node.getId());
 				this.children.add(node);
 				lattice.addNodeToExistent(node);
@@ -470,7 +472,7 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 				rs = qh.retrieveNonFuctionGroupDistribution(rootLiteral, groupLiteral);
 			
 			float mean = QueryHandler.getMean(rs);
-			if (!Float.isNaN(mean)) {
+			if (allowNumericalBipartition && !Float.isNaN(mean)) {
 				extractNodeAndConstants(rs, groupLiteral, mean);
 			} else {
 				extractNodeAndConstants(rs, groupLiteral);
@@ -570,22 +572,22 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		for (CorrelationLatticeNode parent: parents) {
 			float kldiv = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(parent.distribution));
 			//kldivParents.put(kldiv,parent.getId());
-			kldivParents.put(kldiv,parent);
-			if (kldiv > this.maxKldivParents)
-				this.maxKldivParents = kldiv;
+			//interestingnessParents.put(kldiv,parent);
+			if (kldiv > this.maxInterestingnessParents)
+				this.maxInterestingnessParents = kldiv;
 		}
 		
 		//for (long l : children) {
 		//	CorrelationLatticeNode child = lattice.getExistentNode(l);
 		for (CorrelationLatticeNode child: children) {
 			if (child.distribution != null) {
-				float kldiv = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution));
+				float interest = ArrayTools.divergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution));
 				//sortedChildren.put(kldiv, child.getId());
-				sortedChildren.put(kldiv, child);
+				sortedChildren.put(interest, child);
 				//sortedChildren.put(ArrayTools.kullbackLeiblerDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution)), child.getId());
 				sortedChildren.put(ArrayTools.kullbackLeiblerDivergence(ArrayTools.laplaceSmooth(this.distribution),ArrayTools.laplaceSmooth(child.distribution)), child);
-				if (kldiv > this.maxKldivChildren)
-					this.maxKldivChildren = kldiv;
+				if (interest > this.maxInterestingnessChildren)
+					this.maxInterestingnessChildren = interest;
 			}
 		}
 
@@ -607,7 +609,7 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	}
 
 	public String getInfo() {
-		return "Level=" + this.level + " Pruned=" + this.pruned + " #Parents="+ this.parents.size() +" Entropy="+ this.entropy + " Support=" + this.support + " KLdivRoot="+ this.kldivRoot + " MaxKLdivParents=" + this.maxKldivParents;
+		return "Level=" + this.level + " Pruned=" + this.pruned + " #Parents="+ this.parents.size() +" Entropy="+ this.entropy + " Support=" + this.support + " KLdivRoot="+ this.kldivRoot + " MaxKLdivParents=" + this.maxInterestingnessParents;
 	}
 	
 	private Literal getDifferenceLiteral(CorrelationLatticeNode node) {
@@ -726,12 +728,14 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		if (this.equals(o)) 
 			return 0;
 		else
-			return -Float.compare(this.maxKldivParents, o.maxKldivParents);
+			return -Float.compare(this.maxInterestingnessParents, o.maxInterestingnessParents);
 	}
 	
 	public void addSuggestion(CorrelationLatticeNode node, Literal newLiteral) {
-		float div = ArrayTools.divergence(ArrayTools.laplaceSmooth(node.getDistribution()),ArrayTools.laplaceSmooth(this.getDistribution()));
-		suggestions.put(div, newLiteral);
+		if (ArrayTools.sum(node.getDistribution())>=supportThreshold) {
+			float div = ArrayTools.divergence(ArrayTools.laplaceSmooth(node.getDistribution()),ArrayTools.laplaceSmooth(this.getDistribution()));
+			suggestions.put(div, newLiteral);
+		}
 	}
 	
 	public void addHeadNewLiteral(Literal head, Literal newLiteral, CorrelationLatticeNode joinNode, CorrelationLatticeNode bodyNode) {
@@ -757,12 +761,16 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 		Collection<CorrelationLatticeNode> next = new ArrayList<CorrelationLatticeNode>();
 		
 		int i =0;
+		int nodes = 0;
+		int nodesAtLevel = 0;
 		set.add(this);
 		while (!set.isEmpty()) {
 			System.out.println("Level "+i+":");
 			for (CorrelationLatticeNode node: set) {
 				System.out.println(node);
-				ArrayTools.print(node.getDistribution());
+				//ArrayTools.print(node.getDistribution());
+				nodesAtLevel++;
+				nodes++;
 				//for (long child: node.children) 
 				//	next.add(lattice.getExistentNode(child));
 				for (CorrelationLatticeNode child: node.getChildren()) {
@@ -772,7 +780,10 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 			set = next;
 			next = new HashSet<CorrelationLatticeNode>();
 			i++;
+			System.out.println("$$$$$ "+i+")"+nodesAtLevel+" $$$$$");
+			nodesAtLevel = 0;
 		}
+		System.out.println("$$$$$ "+nodes+" $$$$$");
 	}
 	
 	public TreeMap<Float,Literal> getSuggestions(Literal head) {
@@ -858,134 +869,23 @@ public class CorrelationLatticeNode implements Comparable<CorrelationLatticeNode
 	public void setIndepThreshold(float indepThreshold) {
 		this.indepThreshold = indepThreshold;
 	}
-	
-	/*public void queryNodeMultiGroupProperties(QueryHandler qh, CorrelationLatticeNode parent1, CorrelationLatticeNode parent2) throws SQLException {
-	ResultSet rs = qh.retrieveMultiGroupDistribution(rootLiteral,relationLiteralMap.values());
-	String lastGroup = "";
-	CorrelationLatticeNode newConst = null;
-	String[] lastConsts = new String[relationLiteralMap.size()];
-	String[] consts = new String[relationLiteralMap.size()];
-	Histogram hs = this.histogram.clone();
-	hs.reset();
-	for (String s: lastConsts) s="";
-	while (rs.next()) {
-		float x = rs.getFloat(1);
-		int i=0;
-		for (Literal l: relationLiteralMap.values()) {
-			consts[i] = rs.getString(i+1).replaceAll("\"", "");
-			i++;
-		}
-		int count = 1;
-		try { 
-			count = rs.getInt("count");
-		} catch (SQLException e){}
 
-
-		if (!ArrayUtils.isEquals(consts, lastConsts)) {
-			if (hs.getSupport() >= supportThreshold) {
-				newConst = this.clone();
-				newConst.histogram = hs;
-				i = 0;
-				for (Literal l: relationLiteralMap.values()) {
-					newConst.setConstant(l.getRelation(), lastConsts[i]);
-					i++;
-				}
-				newConst.extractHistogramInformation();
-				this.addConstant(newConst);			
-				existentItems.add(newConst);
-			}				
-			hs = this.histogram.clone();
-			hs.reset();
+	/*public void changeInterestingnessMeasuresTo(int measure) {
+		ArrayTools.measure = measure;
+		for (Entry<Float,CorrelationLatticeNode> e: sortedChildren.entrySet()) {
+			sortedChildren.remove(key)
 		}
-		lastConsts = consts;
-
-		this.histogram.addDataPoint(x, count);
-		hs.addDataPoint(x, count);
-	}
-	if (hs.getSupport() >= supportThreshold) {
-		newConst = this.clone();
-		newConst.histogram = hs;
-		int i = 0;
-		for (Literal l: relationLiteralMap.values()) {
-			newConst.setConstant(l.getRelation(), lastConsts[i]);
-			i++;
-		}
-		newConst.extractHistogramInformation();
-		this.addConstant(newConst);
-		existentItems.add(newConst);
 		
-	}
-	this.extractHistogramInformation();
-	
-	for (CorrelationLatticeNode n1: parent1.constants) {
-		for (CorrelationLatticeNode n2: parent2.constants) {
-			try {
-				joinNodes(n1, n2, qh);
-			} catch (IllegalArgumentException e) {}
-		}
-	}
-	
-	for (CorrelationLatticeNode n: this.constants) {
-		if (!n.parents.isEmpty()) {
-			n.analizeNode();
-			if (n.isPruned())
-				this.constants.remove(n);
-		} else {
-			this.constants.remove(n);
-		}
-	}
-	this.analizeNode();
+		
+		private TreeMap<Float,CorrelationLatticeNode> sortedChildren;
+		private TreeMap<Float,CorrelationLatticeNode> sortedConstants;
+		private HashMap<String, TreeMap<Float,Literal>> headSuggestionsMap;
+		private TreeMap<Float,CorrelationLatticeNode> interestingnessParents;
+		private TreeMap<Float,Literal> suggestions;
 
-}*/
+		public float maxInterestingnessParents;
+		private float maxInterestingnessChildren;
+	}*/
 	
-	/*public static Collection<String> searchDistRules(AssociationRuleNode node, boolean high, boolean low){ 
-	for (AssociationRuleNode child: node.children) {
-		for (AssociationRuleNode constant: child.getConstants()) {
-			if (!constant.isPruned()) {
-				int bucket = root.histogram.getBucket(root.histogram.getMean());
-				int count = 0;
-				for (int i=0; i<bucket; i++)
-					count += constant.distribution[i];
-				
-				String rule = "";
-				for (Relation r: constant.getRelations()) 
-					rule +=  constant.getLiteral(r).getRuleLiteralString();
-				
-				double rootMean = root.histogram.getMean();
-				double mean = node.histogram.getMean();
-				double factor = 0.5;
-				double minPercentage = 0.75;
-				double diffLow = ((double)(count))/ ((double)constant.support) ;
-				double diffHigh = ((double)(constant.support - count  - constant.distribution[bucket]))/ ((double)constant.support) ;
-				
-				
-				
-				if ((mean <= rootMean*factor && diffLow >= minPercentage) || (mean >= rootMean/factor && diffHigh >= minPercentage)) {
-					
-					if (mean <= rootMean/factor && diffLow >= minPercentage && low==false) {
-						rule = "hasLowIncome(A) <- " + rule + " [acc="+diffLow+"]";
-						low = true;
-						high = false;
-						resultRules.add(rule);
-						try {ArrayTools.plot(ArrayTools.normalize(constant.distribution), ArrayTools.normalize(root.distribution), rule);} catch (IOException e) {}
-					}						
-					if (mean >= rootMean/factor && diffHigh >= minPercentage && high==false) {					
-						rule = "hasHighIncome(A) <- " + rule + " [acc="+diffHigh+"]";
-						high = true;
-						low = false;			
-						resultRules.add(rule);
-						try {ArrayTools.plot(ArrayTools.normalize(constant.distribution), ArrayTools.normalize(root.distribution), rule);} catch (IOException e) {}
-					}
-				}		
-				else {
-					high = false;
-					low = false;
-				}
-			}
-		}
-		searchDistRules(child,high,low);
-	}
-	return resultRules;
-}*/
 
 }
